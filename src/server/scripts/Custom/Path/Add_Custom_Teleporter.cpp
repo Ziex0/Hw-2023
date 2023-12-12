@@ -1597,7 +1597,9 @@ public:
 				//event zones
 				case GOSSIP_ACTION_INFO_DEF + 810:
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Stair Event", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 811);
-				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Maze Event ", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 812);
+				//pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Empty Event ", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 812);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Impossible event ", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 813);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Maze Event ", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 814);
 				
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "<- [Back]", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 11);
 				pPlayer->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pCreature->GetGUID());
@@ -1611,6 +1613,14 @@ public:
 				case GOSSIP_ACTION_INFO_DEF + 812:
 				pPlayer->CLOSE_GOSSIP_MENU();
 				pPlayer->TeleportTo(1, 2031.44f, 2020.12f, 131.414f, 6.25565f);
+				break;
+				case GOSSIP_ACTION_INFO_DEF + 813:
+				pPlayer->CLOSE_GOSSIP_MENU();
+				pPlayer->TeleportTo(0, -7076.0283f, -157.9863f, 62.0753f, 4.9801f);
+				break;
+				case GOSSIP_ACTION_INFO_DEF + 814:
+				pPlayer->CLOSE_GOSSIP_MENU();
+				pPlayer->TeleportTo(0, -7388.9252f, 795.6946f, 132.2962f, 3.0955f);
 				break;
 				
 				//Leveling zone

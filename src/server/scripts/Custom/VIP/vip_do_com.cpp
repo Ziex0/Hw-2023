@@ -34,8 +34,7 @@ public:
 				{ "lk",        		SEC_PLAYER,  false, &HandleDoTeleCommand,     				"", NULL },
 				{ "combat", 		SEC_PLAYER,  false, &HandleCombatStopCommand, 				"", NULL },
 				{ "bank",  			SEC_PLAYER,  false, &HandlePremiumBankCommand,    			"", NULL },
-				//{ "song",        	SEC_VIP_3,   false, &HandleDoSongCommand,     				"", NULL },
-				//( "time",			SEC_VIP,  	 false, &HandleVIPTimeCommand,     				"", NULL },
+				//{ "song",        	SEC_VIP_3,   false, &HandleDoSongCommand,     				"", NULL }
 				{ NULL,             0,                  false, NULL,                            "", NULL }
 		
 		};
@@ -76,12 +75,7 @@ public:
             me->Say("Do command?", LANG_UNIVERSAL);
             return true;
     }
-	
-	static bool HandleVIPTimeCommand(ChatHandler* handler, const char* args)
-    {
-            return true;
-    }
-	
+		
 	static bool HandlePremiumBankCommand(ChatHandler* handler, char const* args)
     {
         Player *player = handler->GetSession()->GetPlayer();
@@ -141,7 +135,7 @@ public:
 			//handler->PSendSysMessage("You Have Been Teleported to Lich King Place!");
             return true;
     }
-	
+
 	static bool HandleDoTalentsCommand(ChatHandler* handler, char const* /*args*/)
     {
         Player* player = handler->GetSession()->GetPlayer();
