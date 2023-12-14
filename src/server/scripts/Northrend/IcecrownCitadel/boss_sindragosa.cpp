@@ -24,7 +24,7 @@
 
 enum Texts
 {
-    SAY_AGGRO                           = 0, // You are fools to have come to this place! The icy winds of Northrend will consume your souls!
+    //SAY_AGGRO                           = 0, // You are fools to have come to this place! The icy winds of Northrend will consume your souls!
     SAY_UNCHAINED_MAGIC                 = 1, // Suffer, mortals, as your pathetic magic betrays you!
     EMOTE_WARN_BLISTERING_COLD          = 2, // %s prepares to unleash a wave of blistering cold!
     SAY_BLISTERING_COLD                 = 3, // Can you feel the cold hand of death upon your heart?
@@ -252,7 +252,7 @@ class boss_sindragosa : public CreatureScript
                 BossAI::EnterCombat(victim);
                 DoCast(me, SPELL_FROST_AURA);
                 DoCast(me, SPELL_PERMAEATING_CHILL);
-                Talk(SAY_AGGRO);
+                //Talk(SAY_AGGRO);
             }
 
             void JustReachedHome()

@@ -1,10 +1,8 @@
 #include "ScriptPCH.h"
 
-
 bool WSGisActive;
 bool ABisActive;
 bool EOTSisActive;
-
 	
 class cta_npc : public CreatureScript
 {

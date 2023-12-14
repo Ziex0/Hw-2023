@@ -26,7 +26,7 @@ public:
         {
             case AREA_VIP_MALL:
 				// if player is vip and reach the vipmall..
-                if (player->GetSession()->GetSecurity() >= 1) 
+                if (player->GetSession()->GetSecurity() <= 4) 
                     return;
                 player->TeleportTo(530, -266.10f, 921.734f, 84.3799f, 0.582604f); // Teleport to dueling zone
                 break;

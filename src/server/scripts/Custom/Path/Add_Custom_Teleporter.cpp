@@ -1,3 +1,12 @@
+/*
+<--------------------------------------------------------------------------->
+ - Developer(s): Zie
+ - Complete: 100%
+ - ScriptName: 'tele ICC' 
+ - Comment: N/A
+<--------------------------------------------------------------------------->
+*/ 
+
 #include "ScriptPCH.h"
 #include "Language.h"
 
@@ -76,7 +85,7 @@ public:
 		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/ICONS/Achievement_Zone_Blackrock_01:35:35|t|cffff0000 Free Mounts ->", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 177);
 		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/ICONS/Achievement_Zone_Azshara_01:35:35|t|cffff0000 The Heaven", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1110); 
 		//pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/ICONS/Achievement_Zone_Azshara_01:35:35|t|cffff0000 VIP Area", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999); 
-
+		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface\\icons\\Achievement_Boss_Valanar:35:35|t|r|cff00ff00 Spawn Tele Instance", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9000); 
 		
 		pPlayer->SEND_GOSSIP_MENU(907, pCreature->GetGUID());
 	}
@@ -218,6 +227,8 @@ public:
 		}
 	}
 
+
+
 	void GiveRidingSkill(Player *pPlayer, Creature *pCreature)
 	{
 		if (pPlayer->getLevel() <= 19)
@@ -314,6 +325,79 @@ public:
 	
 				break;
 			}
+
+			case GOSSIP_ACTION_INFO_DEF + 9000:
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "ICC", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9001);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "other", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9002);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "other", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9003);
+				
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "<- [Back]", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 11);
+				pPlayer->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pCreature->GetGUID());
+				break;
+
+			case GOSSIP_ACTION_INFO_DEF + 9001:    //  icc spawn
+					pPlayer->SummonCreature(60026,pPlayer->GetPositionX()+2 ,pPlayer->GetPositionY(), pPlayer->GetPositionZ(), 0,TEMPSUMMON_TIMED_DESPAWN,40000);
+					pPlayer->CLOSE_GOSSIP_MENU();
+					break;
+			   
+           /* case GOSSIP_ACTION_INFO_DEF +2:
+					pPlayer->SummonCreature(90001,pPlayer->GetPositionX() ,pPlayer->GetPositionY()+2, pPlayer->GetPositionZ(), 0,TEMPSUMMON_TIMED_DESPAWN,30000);
+					pPlayer->CLOSE_GOSSIP_MENU();
+					break;
+			   
+            case GOSSIP_ACTION_INFO_DEF +3:
+					pPlayer->SummonCreature(96000,pPlayer->GetPositionX() ,pPlayer->GetPositionY(), pPlayer->GetPositionZ()+2, 0,TEMPSUMMON_TIMED_DESPAWN,30000);
+					pPlayer->CLOSE_GOSSIP_MENU();
+					break;
+			   
+            case GOSSIP_ACTION_INFO_DEF +4:
+					pPlayer->SummonCreature(190106,pPlayer->GetPositionX()+2 ,pPlayer->GetPositionY(), pPlayer->GetPositionZ(), 0,TEMPSUMMON_TIMED_DESPAWN,30000);
+					pPlayer->CLOSE_GOSSIP_MENU();
+					break;
+			   
+            case GOSSIP_ACTION_INFO_DEF +5:
+					pPlayer->SummonCreature(190012,pPlayer->GetPositionX() ,pPlayer->GetPositionY()+2, pPlayer->GetPositionZ(), 0,TEMPSUMMON_TIMED_DESPAWN,30000);
+					pPlayer->CLOSE_GOSSIP_MENU();
+					break;
+					
+			case GOSSIP_ACTION_INFO_DEF +6:              
+					pPlayer->SummonCreature(190107,pPlayer->GetPositionX() ,pPlayer->GetPositionY()+2, pPlayer->GetPositionZ(), 0,TEMPSUMMON_TIMED_DESPAWN,30000);
+					pPlayer->CLOSE_GOSSIP_MENU();
+					break;
+					
+			case GOSSIP_ACTION_INFO_DEF +70:
+					pPlayer->SummonCreature(190108,pPlayer->GetPositionX() ,pPlayer->GetPositionY()+2, pPlayer->GetPositionZ(), 0,TEMPSUMMON_TIMED_DESPAWN,40000);
+					pPlayer->CLOSE_GOSSIP_MENU();
+					break;
+					
+			case GOSSIP_ACTION_INFO_DEF +71:
+					pPlayer->SummonCreature(190109,pPlayer->GetPositionX() ,pPlayer->GetPositionY()+2, pPlayer->GetPositionZ(), 0,TEMPSUMMON_TIMED_DESPAWN,40000);
+					pPlayer->CLOSE_GOSSIP_MENU();
+					break;
+					
+			case GOSSIP_ACTION_INFO_DEF +72:
+					pPlayer->SummonCreature(190110,pPlayer->GetPositionX() ,pPlayer->GetPositionY()+2, pPlayer->GetPositionZ(), 0,TEMPSUMMON_TIMED_DESPAWN,40000);
+					pPlayer->CLOSE_GOSSIP_MENU();
+					break;
+					
+			case GOSSIP_ACTION_INFO_DEF +73:
+					pPlayer->SummonCreature(190111,pPlayer->GetPositionX() ,pPlayer->GetPositionY()+2, pPlayer->GetPositionZ(), 0,TEMPSUMMON_TIMED_DESPAWN,40000);
+					pPlayer->CLOSE_GOSSIP_MENU();
+					break;
+			   
+			case GOSSIP_ACTION_INFO_DEF +8:               
+					pPlayer->SummonCreature(190112,pPlayer->GetPositionX() ,pPlayer->GetPositionY()+2, pPlayer->GetPositionZ(), 0,TEMPSUMMON_TIMED_DESPAWN,40000);
+					pPlayer->CLOSE_GOSSIP_MENU();
+					break;
+					
+			case GOSSIP_ACTION_INFO_DEF +9:               
+					pPlayer->SummonCreature(190113,pPlayer->GetPositionX() ,pPlayer->GetPositionY()+4, pPlayer->GetPositionZ(), 0,TEMPSUMMON_TIMED_DESPAWN,40000);
+					pPlayer->CLOSE_GOSSIP_MENU();
+					break;
+			case GOSSIP_ACTION_INFO_DEF +80:
+					pPlayer->SummonCreature(210200,pPlayer->GetPositionX()+2 ,pPlayer->GetPositionY(), pPlayer->GetPositionZ(), 0,TEMPSUMMON_TIMED_DESPAWN,40000);
+					pPlayer->CLOSE_GOSSIP_MENU();
+					break; */
 
 			case GOSSIP_ACTION_INFO_DEF + 12:
 			{

@@ -30,6 +30,7 @@ public:
             ".zapto",
             ".biz",
             ".servegame",
+			".me",
         };
         const int checksize = sizeof(checks) / sizeof(*checks);
 

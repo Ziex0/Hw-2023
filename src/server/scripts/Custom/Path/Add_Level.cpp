@@ -1,5 +1,4 @@
-	
-    #include "ScriptPCH.h"
+#include "ScriptPCH.h"
      
     enum
     {

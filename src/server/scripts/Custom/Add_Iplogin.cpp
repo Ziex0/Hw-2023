@@ -2,12 +2,12 @@
 #include "ScriptPCH.h"
 #include "Chat.h"
 
-const uint32 ONE_CHARACTER_VIP = 4992700;
+//const uint32 ONE_CHARACTER_VIP = 4992700;
 
 enum ForbiddenAreas
 {
-	AREA_VIP_MALL            = 268,  // Utgarde Pinnacle
-	AREA_VIP_ISLAND          = 2317,  // South Seas
+	AREA_VIP_MALL            = 3817,  // Testing Zone
+	//AREA_VIP_ISLAND          = 2317,  // South Seas
 	AREA_GM_ISLAND           = 876,   // GM Island
 };
 
@@ -25,11 +25,11 @@ public:
 		//case AREA_VIP_ISLAND:
 		case AREA_GM_ISLAND:
 			{
-				if (pPlayer->GetSession()->GetSecurity() >= 0 || pPlayer->HasItemCount(ONE_CHARACTER_VIP, 1))
+				if (pPlayer->GetSession()->GetSecurity() <= 4 )
 					return;
 
 				pPlayer->TeleportTo(530, -266.10f, 921.734f, 84.3799f, 0.582604f); // Teleport to dueling zone
-				pPlayer->GetSession()->SendAreaTriggerMessage("You don't have VIP access to reach this destination.");
+				pPlayer->GetSession()->SendAreaTriggerMessage("You don't have right access to reach this destination.");
 			}
 			break;
 		}
@@ -56,7 +56,7 @@ public:
 		if (player->GetTotalPlayedTime() < 1)
 			player->GetSession()->SendAreaTriggerMessage("Please delete your Cache folder from your WoW directory to see anything properly.");
 
-		// Prevent GMs rank 2 and rank 3 to play as normal players
+		// Prevent GMs rank 4 and rank 5 to play as normal players
 		 if (player->GetSession()->GetSecurity() == 4 || player->GetSession()->GetSecurity() == 5 )
         {
             for (uint8 slot = EQUIPMENT_SLOT_START; slot < EQUIPMENT_SLOT_END; slot++)

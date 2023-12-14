@@ -1325,7 +1325,6 @@ void AddBattlegroundScripts()
 #ifdef SCRIPTS
 /* This is where custom scripts' loading functions should be declared. */
 
-	//void AddSc_Script_UTeleporter();
 	void AddSC_item_enchant_visuals();
 	void AddSC_npc_changer();
 	void AddSC_NPC_VisualWeapon();
@@ -1400,6 +1399,10 @@ void AddBattlegroundScripts()
 	void AddSC_SpellRegulator();
 	void AddSpellRegulatorScripts();
 	void AddSC_GMIsland_Theminator();
+	void AddSC_Security_Scripts();
+
+	//TELE
+	void AddSc_Scripttele_icc();
 
 #endif
 
@@ -1430,8 +1433,6 @@ void AddCustomScripts()
     //AddSC_Mod_LexicsCutter();
 
 	// Zie
-
-	//AddSc_Script_UTeleporter();
 	AddSC_item_enchant_visuals();
 	AddSC_npc_changer();
 	AddSC_NPC_VisualWeapon();
@@ -1504,6 +1505,10 @@ void AddCustomScripts()
 	AddSC_beastmaster_npc();
 	AddSC_SpellRegulator();
 	AddSC_GMIsland_Theminator();
+	AddSC_Security_Scripts();
+
+	//TELE
+	AddSc_Scripttele_icc();
 	
 #endif
 }
