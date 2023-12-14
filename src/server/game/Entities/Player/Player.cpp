@@ -3858,7 +3858,7 @@ void Player::Regenerate(Powers power)
             }
         }   break;
         case POWER_ENERGY:                                  // Regenerate energy (rogue)
-            addvalue += 0.01f * m_regenTimer * sWorld->getRate(RATE_POWER_ENERGY);
+            addvalue += 0.05f * m_regenTimer * sWorld->getRate(RATE_POWER_ENERGY);
             break;
         case POWER_RUNIC_POWER:
         {

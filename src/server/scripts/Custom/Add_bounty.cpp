@@ -4,10 +4,10 @@
 #define SET_CURRENCY 1  //0 for gold, 1 for honor, 2 for tokens
 
 #if SET_CURRENCY == 0
-#define BOUNTY_1 "I would like to place a 20g bounty."
-#define BOUNTY_2 "I would like to place a 40g bounty."
-#define BOUNTY_3 "I would like to place a 100g bounty."
-#define BOUNTY_4 "I would like to place a 200g bounty."
+#define BOUNTY_1 "I would like to place a 200g bounty."
+#define BOUNTY_2 "I would like to place a 400g bounty."
+#define BOUNTY_3 "I would like to place a 1000g bounty."
+#define BOUNTY_4 "I would like to place a 5000g bounty."
 #endif
 
 #if SET_CURRENCY == 1

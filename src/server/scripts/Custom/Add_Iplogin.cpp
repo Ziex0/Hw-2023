@@ -1,14 +1,6 @@
-/////////////////////////////////////////////////////////////////////////////
-//        ____        __  __  __     ___                                   //
-//       / __ )____ _/ /_/ /_/ /__  /   |  ________  ____  ____ ______     //
-//      / __  / __ `/ __/ __/ / _ \/ /| | / ___/ _ \/ __ \/ __ `/ ___/     //
-//     / /_/ / /_/ / /_/ /_/ /  __/ ___ |/ /  /  __/ / / / /_/ (__  )      //
-//    /_____/\__,_/\__/\__/_/\___/_/  |_/_/   \___/_/ /_/\__,_/____/       //
-//         Developed by Natureknight for BattleArenas.no-ip.org            //
-//                                                                         //
-/////////////////////////////////////////////////////////////////////////////
 
 #include "ScriptPCH.h"
+#include "Chat.h"
 
 const uint32 ONE_CHARACTER_VIP = 4992700;
 
@@ -30,13 +22,13 @@ public:
 		switch (pPlayer->GetAreaId())
 		{
 		case AREA_VIP_MALL:
-		case AREA_VIP_ISLAND:
+		//case AREA_VIP_ISLAND:
 		case AREA_GM_ISLAND:
 			{
-				if (pPlayer->GetSession()->GetSecurity() >= 1 || pPlayer->HasItemCount(ONE_CHARACTER_VIP, 1))
+				if (pPlayer->GetSession()->GetSecurity() >= 0 || pPlayer->HasItemCount(ONE_CHARACTER_VIP, 1))
 					return;
 
-				pPlayer->TeleportTo(560,  2168.909912f,  32.518398f,  41.658501f,  5.186590f); // Prison
+				pPlayer->TeleportTo(530, -266.10f, 921.734f, 84.3799f, 0.582604f); // Teleport to dueling zone
 				pPlayer->GetSession()->SendAreaTriggerMessage("You don't have VIP access to reach this destination.");
 			}
 			break;
@@ -65,15 +57,27 @@ public:
 			player->GetSession()->SendAreaTriggerMessage("Please delete your Cache folder from your WoW directory to see anything properly.");
 
 		// Prevent GMs rank 2 and rank 3 to play as normal players
-		if (player->GetSession()->GetSecurity() == 2 || player->GetSession()->GetSecurity() == 3)
-		{
-			for (uint8 slot = EQUIPMENT_SLOT_START; slot < EQUIPMENT_SLOT_END; slot++)
-				player->DestroyItem(INVENTORY_SLOT_BAG_0, slot, true);
+		 if (player->GetSession()->GetSecurity() == 4 || player->GetSession()->GetSecurity() == 5 )
+        {
+            for (uint8 slot = EQUIPMENT_SLOT_START; slot < EQUIPMENT_SLOT_END; slot++)
+                player->DestroyItem(INVENTORY_SLOT_BAG_0, slot, true);
+            for (uint8 slot = INVENTORY_SLOT_BAG_START; slot < INVENTORY_SLOT_BAG_END; slot++)
+                player->DestroyItem(INVENTORY_SLOT_BAG_0, slot, true);
+            for (uint8 slot = INVENTORY_SLOT_ITEM_START; slot < INVENTORY_SLOT_ITEM_END; slot++)
+                player->DestroyItem(INVENTORY_SLOT_BAG_0, slot, true);
+            for (uint8 slot = BANK_SLOT_ITEM_START; slot < BANK_SLOT_ITEM_END; slot++)
+                player->DestroyItem(INVENTORY_SLOT_BAG_0, slot, true);
+            for (uint8 slot = BANK_SLOT_BAG_START; slot < BANK_SLOT_BAG_END; slot++)
+                player->DestroyItem(INVENTORY_SLOT_BAG_0, slot, true);
+            for (uint8 slot = BUYBACK_SLOT_START; slot < BUYBACK_SLOT_END; slot++)
+                player->DestroyItem(INVENTORY_SLOT_BAG_0, slot, true);
 
-			player->EquipNewItem(EQUIPMENT_SLOT_CHEST, 2586, true);
-			player->EquipNewItem(EQUIPMENT_SLOT_FEET, 11508, true);
-			player->EquipNewItem(EQUIPMENT_SLOT_HEAD, 12064, true);
-		}
+            player->EquipNewItem(EQUIPMENT_SLOT_CHEST, 7, true);
+            player->EquipNewItem(EQUIPMENT_SLOT_FEET, 5, true);
+            player->EquipNewItem(EQUIPMENT_SLOT_WAIST, 4, true);
+			player->EquipNewItem(EQUIPMENT_SLOT_HANDS, 3, true);
+			player->EquipNewItem(EQUIPMENT_SLOT_LEGS, 6, true);
+        }
 
 		// Prevent players to log in with the same IP
 		SessionMap sessions = sWorld->GetAllSessions();
@@ -82,7 +86,7 @@ public:
 			if (Player* plr = itr->second->GetPlayer())
 			{
 				// GMs can log with more that one character
-				if (player->GetSession()->GetSecurity() >= 3)
+				if (player->GetSession()->GetSecurity() >= 4)
 					return;
 
 				// but players are not able to
@@ -120,7 +124,7 @@ public:
 	void OnChat(Player* player, uint32 /*type*/, uint32 lang, std::string& msg, Player* receiver) // Whisper
 	{
 		// Whispers only to GM is available
-		if (receiver->GetSession()->GetSecurity() >= 2)
+		if (receiver->GetSession()->GetSecurity() >= 4)
 			return;
 
 		CheckMessage(player, msg, lang, receiver, NULL, NULL, NULL);

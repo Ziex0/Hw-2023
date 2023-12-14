@@ -33,5 +33,5 @@ public:
 
 void AddSC_Vip_Access()
 {
-    new Vip_Access();
+    new Vip_Access();  // 6119.06005,5665.311523,5.1514
 }

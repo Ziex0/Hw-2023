@@ -1504,6 +1504,6 @@ void AddCustomScripts()
 	AddSC_beastmaster_npc();
 	AddSC_SpellRegulator();
 	AddSC_GMIsland_Theminator();
-
+	
 #endif
 }

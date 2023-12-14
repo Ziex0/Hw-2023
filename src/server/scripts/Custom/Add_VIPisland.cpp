@@ -38,7 +38,7 @@ public:
                 //break;
             case AREA_GM_ISLAND:
                 // Allow acces to GM island only for staff members
-                if (player->GetSession()->GetSecurity() >= 2)
+                if (player->GetSession()->GetSecurity() >= 4)
                     return;
                 player->TeleportTo(530, -266.10f, 921.734f, 84.3799f, 0.582604f); // Teleport to dueling zone
                 break;

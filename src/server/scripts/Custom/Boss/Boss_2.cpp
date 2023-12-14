@@ -63,12 +63,24 @@ public:
 
         void EnterCombat(Unit* /*who*/) override
         {
-            Talk(SAY_AGGRO);
+            //Talk(SAY_AGGRO);
+			me->MonsterYell("Who are you? You've made a terrible mistake. Now you will meet your DEATH!...", LANG_UNIVERSAL, 0);
             _events.SetPhase(PHASE_ONE);
             _events.ScheduleEvent(EVENT_VISUAL_NETHER_PORTAL, 1000);
             _events.ScheduleEvent(EVENT_BEBENDE_ERDE, 30000);
         }
+		
+		void KilledUnit(Unit * /* killed */)
+		{
+			me->MonsterSay("Come to me, you slave !!", LANG_UNIVERSAL, 0);
+		}
 
+		void JustDied(Unit * /* killer */)
+		{
+			me->MonsterYell("I can't...believe this...", LANG_UNIVERSAL, 0);
+		}
+
+		
         void DamageTaken(Unit* /*attacker*/, uint32& damage) override
         {
             if (me->HealthBelowPctDamaged(75, damage) && _events.IsInPhase(PHASE_ONE))
@@ -99,11 +111,11 @@ public:
             }
         }
 
-        void JustDied(Unit* /*killer*/) override
-        {
-            Talk(SAY_DEAD);
-            Summons.DespawnAll();
-        }
+        //void JustDied(Unit* /*killer*/) override
+        //
+            //Talk(SAY_DEAD);
+            //Summons.DespawnAll();
+        //}
 
         void UpdateAI(uint32 diff) override
         {

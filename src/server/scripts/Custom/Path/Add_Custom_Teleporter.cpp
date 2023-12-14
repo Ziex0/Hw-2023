@@ -74,7 +74,9 @@ public:
 		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/ICONS/Ability_DualWieldSpecialization:35:35|t|cffff0000 Player Tools ->", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 450);
 		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/icons/achievement_zone_ashenvale_01:35:35|t|cff0000ff Buff Me UP", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2500);
 		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/ICONS/Achievement_Zone_Blackrock_01:35:35|t|cffff0000 Free Mounts ->", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 177);
-		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/ICONS/Achievement_Zone_Azshara_01:35:35|t|cffff0000 The Heaven", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1110);
+		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/ICONS/Achievement_Zone_Azshara_01:35:35|t|cffff0000 The Heaven", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1110); 
+		//pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/ICONS/Achievement_Zone_Azshara_01:35:35|t|cffff0000 VIP Area", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999); 
+
 		
 		pPlayer->SEND_GOSSIP_MENU(907, pCreature->GetGUID());
 	}
@@ -282,6 +284,7 @@ public:
 
 		switch (uiAction)
 		{
+
 			case GOSSIP_ACTION_INFO_DEF + 1:
 				pPlayer->DurabilityRepairAll(false, 0.0f, true);
 				pCreature->MonsterWhisper("I repaired all your items, including items from bank.", pPlayer->GetGUID());
@@ -407,6 +410,13 @@ public:
 				pPlayer->TeleportTo(1, -7177.15f, -3785.34f, 8.36981f, 6.10237f);
 
 				break;
+
+			case GOSSIP_ACTION_INFO_DEF + 9999:
+				pPlayer->CLOSE_GOSSIP_MENU();
+				pPlayer->TeleportTo(530, 6119.060059f, 5665.311523f, 5.151441f, 1.027398f);
+
+				break;
+
 			case GOSSIP_ACTION_INFO_DEF + 26:
 			{
 				uint32 currHp = pPlayer->GetHealth();
