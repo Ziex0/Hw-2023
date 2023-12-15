@@ -9,17 +9,17 @@
 #include "ScriptPCH.h"
 #include "Language.h"
 
-class tele_icc : public CreatureScript
+class Dawn_sand : public CreatureScript
 {
 public:
-	tele_icc()
-		: CreatureScript("tele_icc") 
+	Dawn_sand()
+		: CreatureScript("Dawn_sand") 
 	{
 	}
 	
-	struct tele_iccAI : public ScriptedAI
+	struct Dawn_sandAI : public ScriptedAI
 	{
-		tele_iccAI(Creature *c) : ScriptedAI(c){}
+		Dawn_sandAI(Creature *c) : ScriptedAI(c){}
 		
 		void Reset()
 		{
@@ -52,10 +52,11 @@ public:
 
 	void MainMenu(Player *pPlayer, Creature *pCreature)
 	{
-		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|TInterface/ICONS/Thrown_1H_Harpoon_D_01Blue:35|t Lich King ", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|TInterface/ICONS/Thrown_1H_Harpoon_D_01Blue:35|t Sartharion ", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|TInterface/ICONS/Thrown_1H_Harpoon_D_01Blue:35|t Anomalus ", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|TInterface/ICONS/Thrown_1H_Harpoon_D_01Blue:35|t Ionar ", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
+
+		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|TInterface/icons/Achievement_BG_DefendXtowers_AV:35|t Kael'thas Sunstrider ", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|TInterface/icons/Achievement_BG_DefendXtowers_AV:35|t Grobbulus ", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|TInterface/icons/Achievement_BG_DefendXtowers_AV:35|t Forgemaster ", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|TInterface/icons/Achievement_BG_DefendXtowers_AV:35|t Devourer of Souls ", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
 
 
 		pPlayer->SEND_GOSSIP_MENU(907, pCreature->GetGUID());
@@ -74,24 +75,24 @@ public:
 
 		switch (uiAction)
 		{
-			case GOSSIP_ACTION_INFO_DEF + 1: //LK
+			case GOSSIP_ACTION_INFO_DEF + 1: 
 				pPlayer->CLOSE_GOSSIP_MENU();
-				pPlayer->TeleportTo(631, 505.212006f, -2124.3500f, 840.9400f, 0.0000f);
+				pPlayer->TeleportTo(550, 638.2289f, -0.7779f, 47.5418f, 6.2721f);
 
 				break;
-			case GOSSIP_ACTION_INFO_DEF + 2: //Sartharion
+			case GOSSIP_ACTION_INFO_DEF + 2: 
 				pPlayer->CLOSE_GOSSIP_MENU();
-				pPlayer->TeleportTo(615, 3243.3017f, 455.6693f, 58.3878f, 1.4600f);
+				pPlayer->TeleportTo(533, 3212.1162f, -3189.5527f, 295.12039f, 5.4591);
 
 				break;
-			case GOSSIP_ACTION_INFO_DEF + 3: //anomalus
+			case GOSSIP_ACTION_INFO_DEF + 3: 
 				pPlayer->CLOSE_GOSSIP_MENU();
-				pPlayer->TeleportTo(576, 635.9260f, -187.5305f, -14.4314f, 4.7899f);
+				pPlayer->TeleportTo(658, 694.7522ff, -111.6783f, 514.7655, 4.7007);
 
 				break;
-			case GOSSIP_ACTION_INFO_DEF + 4: // ionar
+			case GOSSIP_ACTION_INFO_DEF + 4: 
 				pPlayer->CLOSE_GOSSIP_MENU();
-				pPlayer->TeleportTo(602, 1175.3867f, -261.9447f, 53.1228f, 3.1385f);
+				pPlayer->TeleportTo(632, 5482.2685f, 2500.5654f, 706.8743f, 5.5896);
 
 				break;
 			/*case GOSSIP_ACTION_INFO_DEF + 3:
@@ -130,7 +131,7 @@ public:
 	}
 };
 
-void AddSc_Scripttele_icc()
+void AddSc_ScriptDawn_sand()
 {
-	new tele_icc();
+	new Dawn_sand();
 }

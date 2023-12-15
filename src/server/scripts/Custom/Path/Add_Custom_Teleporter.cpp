@@ -327,25 +327,25 @@ public:
 			}
 
 			case GOSSIP_ACTION_INFO_DEF + 9000:
-				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "ICC", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9001);
-				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "other", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9002);
-				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "other", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9003);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Icecrown Citadel", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9001);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Dawn of Sands of Time", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9002);
+				//pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "other", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9003);
 				
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "<- [Back]", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 11);
 				pPlayer->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pCreature->GetGUID());
 				break;
 
 			case GOSSIP_ACTION_INFO_DEF + 9001:    //  icc spawn
-					pPlayer->SummonCreature(60026,pPlayer->GetPositionX()+2 ,pPlayer->GetPositionY(), pPlayer->GetPositionZ(), 0,TEMPSUMMON_TIMED_DESPAWN,40000);
+					pPlayer->SummonCreature(60026,pPlayer->GetPositionX()+2 ,pPlayer->GetPositionY(), pPlayer->GetPositionZ(), 0,TEMPSUMMON_TIMED_DESPAWN,20000);
 					pPlayer->CLOSE_GOSSIP_MENU();
 					break;
 			   
-           /* case GOSSIP_ACTION_INFO_DEF +2:
-					pPlayer->SummonCreature(90001,pPlayer->GetPositionX() ,pPlayer->GetPositionY()+2, pPlayer->GetPositionZ(), 0,TEMPSUMMON_TIMED_DESPAWN,30000);
+           case GOSSIP_ACTION_INFO_DEF +9002:
+					pPlayer->SummonCreature(60027,pPlayer->GetPositionX() ,pPlayer->GetPositionY()+2, pPlayer->GetPositionZ(), 0,TEMPSUMMON_TIMED_DESPAWN,20000);
 					pPlayer->CLOSE_GOSSIP_MENU();
 					break;
 			   
-            case GOSSIP_ACTION_INFO_DEF +3:
+            /*case GOSSIP_ACTION_INFO_DEF +3:
 					pPlayer->SummonCreature(96000,pPlayer->GetPositionX() ,pPlayer->GetPositionY(), pPlayer->GetPositionZ()+2, 0,TEMPSUMMON_TIMED_DESPAWN,30000);
 					pPlayer->CLOSE_GOSSIP_MENU();
 					break;

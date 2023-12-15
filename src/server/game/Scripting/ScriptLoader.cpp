@@ -1403,6 +1403,7 @@ void AddBattlegroundScripts()
 
 	//TELE
 	void AddSc_Scripttele_icc();
+	void AddSc_ScriptDawn_sand();
 
 #endif
 
@@ -1509,6 +1510,7 @@ void AddCustomScripts()
 
 	//TELE
 	AddSc_Scripttele_icc();
+	AddSc_ScriptDawn_sand();
 	
 #endif
 }
