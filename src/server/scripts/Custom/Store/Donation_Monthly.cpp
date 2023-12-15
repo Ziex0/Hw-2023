@@ -64,15 +64,15 @@ public:
 
 		// Purchase VIP Account for one month
 		if (SelectDPoints(pPlayer) < oneMonthVipPrice)
-			pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|TInterface/icons/Spell_Shadow_Shadowform:25|tPurchase |cffFF0000Premium|r Account for one month (|cff980000Locked|r / Information) 3 Dp", GOSSIP_SENDER_MAIN, 1);
+			pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|TInterface/icons/Spell_Shadow_Shadowform:25|tPurchase |cffFF0000Premium|r Account for one month (|cff980000Locked|r / Information) 5 Dp", GOSSIP_SENDER_MAIN, 1);
 		else if (SelectDPoints(pPlayer) >= oneMonthVipPrice)
-			pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|TInterface/icons/Spell_Shadow_Shadowform:25|tPurchase |cffFF0000Premium|r Account for one month (|cff009900Unlocked|r / Click to use) 3 Dp", GOSSIP_SENDER_MAIN, 2);
+			pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|TInterface/icons/Spell_Shadow_Shadowform:25|tPurchase |cffFF0000Premium|r Account for one month (|cff009900Unlocked|r / Click to use) 5 Dp", GOSSIP_SENDER_MAIN, 2);
 
 		// Purchase VIP Account for three months
 		if (SelectDPoints(pPlayer) < threeMonthsVipPrice)
-			pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|TInterface/icons/Spell_Shadow_Shadowform:25|tPurchase |cffFF0000Premium|r Account for three months (|cff980000Locked|r / Information) 8 Dp", GOSSIP_SENDER_MAIN, 1);
+			pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|TInterface/icons/Spell_Shadow_Shadowform:25|tPurchase |cffFF0000Premium|r Account for three months (|cff980000Locked|r / Information) 14 Dp", GOSSIP_SENDER_MAIN, 1);
 		else if (SelectDPoints(pPlayer) >= threeMonthsVipPrice)
-			pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|TInterface/icons/Spell_Shadow_Shadowform:25|tPurchase |cffFF0000Premium|r Account for three months (|cff009900Unlocked|r / Click to use) 8 Dp", GOSSIP_SENDER_MAIN, 3);
+			pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "|TInterface/icons/Spell_Shadow_Shadowform:25|tPurchase |cffFF0000Premium|r Account for three months (|cff009900Unlocked|r / Click to use) 14 Dp", GOSSIP_SENDER_MAIN, 3);
 		
 		// Purchase VIP Account for 9 months
 		//if (SelectDPoints(pPlayer) < nineMonthsVipPrice)

@@ -41,7 +41,7 @@ public:
 
 	CreatureAI* GetAI(Creature* pCreature) const
     {
-		return new tele_iccAI(pCreature);
+		return new Dawn_sandAI(pCreature);
     }
 
 	void CreatureWhisperBasedOnBool(const char *text, Creature *pCreature, Player *pPlayer, bool value)
@@ -82,17 +82,17 @@ public:
 				break;
 			case GOSSIP_ACTION_INFO_DEF + 2: 
 				pPlayer->CLOSE_GOSSIP_MENU();
-				pPlayer->TeleportTo(533, 3212.1162f, -3189.5527f, 295.12039f, 5.4591);
+				pPlayer->TeleportTo(533, 3212.1162f, -3189.5527f, 295.12039f, 5.4591f);
 
 				break;
 			case GOSSIP_ACTION_INFO_DEF + 3: 
 				pPlayer->CLOSE_GOSSIP_MENU();
-				pPlayer->TeleportTo(658, 694.7522ff, -111.6783f, 514.7655, 4.7007);
+				pPlayer->TeleportTo(658, 694.7522f, -111.6783f, 514.7655f, 4.7007f);
 
 				break;
 			case GOSSIP_ACTION_INFO_DEF + 4: 
 				pPlayer->CLOSE_GOSSIP_MENU();
-				pPlayer->TeleportTo(632, 5482.2685f, 2500.5654f, 706.8743f, 5.5896);
+				pPlayer->TeleportTo(632, 5482.2685f, 2500.5654f, 706.8743f, 5.5896f);
 
 				break;
 			/*case GOSSIP_ACTION_INFO_DEF + 3:

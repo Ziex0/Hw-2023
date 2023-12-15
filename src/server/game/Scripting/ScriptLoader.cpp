@@ -1330,7 +1330,6 @@ void AddBattlegroundScripts()
 	void AddSC_NPC_VisualWeapon();
 	//void AddSC_welcome_new_login();
 	void AddSC_npc_enchantment();
-	void AddSC_Packet_Protection();
 	void AddSC_PWS_Transmogrification();
 	void AddSC_CS_Transmogrification();
 	//void AddSC_summon_all_npc();
@@ -1400,6 +1399,7 @@ void AddBattlegroundScripts()
 	void AddSpellRegulatorScripts();
 	void AddSC_GMIsland_Theminator();
 	void AddSC_Security_Scripts();
+	void AddSC_Packet_Protection();
 
 	//TELE
 	void AddSc_Scripttele_icc();
@@ -1438,7 +1438,6 @@ void AddCustomScripts()
 	AddSC_npc_changer();
 	AddSC_NPC_VisualWeapon();
 	//AddSC_welcome_new_login();
-	AddSC_Packet_Protection();
 	AddSC_npc_enchantment();
 	AddSC_PWS_Transmogrification();
 	AddSC_CS_Transmogrification();
@@ -1507,6 +1506,7 @@ void AddCustomScripts()
 	AddSC_SpellRegulator();
 	AddSC_GMIsland_Theminator();
 	AddSC_Security_Scripts();
+	AddSC_Packet_Protection();
 
 	//TELE
 	AddSc_Scripttele_icc();

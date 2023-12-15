@@ -13,11 +13,11 @@ class gm_active : public CreatureScript
 
         bool OnGossipHello(Player* pPlayer, Creature* pCreature)
         {
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/ICONS/INV_Misc_Book_11:30:30:-18:0|t Please Set our Premium Rank !!", GOSSIP_SENDER_MAIN, 2000);
-			//pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/ICONS/INV_Misc_Book_11:30:30:-18:0|t For VIP 3 , Please contact Admin!", GOSSIP_SENDER_MAIN, 0);
-			pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/ICONS/INV_Misc_Book_11:30:30:-18:0|t Nevermind", GOSSIP_SENDER_MAIN, 0);
+            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/ICONS/INV_Misc_Book_11:35:35:-18:0|t Please Set our Premium Rank !!", GOSSIP_SENDER_MAIN, 2000);
+			pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/ICONS/INV_Misc_Book_11:35:35:-18:0|t Nevermind", GOSSIP_SENDER_MAIN, 0);
 			
-            pPlayer->PlayerTalkClass->SendGossipMenu(85005, pCreature->GetGUID());
+            pPlayer->SEND_GOSSIP_MENU(85005, pCreature->GetGUID());
+			
             return true;
         }
 
