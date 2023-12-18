@@ -82,10 +82,11 @@ public:
 		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/ICONS/ACHIEVEMENT_WIN_WINTERGRASP:35:35|t|cff0000ff Learn Spells ->", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 460);
 		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/ICONS/Ability_DualWieldSpecialization:35:35|t|cffff0000 Player Tools ->", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 450);
 		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/icons/achievement_zone_ashenvale_01:35:35|t|cff0000ff Buff Me UP", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2500);
-		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/ICONS/Achievement_Zone_Blackrock_01:35:35|t|cffff0000 Free Mounts ->", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 177);
+		//pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/ICONS/Achievement_Zone_Blackrock_01:35:35|t|cffff0000 Free Mounts ->", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 177);
 		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/ICONS/Achievement_Zone_Azshara_01:35:35|t|cffff0000 The Heaven", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1110); 
 		//pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/ICONS/Achievement_Zone_Azshara_01:35:35|t|cffff0000 VIP Area", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999); 
-		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface\\icons\\Achievement_Boss_Valanar:35:35|t|r|cff00ff00 Spawn Tele Instance", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9000); 
+		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface\\icons\\Achievement_Boss_Valanar:35:35|t|r|cffD2691E Hells Legion", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9000); 
+		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface\\icons\\Achievement_Boss_Valanar:35:35|t|r|cff0000ff Frozen Throne", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1111);
 		
 		pPlayer->SEND_GOSSIP_MENU(907, pCreature->GetGUID());
 	}
@@ -327,9 +328,9 @@ public:
 			}
 
 			case GOSSIP_ACTION_INFO_DEF + 9000:
-				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Icecrown Citadel", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9001);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Legacy of Bornstellar", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9001);
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Dawn of Sands of Time", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9002);
-				//pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "other", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9003);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Ashes of T. Fates", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9003);
 				
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "<- [Back]", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 11);
 				pPlayer->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pCreature->GetGUID());
@@ -340,11 +341,16 @@ public:
 					pPlayer->CLOSE_GOSSIP_MENU();
 					break;
 			   
-           case GOSSIP_ACTION_INFO_DEF +9002:
+           case GOSSIP_ACTION_INFO_DEF +9002: 
 					pPlayer->SummonCreature(60027,pPlayer->GetPositionX() ,pPlayer->GetPositionY()+2, pPlayer->GetPositionZ(), 0,TEMPSUMMON_TIMED_DESPAWN,20000);
 					pPlayer->CLOSE_GOSSIP_MENU();
 					break;
-			   
+
+           case GOSSIP_ACTION_INFO_DEF +9003:
+					pPlayer->SummonCreature(60028,pPlayer->GetPositionX() ,pPlayer->GetPositionY()+2, pPlayer->GetPositionZ(), 0,TEMPSUMMON_TIMED_DESPAWN,20000);
+					pPlayer->CLOSE_GOSSIP_MENU();
+					break;
+
             /*case GOSSIP_ACTION_INFO_DEF +3:
 					pPlayer->SummonCreature(96000,pPlayer->GetPositionX() ,pPlayer->GetPositionY(), pPlayer->GetPositionZ()+2, 0,TEMPSUMMON_TIMED_DESPAWN,30000);
 					pPlayer->CLOSE_GOSSIP_MENU();
@@ -1540,13 +1546,13 @@ public:
 				
 				//Mall non pvp
 			case GOSSIP_ACTION_INFO_DEF + 910:
-			pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Old Mall", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9101);
-			pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "New Mall", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9102);
+			pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Frozen City", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9101);
+			pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Dark Portal", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9102);
 			pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "<- [Back]", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 11);
 			pPlayer->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pCreature->GetGUID());
 				break;
 				
-			case GOSSIP_ACTION_INFO_DEF + 9101: //old mall
+			case GOSSIP_ACTION_INFO_DEF + 9101: //Frozen city
 				pPlayer->CLOSE_GOSSIP_MENU();
 				pPlayer->TeleportTo(1,7419.6625f, -1579.8883f, 179.8158f, 5.4945f);
 				break;
@@ -2612,6 +2618,11 @@ public:
 			case GOSSIP_ACTION_INFO_DEF + 1110:
 				pPlayer->CLOSE_GOSSIP_MENU();
 				pPlayer->TeleportTo(571, 7308.9501f, -736.6033f, 792.1558f, 1.5730f);
+				break;
+
+			case GOSSIP_ACTION_INFO_DEF + 1111:
+				pPlayer->CLOSE_GOSSIP_MENU();
+				pPlayer->TeleportTo(571, 7061.0449f, 2615.4746f, 976.6530f, 0.1005f);
 				break;
 		}
 

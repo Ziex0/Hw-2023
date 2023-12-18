@@ -1404,6 +1404,7 @@ void AddBattlegroundScripts()
 	//TELE
 	void AddSc_Scripttele_icc();
 	void AddSc_ScriptDawn_sand();
+	void AddSc_ScriptAshes_Fates();
 
 #endif
 
@@ -1511,6 +1512,7 @@ void AddCustomScripts()
 	//TELE
 	AddSc_Scripttele_icc();
 	AddSc_ScriptDawn_sand();
+	AddSc_ScriptAshes_Fates();
 	
 #endif
 }
