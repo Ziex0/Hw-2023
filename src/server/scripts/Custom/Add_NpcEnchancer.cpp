@@ -142,7 +142,7 @@ void Enchant(Player* player, Item* item, uint32 enchantid)
     if (!enchantid)
     {
         player->GetSession()->SendNotification("Something went wrong in the code. It has been logged for developers and will be looked into, sorry for the inconvenience.");
-       sLog->outError(LOG_FILTER_GENERAL,"enchant_vendor::Enchant: Enchant NPC 'enchantid' is NULL, something went wrong here!");
+        sLog->outError(LOG_FILTER_GENERAL,"enchant_vendor::Enchant: Enchant NPC 'enchantid' is NULL, something went wrong here!");
         return;
     }
 		

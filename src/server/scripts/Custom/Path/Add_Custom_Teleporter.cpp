@@ -85,7 +85,7 @@ public:
 		//pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/ICONS/Achievement_Zone_Blackrock_01:35:35|t|cffff0000 Free Mounts ->", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 177);
 		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/ICONS/Achievement_Zone_Azshara_01:35:35|t|cffff0000 The Heaven", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1110); 
 		//pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/ICONS/Achievement_Zone_Azshara_01:35:35|t|cffff0000 VIP Area", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999); 
-		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface\\icons\\Achievement_Boss_Valanar:35:35|t|r|cffD2691E Hells Legion", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9000); 
+		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface\\icons\\Achievement_Dungeon_Icecrown_Frostmourne:35:35|t|r|cffD2691E Hells Legion", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9000); 
 		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface\\icons\\Achievement_Boss_Valanar:35:35|t|r|cff0000ff Frozen Throne", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1111);
 		
 		pPlayer->SEND_GOSSIP_MENU(907, pCreature->GetGUID());
@@ -328,9 +328,9 @@ public:
 			}
 
 			case GOSSIP_ACTION_INFO_DEF + 9000:
-				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Legacy of Bornstellar", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9001);
-				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Dawn of Sands of Time", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9002);
-				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Ashes of T. Fates", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9003);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|TInterface/Buttons/UI-GroupLoot-Dice-Up:35:35|t|r| Legacy of Bornstellar (T3)", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9001);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|TInterface/Icons/INV_Box_01:35:35|t|r| Dawn of Sands of Time (T4)", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9002);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|TInterface/Icons/INV_Misc_Coin_01:35:35|t|r| Ashes of T. Fates (T5)", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9003);
 				
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "<- [Back]", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 11);
 				pPlayer->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pCreature->GetGUID());
