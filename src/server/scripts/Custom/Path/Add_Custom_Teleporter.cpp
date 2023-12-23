@@ -53,7 +53,7 @@ public:
         }
 				void ReceiveEmote(Player *pPlayer, uint32 uiTextEmote)
 		{
-			if (pPlayer->isInCombat())
+			if (pPlayer->IsInCombat())
 				{ pPlayer->GetSession()->SendAreaTriggerMessage("|cffff0000You are in combat!|r"); } 
 				return;
 		}
@@ -77,16 +77,16 @@ public:
 
 	void MainMenu(Player *pPlayer, Creature *pCreature)
 	{
-		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/ICONS/Achievement_Zone_Netherstorm_01:35:35|t|cff0000ff Teleport Menu ->", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 11);
-		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/ICONS/INV_MISC_GEM_AMETHYST_03:35:35|t|cff0000ff Professions ->", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 196);
-		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/ICONS/ACHIEVEMENT_WIN_WINTERGRASP:35:35|t|cff0000ff Learn Spells ->", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 460);
-		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/ICONS/Ability_DualWieldSpecialization:35:35|t|cffff0000 Player Tools ->", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 450);
-		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/icons/achievement_zone_ashenvale_01:35:35|t|cff0000ff Buff Me UP", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2500);
-		//pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/ICONS/Achievement_Zone_Blackrock_01:35:35|t|cffff0000 Free Mounts ->", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 177);
-		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/ICONS/Achievement_Zone_Azshara_01:35:35|t|cffff0000 The Heaven Shop", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1110); 
-		//pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/ICONS/Achievement_Zone_Azshara_01:35:35|t|cffff0000 VIP Area", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999); 
-		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface\\icons\\Achievement_Dungeon_Icecrown_Frostmourne:35:35|t|r|cffD2691E Heaven Tier's Farming", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9000); 
-		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface\\icons\\Achievement_Boss_Valanar:35:35|t|r|cff0000ff High Level Tiers Questing", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1111);
+		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/ICONS/Achievement_Zone_Netherstorm_01:35:35|t| cff0000ff Teleport Menu ->", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 11);
+		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/ICONS/INV_MISC_GEM_AMETHYST_03:35:35|t| cff0000ff Professions ->", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 196);
+		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/ICONS/ACHIEVEMENT_WIN_WINTERGRASP:35:35|t| cff0000ff Learn Spells ->", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 460);
+		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/ICONS/Ability_DualWieldSpecialization:35:35|t| cffff0000 Player Tools ->", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 450);
+		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/icons/achievement_zone_ashenvale_01:35:35|t| cff0000ff Buff Me UP", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2500);
+		//pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/ICONS/Achievement_Zone_Blackrock_01:35:35|t| cffff0000 Free Mounts ->", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 177);
+		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/ICONS/Achievement_Zone_Azshara_01:35:35|t| cffff0000 The Heaven Shop", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1110); 
+		//pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/ICONS/Achievement_Zone_Azshara_01:35:35|t| cffff0000 VIP Area", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999); 
+		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface\\icons\\Achievement_Dungeon_Icecrown_Frostmourne:35:35|t| rcffD2691E Heaven Tier's Farming", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9000); 
+		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface\\icons\\Achievement_Boss_Valanar:35:35|t|r cff0000ff High Level Tiers Questing", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1111);
 		
 		pPlayer->SEND_GOSSIP_MENU(907, pCreature->GetGUID());
 	}
@@ -284,7 +284,7 @@ public:
 
     bool OnGossipSelect(Player* pPlayer, Creature* pCreature, uint32 /*uiSender*/, uint32 uiAction)
     {
-		if (pPlayer->isInCombat())
+		if (pPlayer->IsInCombat())
 		{
 			pCreature->MonsterWhisper("You are in combat, wait until your combat is gone.", pPlayer->GetGUID());
 			pPlayer->CLOSE_GOSSIP_MENU();
@@ -328,10 +328,10 @@ public:
 			}
 
 			case GOSSIP_ACTION_INFO_DEF + 9000:
-				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|TInterface/Icons/Achievement_zone_wetlands_01:35|t|r| Legacy of Bornstellar (T3)", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9001);
-				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|TInterface/Icons/Achievement_zone_bloodmystisle_01:35|t|r| Dawn of Sands of Time (T4)", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9002);
-				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|TInterface/Icons/Achievement_zone_stonetalon_01:35:35|t|r| Ashes of T. Fates (T5)", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9003);
-				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|TInterface/Icons/Achievement_zone_zuldrak_09:35:35|t|r| Blood Forged (T6)", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9004);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|TInterface/Icons/Achievement_zone_wetlands_01:35:35|t|r Legacy of Bornstellar (T3)", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9001);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|TInterface/Icons/Achievement_zone_bloodmystisle_01:35:355|t|r Dawn of Sands of Time (T4)", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9002);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|TInterface/Icons/Achievement_zone_stonetalon_01:35:35|t|r Ashes of T. Fates (T5)", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9003);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|TInterface/Icons/Achievement_zone_zuldrak_09:35:35|t|r Blood Forged (T6)", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9004);
 				
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "<- [Back]", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 11);
 				pPlayer->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pCreature->GetGUID());
