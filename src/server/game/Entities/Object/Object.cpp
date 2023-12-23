@@ -242,7 +242,7 @@ void Object::BuildCreateUpdateBlockForPlayer(UpdateData* data, Player* target) c
 
         if (isType(TYPEMASK_UNIT))
         {
-            if (ToUnit()->getVictim())
+            if (ToUnit()->GetVictim())
                 flags |= UPDATEFLAG_HAS_TARGET;
         }
     }
@@ -485,7 +485,7 @@ void Object::_BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
     // 0x4
     if (flags & UPDATEFLAG_HAS_TARGET)
     {
-        if (Unit* victim = unit->getVictim())
+        if (Unit* victim = unit->GetVictim())
             data->append(victim->GetPackGUID());
         else
             *data << uint8(0);
@@ -532,7 +532,7 @@ void Object::_BuildValuesUpdate(uint8 updateType, ByteBuffer* data, UpdateMask* 
         {
             if (!go->IsDynTransport())
             {
-                if (go->ActivateToQuest(target) || target->isGameMaster())
+                if (go->ActivateToQuest(target) || target->IsGameMaster())
                     IsActivateToQuest = true;
 
                 if (go->GetGoArtKit())
@@ -543,7 +543,7 @@ void Object::_BuildValuesUpdate(uint8 updateType, ByteBuffer* data, UpdateMask* 
         {
             if (!go->IsTransport())
             {
-                if (go->ActivateToQuest(target) || target->isGameMaster())
+                if (go->ActivateToQuest(target) || target->IsGameMaster())
                     IsActivateToQuest = true;
 
                 updateMask->SetBit(GAMEOBJECT_BYTES_1);
@@ -611,7 +611,7 @@ void Object::_BuildValuesUpdate(uint8 updateType, ByteBuffer* data, UpdateMask* 
                 // Gamemasters should be always able to select units - remove not selectable flag
                 else if (index == UNIT_FIELD_FLAGS)
                 {
-                    if (target->isGameMaster())
+                    if (target->IsGameMaster())
                         *data << (m_uint32Values[index] & ~UNIT_FLAG_NOT_SELECTABLE);
                     else
                         *data << m_uint32Values[index];
@@ -635,7 +635,7 @@ void Object::_BuildValuesUpdate(uint8 updateType, ByteBuffer* data, UpdateMask* 
 
                         if (cinfo->flags_extra & CREATURE_FLAG_EXTRA_TRIGGER)
                         {
-                            if (target->isGameMaster())
+                            if (target->IsGameMaster())
                             {
                                 if (cinfo->Modelid1)
                                     *data << cinfo->Modelid1;//Modelid1 is a visible model for gms
@@ -740,21 +740,21 @@ void Object::_BuildValuesUpdate(uint8 updateType, ByteBuffer* data, UpdateMask* 
                         switch (go->GetGoType())
                         {
                             case GAMEOBJECT_TYPE_CHEST:
-                                if (target->isGameMaster())
+                                if (target->IsGameMaster())
                                     *data << uint16(GO_DYNFLAG_LO_ACTIVATE);
                                 else
                                     *data << uint16(GO_DYNFLAG_LO_ACTIVATE | GO_DYNFLAG_LO_SPARKLE);
                                 *data << uint16(-1);
                                 break;
                             case GAMEOBJECT_TYPE_GENERIC:
-                                if (target->isGameMaster())
+                                if (target->IsGameMaster())
                                     *data << uint16(0);
                                 else
                                     *data << uint16(GO_DYNFLAG_LO_SPARKLE);
                                 *data << uint16(-1);
                                 break;
                             case GAMEOBJECT_TYPE_GOOBER:
-                                if (target->isGameMaster())
+                                if (target->IsGameMaster())
                                     *data << uint16(GO_DYNFLAG_LO_ACTIVATE);
                                 else
                                     *data << uint16(GO_DYNFLAG_LO_ACTIVATE | GO_DYNFLAG_LO_SPARKLE);
@@ -2763,7 +2763,7 @@ namespace Trinity
 
                 float x, y, z;
 
-                if (!c->isAlive() || c->HasUnitState(UNIT_STATE_ROOT | UNIT_STATE_STUNNED | UNIT_STATE_DISTRACTED) ||
+                if (!c->IsAlive() || c->HasUnitState(UNIT_STATE_ROOT | UNIT_STATE_STUNNED | UNIT_STATE_DISTRACTED) ||
                     !c->GetMotionMaster()->GetDestination(x, y, z))
                 {
                     x = c->GetPositionX();

@@ -227,7 +227,7 @@ void Creature::DisappearAndDie()
     DestroyForNearbyPlayers();
     //SetVisibility(VISIBILITY_OFF);
     //ObjectAccessor::UpdateObjectVisibility(this);
-    if (isAlive())
+    if (IsAlive())
         setDeathState(JUST_DIED);
     RemoveCorpse(false);
 }
@@ -591,7 +591,7 @@ void Creature::Update(uint32 diff)
 
             // creature can be dead after Unit::Update call
             // CORPSE/DEAD state will processed at next tick (in other case death timer will be updated unexpectedly)
-            if (!isAlive())
+            if (!IsAlive())
                 break;
 
             // if creature is charmed, switch to charmed AI
@@ -612,7 +612,7 @@ void Creature::Update(uint32 diff)
 
             // creature can be dead after UpdateAI call
             // CORPSE/DEAD state will processed at next tick (in other case death timer will be updated unexpectedly)
-            if (!isAlive())
+            if (!IsAlive())
                 break;
 
             if (m_regenTimer > 0)
@@ -626,9 +626,9 @@ void Creature::Update(uint32 diff)
             if (m_regenTimer != 0)
                break;
 
-            bool bInCombat = isInCombat() && (!getVictim() ||                                        // if isInCombat() is true and this has no victim
-                             !getVictim()->GetCharmerOrOwnerPlayerOrPlayerItself() ||                // or the victim/owner/charmer is not a player
-                             !getVictim()->GetCharmerOrOwnerPlayerOrPlayerItself()->isGameMaster()); // or the victim/owner/charmer is not a GameMaster
+            bool bInCombat = IsInCombat() && (!GetVictim() ||                                        // if IsInCombat() is true and this has no victim
+                             !GetVictim()->GetCharmerOrOwnerPlayerOrPlayerItself() ||                // or the victim/owner/charmer is not a player
+                             !GetVictim()->GetCharmerOrOwnerPlayerOrPlayerItself()->IsGameMaster()); // or the victim/owner/charmer is not a GameMaster
 
             /*if (m_regenTimer <= diff)
             {*/
@@ -670,7 +670,7 @@ void Creature::RegenerateMana()
     uint32 addvalue = 0;
 
     // Combat and any controlled creature
-    if (isInCombat() || GetCharmerOrOwnerGUID())
+    if (IsInCombat() || GetCharmerOrOwnerGUID())
     {
         if (!IsUnderLastManaUseEffect())
         {
@@ -733,7 +733,7 @@ void Creature::RegenerateHealth()
 
 void Creature::DoFleeToGetAssistance()
 {
-    if (!getVictim())
+    if (!GetVictim())
         return;
 
     if (HasAuraType(SPELL_AURA_PREVENTS_FLEEING))
@@ -747,7 +747,7 @@ void Creature::DoFleeToGetAssistance()
         CellCoord p(Trinity::ComputeCellCoord(GetPositionX(), GetPositionY()));
         Cell cell(p);
         cell.SetNoCreate();
-        Trinity::NearestAssistCreatureInCreatureRangeCheck u_check(this, getVictim(), radius);
+        Trinity::NearestAssistCreatureInCreatureRangeCheck u_check(this, GetVictim(), radius);
         Trinity::CreatureLastSearcher<Trinity::NearestAssistCreatureInCreatureRangeCheck> searcher(this, creature, u_check);
 
         TypeContainerVisitor<Trinity::CreatureLastSearcher<Trinity::NearestAssistCreatureInCreatureRangeCheck>, GridTypeMapContainer > grid_creature_searcher(searcher);
@@ -758,7 +758,7 @@ void Creature::DoFleeToGetAssistance()
         UpdateSpeed(MOVE_RUN, false);
 
         if (!creature)
-            //SetFeared(true, getVictim()->GetGUID(), 0, sWorld->getIntConfig(CONFIG_CREATURE_FAMILY_FLEE_DELAY));
+            //SetFeared(true, GetVictim()->GetGUID(), 0, sWorld->getIntConfig(CONFIG_CREATURE_FAMILY_FLEE_DELAY));
             /// @todo use 31365
             SetControlled(true, UNIT_STATE_FLEEING);
         else
@@ -1190,7 +1190,7 @@ void Creature::SelectLevel(const CreatureTemplate* cinfo)
     if (!needSetStats)
         return;
 
-    uint32 rank = isPet()? 0 : cinfo->rank;
+    uint32 rank = IsPet()? 0 : cinfo->rank;
 
     // level
     uint8 minlevel = std::min(cinfo->maxlevel, cinfo->minlevel);
@@ -1492,7 +1492,7 @@ bool Creature::IsInvisibleDueToDespawn() const
     if (Unit::IsInvisibleDueToDespawn())
         return true;
 
-    if (isAlive() || m_corpseRemoveTime > time(NULL))
+    if (IsAlive() || m_corpseRemoveTime > time(NULL))
         return false;
 
     return true;
@@ -1529,7 +1529,7 @@ bool Creature::canStartAttack(Unit const* who, bool force) const
         if (!_IsTargetAcceptable(who))
             return false;
 
-        if (who->isInCombat() && IsWithinDist(who, ATTACK_DISTANCE))
+        if (who->IsInCombat() && IsWithinDist(who, ATTACK_DISTANCE))
             if (Unit* victim = who->getAttackerForHelper())
                 if (IsWithinDistInMap(victim, sWorld->getFloatConfig(CONFIG_CREATURE_FAMILY_ASSISTANCE_RADIUS)))
                     force = true;
@@ -1600,7 +1600,7 @@ void Creature::setDeathState(DeathState s)
 
         setActive(false);
 
-        if (!isPet() && GetCreatureTemplate()->SkinLootId)
+        if (!IsPet() && GetCreatureTemplate()->SkinLootId)
             if (LootTemplates_Skinning.HaveLootFor(GetCreatureTemplate()->SkinLootId))
                 if (hasLootRecipient())
                     SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE);
@@ -1622,7 +1622,7 @@ void Creature::setDeathState(DeathState s)
     }
     else if (s == JUST_RESPAWNED)
     {
-        //if (isPet())
+        //if (IsPet())
         //    setActive(true);
         SetFullHealth();
         SetLootRecipient(NULL);
@@ -1668,7 +1668,7 @@ void Creature::Respawn(bool force)
 
     if (force)
     {
-        if (isAlive())
+        if (IsAlive())
             setDeathState(JUST_DIED);
         else if (getDeathState() != CORPSE)
             setDeathState(CORPSE);
@@ -1733,7 +1733,7 @@ void Creature::ForcedDespawn(uint32 timeMSToDespawn)
         return;
     }
 
-    if (isAlive())
+    if (IsAlive())
         setDeathState(JUST_DIED);
 
     RemoveCorpse(false);
@@ -1788,7 +1788,7 @@ bool Creature::IsImmunedToSpellEffect(SpellInfo const* spellInfo, uint32 index) 
 
 bool Creature::isElite() const
 {
-    if (isPet())
+    if (IsPet())
         return false;
 
     uint32 rank = GetCreatureTemplate()->rank;
@@ -1797,7 +1797,7 @@ bool Creature::isElite() const
 
 bool Creature::isWorldBoss() const
 {
-    if (isPet())
+    if (IsPet())
         return false;
 
     return GetCreatureTemplate()->type_flags & CREATURE_TYPEFLAGS_BOSS;
@@ -1978,7 +1978,7 @@ void Creature::SendAIReaction(AiReaction reactionType)
 
 void Creature::CallAssistance()
 {
-    if (!m_AlreadyCallAssistance && getVictim() && !isPet() && !isCharmed())
+    if (!m_AlreadyCallAssistance && GetVictim() && !IsPet() && !isCharmed())
     {
         SetNoCallAssistance(true);
 
@@ -1993,7 +1993,7 @@ void Creature::CallAssistance()
                 Cell cell(p);
                 cell.SetNoCreate();
 
-                Trinity::AnyAssistCreatureInRangeCheck u_check(this, getVictim(), radius);
+                Trinity::AnyAssistCreatureInRangeCheck u_check(this, GetVictim(), radius);
                 Trinity::CreatureListSearcher<Trinity::AnyAssistCreatureInRangeCheck> searcher(this, assistList, u_check);
 
                 TypeContainerVisitor<Trinity::CreatureListSearcher<Trinity::AnyAssistCreatureInRangeCheck>, GridTypeMapContainer >  grid_creature_searcher(searcher);
@@ -2003,7 +2003,7 @@ void Creature::CallAssistance()
 
             if (!assistList.empty())
             {
-                AssistDelayEvent* e = new AssistDelayEvent(getVictim()->GetGUID(), *this);
+                AssistDelayEvent* e = new AssistDelayEvent(GetVictim()->GetGUID(), *this);
                 while (!assistList.empty())
                 {
                     // Pushing guids because in delay can happen some creature gets despawned => invalid pointer
@@ -2018,14 +2018,14 @@ void Creature::CallAssistance()
 
 void Creature::CallForHelp(float radius)
 {
-    if (radius <= 0.0f || !getVictim() || isPet() || isCharmed())
+    if (radius <= 0.0f || !GetVictim() || IsPet() || isCharmed())
         return;
 
     CellCoord p(Trinity::ComputeCellCoord(GetPositionX(), GetPositionY()));
     Cell cell(p);
     cell.SetNoCreate();
 
-    Trinity::CallOfHelpCreatureInRangeDo u_do(this, getVictim(), radius);
+    Trinity::CallOfHelpCreatureInRangeDo u_do(this, GetVictim(), radius);
     Trinity::CreatureWorker<Trinity::CallOfHelpCreatureInRangeDo> worker(this, u_do);
 
     TypeContainerVisitor<Trinity::CreatureWorker<Trinity::CallOfHelpCreatureInRangeDo>, GridTypeMapContainer >  grid_creature_searcher(worker);
@@ -2043,7 +2043,7 @@ bool Creature::CanAssistTo(const Unit* u, const Unit* enemy, bool checkfaction /
         return false;
 
     // we don't need help from zombies :)
-    if (!isAlive())
+    if (!IsAlive())
         return false;
 
     // we don't need help from non-combatant ;)
@@ -2054,7 +2054,7 @@ bool Creature::CanAssistTo(const Unit* u, const Unit* enemy, bool checkfaction /
         return false;
 
     // skip fighting creature
-    if (isInCombat())
+    if (IsInCombat())
         return false;
 
     // only free creature
@@ -2102,14 +2102,14 @@ bool Creature::_IsTargetAcceptable(const Unit* target) const
     }
 
     const Unit* myVictim = getAttackerForHelper();
-    const Unit* targetVictim = target->getAttackerForHelper();
+    const Unit* tarGetVictim = target->getAttackerForHelper();
 
     // if I'm already fighting target, or I'm hostile towards the target, the target is acceptable
-    if (myVictim == target || targetVictim == this || IsHostileTo(target))
+    if (myVictim == target || tarGetVictim == this || IsHostileTo(target))
         return true;
 
     // if the target's victim is friendly, and the target is neutral, the target is acceptable
-    if (targetVictim && IsFriendlyTo(targetVictim))
+    if (tarGetVictim && IsFriendlyTo(tarGetVictim))
         return true;
 
     // if the target's victim is not friendly, or the target is friendly, the target is not acceptable
@@ -2280,10 +2280,10 @@ void Creature::SetInCombatWithZone()
     {
         if (Player* player = i->getSource())
         {
-            if (player->isGameMaster())
+            if (player->IsGameMaster())
                 continue;
 
-            if (player->isAlive())
+            if (player->IsAlive())
             {
                 this->SetInCombatWith(player);
                 player->SetInCombatWith(this);
@@ -2670,7 +2670,7 @@ float Creature::GetAggroRange(Unit const* target) const
     // Determines the aggro range for creatures (usually pets), used mainly for aggressive pet target selection.
     // Based on data from wowwiki due to lack of 3.3.5a data
 
-    if (target && this->isPet())
+    if (target && this->IsPet())
     {
         uint32 targetLevel = 0;
 
@@ -2789,7 +2789,7 @@ void Creature::SetBotTank(Unit* newtank)
         }
 
         bot_AI->UpdateHealth();
-        if (!isInCombat())
+        if (!IsInCombat())
             SetBotCommandState(COMMAND_FOLLOW, true);
     }
 
@@ -2839,7 +2839,7 @@ bool Creature::GetIAmABot() const
 
 bool Creature::GetIAmABotsPet() const
 {
-    return bot_AI && bot_AI->isPetAI();
+    return bot_AI && bot_AI->IsPetAI();
 }
 
 bot_minion_ai* Creature::GetBotMinionAI() const
@@ -2849,7 +2849,7 @@ bot_minion_ai* Creature::GetBotMinionAI() const
 
 bot_pet_ai* Creature::GetBotPetAI() const
 {
-    return IsAIEnabled && bot_AI && bot_AI->isPetAI() ? const_cast<bot_pet_ai*>(bot_AI->GetPetAI()) : NULL;
+    return IsAIEnabled && bot_AI && bot_AI->IsPetAI() ? const_cast<bot_pet_ai*>(bot_AI->GetPetAI()) : NULL;
 }
 
 void Creature::InitBotAI(bool asPet)

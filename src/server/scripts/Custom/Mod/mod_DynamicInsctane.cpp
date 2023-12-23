@@ -176,7 +176,7 @@ void DIRemoveData(uint32 instanceid)
 */
 bool DICreatureCalcStats(Creature* creature)
 {
-    if (!DDEnable || !creature->isAlive())
+    if (!DDEnable || !creature->IsAlive())
         return false;
 
     if (creature->isTotem() || creature->isTrigger() || creature->GetCreatureType() == CREATURE_TYPE_CRITTER || creature->isSpiritService())
@@ -211,7 +211,7 @@ bool DICreatureCalcStats(Creature* creature)
     if (level > DD_EXPANSION_WOTLK)
         expansion++;
 
-    uint32 rank = creature->isPet() ? 0 : cinfo->rank;
+    uint32 rank = creature->IsPet() ? 0 : cinfo->rank;
 
     CreatureBaseStats const* stats = sObjectMgr->GetCreatureBaseStats(level, cinfo->unit_class);
 

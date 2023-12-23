@@ -85,7 +85,7 @@ class IceMan_boss : public CreatureScript
 
                  if (Ahune_timer <= uiDiff)
                         {
-                        DoCast(me->getVictim(), AHUNE); 
+                        DoCast(me->GetVictim(), AHUNE); 
                         Ahune_timer = 2000; 
                     }
             else
@@ -100,7 +100,7 @@ class IceMan_boss : public CreatureScript
 
                  if (Flame_timer <= uiDiff)
                         {
-                        DoCast(me->getVictim(), FLAME); 
+                        DoCast(me->GetVictim(), FLAME); 
                         Flame_timer = 15000; 
                     }
             else
@@ -113,7 +113,7 @@ class IceMan_boss : public CreatureScript
 
                  if (Meteor_timer <= uiDiff)
                         {
-                        DoCast(me->getVictim(), METEOR); 
+                        DoCast(me->GetVictim(), METEOR); 
                         Meteor_timer = 20000; 
                     }
             else
@@ -125,7 +125,7 @@ class IceMan_boss : public CreatureScript
 
                  if (Arcane_timer <= uiDiff)
                         {
-                        DoCast(me->getVictim(), ARCANE); 
+                        DoCast(me->GetVictim(), ARCANE); 
                         Arcane_timer = 10000; 
                     }
             else

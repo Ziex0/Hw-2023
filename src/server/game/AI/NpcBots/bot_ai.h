@@ -203,7 +203,7 @@ class bot_ai : public ScriptedAI
         bot_ai(Creature* creature);
         //Player* GetMaster() const { return master; }
         virtual bool IsMinionAI() const = 0;
-        virtual bool isPetAI() const = 0;
+        virtual bool IsPetAI() const = 0;
         virtual void SetBotCommandState(CommandStates /*st*/, bool /*force*/ = false, Position* /*newpos*/ = NULL) = 0;
         virtual const bot_minion_ai* GetMinionAI() const { return NULL; }
         virtual const bot_pet_ai* GetPetAI() const { return NULL; }
@@ -365,7 +365,7 @@ class bot_minion_ai : public bot_ai
         bot_minion_ai(Creature* creature);
         const bot_minion_ai* GetMinionAI() const { return this; }
         bool IsMinionAI() const { return true; }
-        bool isPetAI() const { return false; }
+        bool IsPetAI() const { return false; }
         void SummonBotsPet(uint32 entry);
         inline bool IAmDead() const { return (!master || me->isDead()); }
         void SetBotCommandState(CommandStates st, bool force = false, Position* newpos = NULL);
@@ -411,7 +411,7 @@ class bot_minion_ai : public bot_ai
         void Follow(bool force = false, Position* newpos = NULL)
         {
             if (force ||
-                (me->isAlive() && (!me->isInCombat() || !opponent) && m_botCommandState != COMMAND_STAY))
+                (me->IsAlive() && (!me->IsInCombat() || !opponent) && m_botCommandState != COMMAND_STAY))
                 SetBotCommandState(COMMAND_FOLLOW, force, newpos);
         }
 
@@ -479,7 +479,7 @@ class bot_pet_ai : public bot_ai
         const bot_pet_ai* GetPetAI() const { return this; }
         Creature* GetCreatureOwner() const { return m_creatureOwner; }
         bool IsMinionAI() const { return false; }
-        bool isPetAI() const { return true; }
+        bool IsPetAI() const { return true; }
         inline bool IAmDead() const { return (!master || !m_creatureOwner || me->isDead()); }
         //void SetCreatureOwner(Creature* newowner) { m_creatureOwner = newowner; }
         void SetBotCommandState(CommandStates st, bool force = false, Position* newpos = NULL);

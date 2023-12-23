@@ -123,7 +123,7 @@ public:
 
         void AttackedBy(Unit* pAttacker)
         {
-            if (me->getVictim())
+            if (me->GetVictim())
                 return;
 
             if (me->IsFriendlyTo(pAttacker))
@@ -257,7 +257,7 @@ public:
 
             if (Creature* pMarzon = Unit::GetCreature(*me, MarzonGUID))
             {
-                if (pMarzon->isAlive())
+                if (pMarzon->IsAlive())
                     pMarzon->DisappearAndDie();
             }
         }
@@ -266,7 +266,7 @@ public:
         {
             if (Creature* pMarzon = Unit::GetCreature(*me, MarzonGUID))
             {
-                if (pMarzon->isAlive() && !pMarzon->isInCombat())
+                if (pMarzon->IsAlive() && !pMarzon->IsInCombat())
                     pMarzon->AI()->AttackStart(who);
             }
         }
@@ -406,7 +406,7 @@ public:
             {
                 if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                 {
-                    if (summoner->GetTypeId() == TYPEID_UNIT && summoner->isAlive() && !summoner->isInCombat())
+                    if (summoner->GetTypeId() == TYPEID_UNIT && summoner->IsAlive() && !summoner->IsInCombat())
                         summoner->ToCreature()->AI()->AttackStart(who);
                 }
             }
@@ -420,7 +420,7 @@ public:
             {
                 if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                 {
-                    if (summoner->GetTypeId() == TYPEID_UNIT && summoner->isAlive())
+                    if (summoner->GetTypeId() == TYPEID_UNIT && summoner->IsAlive())
                         summoner->ToCreature()->DisappearAndDie();
                 }
             }

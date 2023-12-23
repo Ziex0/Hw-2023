@@ -56,7 +56,7 @@ public:
         }
 				void ReceiveEmote(Player *pPlayer, uint32 uiTextEmote)
 		{
-			if (pPlayer->isInCombat())
+			if (pPlayer->IsInCombat())
 				{ pPlayer->GetSession()->SendAreaTriggerMessage("|cffff0000You are in combat!|r"); } 
 				return;
 		}
@@ -340,7 +340,7 @@ public:
 
     bool OnGossipSelect(Player* pPlayer, Creature* pCreature, uint32 /*uiSender*/, uint32 uiAction)
     {
-		if (pPlayer->isInCombat())
+		if (pPlayer->IsInCombat())
 		{
 			pCreature->MonsterWhisper("You are in combat !!!!, wait until your combat is gone...ughhhhh .!!!", pPlayer->GetGUID());
 			pPlayer->CLOSE_GOSSIP_MENU();

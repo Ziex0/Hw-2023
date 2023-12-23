@@ -188,9 +188,9 @@ public:
             if (!FROST_TRAP || Trap_cd > diff || IsCasting() || Rand() > 90)
                 return;
 
-            Unit* target = me->getVictim();
+            Unit* target = me->GetVictim();
             if (!(target && me->GetDistance(target) < 6 && me->HasInArc(M_PI, target) &&
-                IsInBotParty(target->getVictim())))
+                IsInBotParty(target->GetVictim())))
                 target = NULL;
             if (!target)
                 target = FindAOETarget(3.f, true);
@@ -336,7 +336,7 @@ public:
             //if (!AUTO_SHOT)
             //    return;
 
-            Unit* target = me->getVictim();
+            Unit* target = me->GetVictim();
             if (!target)
                 return;
 
@@ -375,7 +375,7 @@ public:
                 return;
 
             //First check current target
-            Unit* target = me->getVictim();
+            Unit* target = me->GetVictim();
             if (target)
             {
                 Unit::AuraMap const &auras = target->GetOwnedAuras();
@@ -420,7 +420,7 @@ public:
             if (!SILENCING_SHOT || SilencingShot_cd > diff || IsCasting() || Rand() > 50) //No GCD
                 return;
 
-            Unit* target = me->getVictim();
+            Unit* target = me->GetVictim();
             if (target && target->IsNonMeleeSpellCasted(false))
             {
                 temptimer = GC_Timer;
@@ -453,7 +453,7 @@ public:
         {
             ReduceCD(diff);
             if (IAmDead()) return;
-            if (me->getVictim())
+            if (me->GetVictim())
                 DoMeleeAttackIfReady();
             else
                 Evade();
@@ -489,14 +489,14 @@ public:
             if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED))
                 return;
 
-            if (!me->isInCombat())
+            if (!me->IsInCombat())
                 DoNonCombatActions(diff);
             else
                 doDefend(diff);
 
             CheckAspects(diff);
 
-            if (master->isInCombat() || me->isInCombat())
+            if (master->IsInCombat() || me->IsInCombat())
             {
                 CheckTranquil(diff);
                 CheckSilence(diff);
@@ -513,7 +513,7 @@ public:
 
         void DoRangedAttack(uint32 diff)
         {
-            opponent = me->getVictim();
+            opponent = me->GetVictim();
             if (opponent)
             {
                 if (!IsCasting())
@@ -575,7 +575,7 @@ public:
                     }
                 }
                 //DISENGAGE
-                if (DISENGAGE && Disengage_cd <= diff && me->isInCombat() && tank != me &&
+                if (DISENGAGE && Disengage_cd <= diff && me->IsInCombat() && tank != me &&
                     !me->getAttackers().empty() && me->HasInArc(M_PI, *me->getAttackers().begin()) && Rand() < 30)
                 {
                     temptimer = GC_Timer;
@@ -642,7 +642,7 @@ public:
                 }
             }
             //DISTRACTING SHOT
-            if (Unit* u = opponent->getVictim())
+            if (Unit* u = opponent->GetVictim())
             {
                 if (DISTRACTING_SHOT && DistractingShot_cd <= diff && tank == me && u != me && Rand() < 75 &&
                     !CCed(opponent) && IsInBotParty(u))

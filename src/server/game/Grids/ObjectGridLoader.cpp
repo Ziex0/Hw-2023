@@ -38,7 +38,7 @@ void ObjectGridEvacuator::Visit(CreatureMapType &m)
         Creature* c = iter->getSource();
         ++iter;
 
-        ASSERT(!c->isPet() && "ObjectGridRespawnMover must not be called for pets");
+        ASSERT(!c->IsPet() && "ObjectGridRespawnMover must not be called for pets");
         c->GetMap()->CreatureRespawnRelocation(c, true);
     }
 }
@@ -213,7 +213,7 @@ void ObjectGridStoper::Visit(CreatureMapType &m)
     for (CreatureMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
     {
         iter->getSource()->RemoveAllDynObjects();
-        if (iter->getSource()->isInCombat())
+        if (iter->getSource()->IsInCombat())
         {
             iter->getSource()->CombatStop();
             iter->getSource()->DeleteThreatList();

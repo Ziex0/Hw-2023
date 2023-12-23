@@ -90,7 +90,7 @@ public:
 					return;
 
 				// but players are not able to
-				if (player != plr) // Just in case to not face the same IP as player's IP
+				if (player != plr) // Just in case to not face the same IP as player's IP Multibox Here
 				{
 					if (player->GetSession()->GetRemoteAddress() == plr->GetSession()->GetRemoteAddress())
 						player->GetSession()->KickPlayer();
@@ -151,8 +151,8 @@ public:
 			msg = "";
 
 			ChatHandler(player->GetSession()).PSendSysMessage("|cffF00000You need at least 30 minutes playtime to use global channels or whispers. Note that you can still whisper to a GMs.");
-			player->GetSession()->SendAreaTriggerMessage("|cffF00000You need at least 30 minutes playtime to use global channels or whispers.");
-			player->GetSession()->SendAreaTriggerMessage("|cffF00000Your current played time: %u minutes.", currentTime);
+						player->GetSession()->SendAreaTriggerMessage("|cffF00000You need at least 30 minutes playtime to use global channels or whispers.");
+						player->GetSession()->SendAreaTriggerMessage("|cffF00000Your current played time: %u minutes.", currentTime);
 			return;
 		}
 	}

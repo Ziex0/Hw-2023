@@ -126,7 +126,7 @@ SpellCastResult bot_ai::checkBotCast(Unit* victim, uint32 spellId, uint8 botclas
         case CLASS_DRUID:
         case CLASS_WARLOCK:
         case CLASS_SHAMAN:
-            if (Feasting() && !master->isInCombat() && !master->HasAuraType(SPELL_AURA_PERIODIC_DAMAGE))
+            if (Feasting() && !master->IsInCombat() && !master->HasAuraType(SPELL_AURA_PERIODIC_DAMAGE))
                 return SPELL_FAILED_DONT_REPORT;
             break;
         case CLASS_WARRIOR:
@@ -312,7 +312,7 @@ void bot_minion_ai::SetBotCommandState(CommandStates st, bool force, Position* n
 {
     if (me->isDead() || IAmDead())
         return;
-    if (st == COMMAND_FOLLOW && ((!me->isMoving() && !IsCasting() && master->isAlive()) || force))
+    if (st == COMMAND_FOLLOW && ((!me->isMoving() && !IsCasting() && master->IsAlive()) || force))
     {
         if (CCed(me, true)/* || master->HasUnitState(UNIT_STATE_FLEEING)*/) return;
         if (me->isMoving() && Rand() > 25) return;
@@ -346,7 +346,7 @@ void bot_pet_ai::SetBotCommandState(CommandStates st, bool force, Position* /*ne
 {
     if (me->isDead() || IAmDead())
         return;
-    if (st == COMMAND_FOLLOW && ((!me->isMoving() && !IsCasting() && master->isAlive()) || force))
+    if (st == COMMAND_FOLLOW && ((!me->isMoving() && !IsCasting() && master->IsAlive()) || force))
     {
         if (CCed(me, true)) return;
         if (me->isMoving() && Rand() > 25) return;
@@ -390,10 +390,10 @@ void bot_ai::FindTank()
     {
         Player* owner = master;
         uint8 Class = owner->GetClass();
-        if (owner->isAlive() &&
+        if (owner->IsAlive() &&
             (Class == CLASS_WARRIOR || Class == CLASS_PALADIN || Class == CLASS_DEATH_KNIGHT))
             tank = owner;
-        else if (owner != master && master->isAlive())
+        else if (owner != master && master->IsAlive())
         {
             Class = master->GetClass();
             if (Class == CLASS_WARRIOR || Class == CLASS_PALADIN || Class == CLASS_DEATH_KNIGHT)
@@ -457,11 +457,11 @@ void bot_minion_ai::BuffAndHealGroup(Player* gPlayer, uint32 diff)
         for (Unit::ControlList::const_iterator itr = master->m_Controlled.begin(); itr != master->m_Controlled.end(); ++itr)
         {
             Unit* u = *itr;
-            if (!u || !u->IsInWorld() || me->GetMap() != u->FindMap() || !u->isAlive()) continue;
+            if (!u || !u->IsInWorld() || me->GetMap() != u->FindMap() || !u->IsAlive()) continue;
             if (HealTarget(u, GetHealthPCT(u), diff))
                 return;
             if (Creature* cre = u->ToCreature())
-                if (cre->GetIAmABot() || cre->isPet())
+                if (cre->GetIAmABot() || cre->IsPet())
                     if (BuffTarget(u, diff))
                         return;
         }
@@ -475,7 +475,7 @@ void bot_minion_ai::BuffAndHealGroup(Player* gPlayer, uint32 diff)
         if (me->GetMap() != tPlayer->FindMap()) continue;
         if (!tPlayer->m_Controlled.empty())
             Bots = true;
-        if (!tPlayer->isAlive()) continue;
+        if (!tPlayer->IsAlive()) continue;
         if (HealTarget(tPlayer, GetHealthPCT(tPlayer), diff))
             return;
         if (BuffTarget(tPlayer, diff))
@@ -491,11 +491,11 @@ void bot_minion_ai::BuffAndHealGroup(Player* gPlayer, uint32 diff)
             for (Unit::ControlList::const_iterator itr = tPlayer->m_Controlled.begin(); itr != tPlayer->m_Controlled.end(); ++itr)
             {
                 Unit* u = *itr;
-                if (!u || !u->IsInWorld() || me->GetMap() != u->FindMap() || !u->isAlive()) continue;
+                if (!u || !u->IsInWorld() || me->GetMap() != u->FindMap() || !u->IsAlive()) continue;
                 if (HealTarget(u, GetHealthPCT(u), diff))
                     return;
                 if (Creature* cre = u->ToCreature())
-                    if (cre->GetIAmABot() || cre->isPet())
+                    if (cre->GetIAmABot() || cre->IsPet())
                         if (BuffTarget(u, diff))
                             return;
             }
@@ -510,8 +510,8 @@ void bot_minion_ai::BuffAndHealGroup(Player* gPlayer, uint32 diff)
             {
                 if (Unit* unit = sObjectAccessor->FindUnit(guid))
                 {
-                    if (unit->isAlive() && me->GetMap() == unit->FindMap() &&
-                        master->getVictim() != unit && unit->getVictim() != master &&
+                    if (unit->IsAlive() && me->GetMap() == unit->FindMap() &&
+                        master->GetVictim() != unit && unit->GetVictim() != master &&
                         unit->GetReactionTo(master) >= REP_NEUTRAL)
                     {
                         HealTarget(unit, GetHealthPCT(unit), diff);
@@ -535,7 +535,7 @@ void bot_minion_ai::RezGroup(uint32 REZZ, Player* gPlayer)
     if (!pGroup)
     {
         Unit* target = master;
-        if (master->isAlive()) return;
+        if (master->IsAlive()) return;
         if (master->isRessurectRequested()) return; //resurrected
         if (master->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST))
             target = (Unit*)master->GetCorpse();
@@ -561,7 +561,7 @@ void bot_minion_ai::RezGroup(uint32 REZZ, Player* gPlayer)
     {
         Player* tPlayer = itr->getSource();
         Unit* target = tPlayer;
-        if (!tPlayer || tPlayer->isAlive()) continue;
+        if (!tPlayer || tPlayer->IsAlive()) continue;
         if (tPlayer->isRessurectRequested()) continue; //resurrected
         if (Rand() > 5) continue;
         if (tPlayer->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST))
@@ -655,7 +655,7 @@ bool bot_minion_ai::CureTarget(Unit* target, uint32 cureSpell, uint32 diff)
 bool bot_minion_ai::CanCureTarget(Unit* target, uint32 cureSpell, uint32 diff) const
 {
     if (!cureSpell || GC_Timer > diff) return false;
-    if (!target || !target->isAlive()) return false;
+    if (!target || !target->IsAlive()) return false;
     if (me->getLevel() < 10 || target->getLevel() < 10) return false;
     if (me->IsMounted()) return false;
     if (IsCasting() || Feasting()) return false;
@@ -935,7 +935,7 @@ void bot_ai::listAuras(Player* player, Unit* unit) const
         }
 
         //debug
-        //if (isPetAI()) GetPetAI()->ListSpells(&ch);
+        //if (IsPetAI()) GetPetAI()->ListSpells(&ch);
     }
 }
 //SETSTATS
@@ -1612,8 +1612,8 @@ bool bot_ai::IsInBotParty(Unit* unit) const
                 if (uint64 guid = gr->GetTargetIcons()[i])//check this one
                     if (guid == unit->GetGUID())
                         if (unit->GetReactionTo(master) >= REP_NEUTRAL &&
-                            master->getVictim() != unit &&
-                            unit->getVictim() != master)
+                            master->GetVictim() != unit &&
+                            unit->GetVictim() != master)
                             return true;
     }
 
@@ -1670,7 +1670,7 @@ bool bot_ai::RefreshAura(uint32 spell, int8 count, Unit* target) const
 //Updates bot's condition once a while
 void bot_minion_ai::CheckAuras(bool force)
 {
-    opponent = me->getVictim(); //safe
+    opponent = me->GetVictim(); //safe
 
     if (!force)
         UpdateRations(); //safe
@@ -1738,7 +1738,7 @@ void bot_minion_ai::CheckAuras(bool force)
                 if (master->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST))
                 {
                     Corpse* corpse = master->GetCorpse();
-                    if (corpse && me->GetMap() == corpse->FindMap() && !me->isInCombat() && !me->HasUnitState(UNIT_STATE_MOVING) && !IsCasting() && !CCed(me) && me->GetDistance(corpse) > 5)
+                    if (corpse && me->GetMap() == corpse->FindMap() && !me->IsInCombat() && !me->HasUnitState(UNIT_STATE_MOVING) && !IsCasting() && !CCed(me) && me->GetDistance(corpse) > 5)
                         me->GetMotionMaster()->MovePoint(corpse->GetMapId(), *corpse);
                 }
                 else
@@ -1757,7 +1757,7 @@ void bot_minion_ai::CheckAuras(bool force)
         }
         if (!IsCasting())
         {
-            if (me->isInCombat())
+            if (me->IsInCombat())
             {
                 if (me->GetBotClass() == CLASS_HUNTER)
                 {
@@ -1780,7 +1780,7 @@ void bot_pet_ai::CheckAuras(bool /*force*/)
     checkAurasTimer = 10 + master->GetNpcBotsCount()/2;
     if (m_botCommandState != COMMAND_FOLLOW && m_botCommandState != COMMAND_STAY)
     {
-        opponent = me->getVictim();
+        opponent = me->GetVictim();
         if (opponent)
         {
             switch (GetPetType(me))
@@ -1815,14 +1815,14 @@ bool bot_ai::CanBotAttack(Unit* target, int8 byspell) const
     uint8 followdist = master->GetBotFollowDist();
     float foldist = _getAttackDistance(float(followdist));
     return
-       (target->isAlive() &&
+       (target->IsAlive() &&
        target->IsVisible() &&
-       (master->isDead() || target->GetTypeId() == TYPEID_PLAYER || target->isPet() ||
+       (master->isDead() || target->GetTypeId() == TYPEID_PLAYER || target->IsPet() ||
        (target->GetDistance(master) < foldist && me->GetDistance(master) < followdist)) &&//if master is killed pursue to the end
         target->isTargetableForAttack() &&
         !IsInBotParty(target) &&
         (target->IsHostileTo(master) ||
-        (target->GetReactionTo(master) < REP_FRIENDLY && master->getVictim() == target && (master->isInCombat() || target->isInCombat())) ||//master has pointed this target
+        (target->GetReactionTo(master) < REP_FRIENDLY && master->GetVictim() == target && (master->IsInCombat() || target->IsInCombat())) ||//master has pointed this target
         target->IsHostileTo(me)) &&//if master is controlled
         //target->IsWithinLOSInMap(me) &&
         (byspell == -1 || !target->IsImmunedToDamage(byspell ? SPELL_SCHOOL_MASK_MAGIC : SPELL_SCHOOL_MASK_NORMAL)));
@@ -1833,11 +1833,11 @@ bool bot_ai::CanBotAttack(Unit* target, int8 byspell) const
 Unit* bot_ai::getTarget(bool byspell, bool ranged, bool &reset) const
 {
     //check if no need to change target
-    Unit* u = master->getVictim();
-    Unit* mytar = me->getVictim();
+    Unit* u = master->GetVictim();
+    Unit* mytar = me->GetVictim();
     if (!mytar && IsMinionAI())
         if (Creature* pet = me->GetBotsPet())
-            mytar = pet->getVictim();
+            mytar = pet->GetVictim();
 
     //sLog->outError("entities.player", "bot_ai::getTarget(): bot: %s, PvP = %u", me->GetName().c_str(), PvP);
 
@@ -1849,13 +1849,13 @@ Unit* bot_ai::getTarget(bool byspell, bool ranged, bool &reset) const
     //Follow if...
     uint8 followdist = master->GetBotFollowDist();
     float foldist = _getAttackDistance(float(followdist));
-    if (!u && master->isAlive() && (me->GetDistance(master) > foldist || (mytar && master->GetDistance(mytar) > foldist && me->GetDistance(master) > foldist)))
+    if (!u && master->IsAlive() && (me->GetDistance(master) > foldist || (mytar && master->GetDistance(mytar) > foldist && me->GetDistance(master) > foldist)))
     {
         //sLog->outError("entities.player", "bot %s cannot attack target %s, too far away", me->GetName().c_str(), mytar ? mytar->GetName().c_str() : "");
         return NULL;
     }
 
-    if (u && (master->isInCombat() || u->isInCombat()) && !InDuel(u) && !IsInBotParty(u) && !(!PvP && (u->ToPlayer() || (u->ToCreature() && u->ToCreature()->GetBotAI()))))
+    if (u && (master->IsInCombat() || u->IsInCombat()) && !InDuel(u) && !IsInBotParty(u) && !(!PvP && (u->ToPlayer() || (u->ToCreature() && u->ToCreature()->GetBotAI()))))
     {
         //sLog->outError("entities.player", "bot %s starts attack master's target %s", me->GetName().c_str(), u->GetName().c_str());
         return u;
@@ -1869,7 +1869,7 @@ Unit* bot_ai::getTarget(bool byspell, bool ranged, bool &reset) const
         return mytar;
     }
 
-    if (followdist == 0 && master->isAlive())
+    if (followdist == 0 && master->IsAlive())
         return NULL; //do not bother
 
     //check group
@@ -1880,9 +1880,9 @@ Unit* bot_ai::getTarget(bool byspell, bool ranged, bool &reset) const
         {
             Creature* bot = master->GetBotMap(i)->_Cre();
             if (!bot || !bot->InSamePhase(me) || bot == me) continue;
-            u = bot->getVictim();
+            u = bot->GetVictim();
             if (u && CanBotAttack(u, byspell) &&
-                (bot->isInCombat() || u->isInCombat()) &&
+                (bot->IsInCombat() || u->IsInCombat()) &&
                 (master->isDead() || master->GetDistance(u) < foldist))
             {
                 //sLog->outError("entities.player", "bot %s hooked %s's victim %s", me->GetName().c_str(), bot->GetName().c_str(), u->GetName().c_str());
@@ -1890,9 +1890,9 @@ Unit* bot_ai::getTarget(bool byspell, bool ranged, bool &reset) const
             }
             Creature* pet = bot->GetIAmABot() ? bot->GetBotsPet() : NULL;
             if (!pet || !pet->InSamePhase(me)) continue;
-            u = pet->getVictim();
+            u = pet->GetVictim();
             if (u && CanBotAttack(u, byspell) &&
-                (pet->isInCombat() || u->isInCombat()) &&
+                (pet->IsInCombat() || u->IsInCombat()) &&
                 (master->isDead() || master->GetDistance(u) < foldist))
             {
                 //sLog->outError("entities.player", "bot %s hooked %s's victim %s", me->GetName().c_str(), pet->GetName().c_str(), u->GetName().c_str());
@@ -1907,9 +1907,9 @@ Unit* bot_ai::getTarget(bool byspell, bool ranged, bool &reset) const
             Player* pl = ref->getSource();
             if (!pl || !pl->IsInWorld() || pl->IsBeingTeleported()) continue;
             if (me->GetMap() != pl->FindMap() || !pl->InSamePhase(me)) continue;
-            u = pl->getVictim();
+            u = pl->GetVictim();
             if (u && pl != master && CanBotAttack(u, byspell) &&
-                (pl->isInCombat() || u->isInCombat()) &&
+                (pl->IsInCombat() || u->IsInCombat()) &&
                 (master->isDead() || master->GetDistance(u) < foldist))
             {
                 //sLog->outError("entities.player", "bot %s hooked %s's victim %s", me->GetName().c_str(), pl->GetName().c_str(), u->GetName().c_str());
@@ -1922,9 +1922,9 @@ Unit* bot_ai::getTarget(bool byspell, bool ranged, bool &reset) const
                 if (!bot || !bot->InSamePhase(me) || bot == me) continue;
                 if (!bot->IsInWorld()) continue;
                 if (me->GetMap() != bot->FindMap()) continue;
-                u = bot->getVictim();
+                u = bot->GetVictim();
                 if (u && CanBotAttack(u, byspell) &&
-                    (bot->isInCombat() || u->isInCombat()) &&
+                    (bot->IsInCombat() || u->IsInCombat()) &&
                     (master->isDead() || master->GetDistance(u) < foldist))
                 {
                     //sLog->outError("entities.player", "bot %s hooked %s's victim %s", me->GetName().c_str(), bot->GetName().c_str(), u->GetName().c_str());
@@ -1934,9 +1934,9 @@ Unit* bot_ai::getTarget(bool byspell, bool ranged, bool &reset) const
                 if (!pet || !pet->InSamePhase(me)) continue;
                 if (!pet->IsInWorld()) continue;
                 if (me->GetMap() != pet->FindMap()) continue;
-                u = pet->getVictim();
+                u = pet->GetVictim();
                 if (u && CanBotAttack(u, byspell) &&
-                    (pet->isInCombat() || u->isInCombat()) &&
+                    (pet->IsInCombat() || u->IsInCombat()) &&
                     (master->isDead() || master->GetDistance(u) < foldist))
                 {
                     //sLog->outError("entities.player", "bot %s hooked %s's victim %s", me->GetName().c_str(), pet->GetName().c_str(), u->GetName().c_str());
@@ -2027,7 +2027,7 @@ bool bot_ai::CheckAttackTarget(uint8 botOrPetType)
     if (reset)
         m_botCommandState = COMMAND_ABANDON;//reset AttackStart()
 
-    if (opponent != me->getVictim())
+    if (opponent != me->GetVictim())
         me->Attack(opponent, !ranged);
     return true;
 }
@@ -2069,10 +2069,10 @@ void bot_ai::GetInPosition(bool force, bool ranged, Unit* newtarget, Position* m
 {
     if (me->HasUnitState(UNIT_STATE_ROOT)) return;
     if (!newtarget)
-        newtarget = me->getVictim();
+        newtarget = me->GetVictim();
     if (!newtarget)
         return;
-    if ((!newtarget->isInCombat() || m_botCommandState == COMMAND_STAY) && !force)
+    if ((!newtarget->IsInCombat() || m_botCommandState == COMMAND_STAY) && !force)
         return;
     if (IsCasting())
         return;
@@ -2095,7 +2095,7 @@ void bot_ai::GetInPosition(bool force, bool ranged, Unit* newtarget, Position* m
     else if (!me->HasUnitState(UNIT_STATE_CHASE) || !me->HasUnitState(UNIT_STATE_CHASE_MOVE))
         me->GetMotionMaster()->MoveChase(newtarget);
 
-    if (newtarget != me->getVictim())
+    if (newtarget != me->GetVictim())
         me->Attack(newtarget, !ranged);
 }
 
@@ -2105,7 +2105,7 @@ bool bot_ai::MoveBehind(Unit &target) const
     if (target.IsWithinCombatRange(me, ATTACK_DISTANCE) &&
         target.HasInArc(M_PI, me)                       &&
         tank != me &&
-        (me->GetBotClass() == CLASS_ROGUE ? target.getVictim() != me || CCed(&target) : target.getVictim() != me && !CCed(&target)))
+        (me->GetBotClass() == CLASS_ROGUE ? target.GetVictim() != me || CCed(&target) : target.GetVictim() != me && !CCed(&target)))
     {
         float x(0),y(0),z(0);
         target.GetNearPoint(me, x, y, z, me->GetObjectSize()/3, 0.1f, me->GetAngle(&target));
@@ -2122,7 +2122,7 @@ void bot_minion_ai::UpdateMountedState()
 
     bool aura = me->HasAuraType(SPELL_AURA_MOUNTED);
     bool mounted = me->IsMounted();
-    if ((!master->IsMounted() || aura != mounted || (me->isInCombat() && opponent)) && (aura || mounted))
+    if ((!master->IsMounted() || aura != mounted || (me->IsInCombat() && opponent)) && (aura || mounted))
     {
         const_cast<CreatureTemplate*>(me->GetCreatureTemplate())->InhabitType &= ~INHABIT_AIR;
         me->RemoveAurasByType(SPELL_AURA_MOUNTED);
@@ -2133,7 +2133,7 @@ void bot_minion_ai::UpdateMountedState()
         me->Dismount();
         return;
     }
-    if (me->isInCombat() || IsCasting() || me->HasUnitMovementFlag(MOVEMENTFLAG_SWIMMING)) //IsInWater() is too much calculations
+    if (me->IsInCombat() || IsCasting() || me->HasUnitMovementFlag(MOVEMENTFLAG_SWIMMING)) //IsInWater() is too much calculations
         return;
     //fly
     //if ((master->IsMounted() && master->HasAuraType(SPELL_AURA_FLY))/* || master->HasUnitMovementFlag(MOVEMENTFLAG_CAN_FLY) || master->HasUnitMovementFlag(MOVEMENTFLAG_FLYING)*/)
@@ -2167,7 +2167,7 @@ void bot_minion_ai::UpdateMountedState()
     //}
     ////ground
     /*else */
-    if (master->IsMounted() && !me->IsMounted() && !master->isInCombat() && !me->isInCombat() && !me->getVictim())
+    if (master->IsMounted() && !me->IsMounted() && !master->IsInCombat() && !me->IsInCombat() && !me->GetVictim())
     {
         uint32 mount = 0;
         Unit::AuraEffectList const &mounts = master->GetAuraEffectsByType(SPELL_AURA_MOUNTED);
@@ -2196,7 +2196,7 @@ void bot_minion_ai::UpdateStandState() const
         me->getStandState() == UNIT_STAND_STATE_SIT &&
         !(me->GetInterruptMask() & AURA_INTERRUPT_FLAG_NOT_SEATED))
         me->SetStandState(UNIT_STAND_STATE_STAND);
-    if ((master->getStandState() == UNIT_STAND_STATE_SIT || Feasting()) && !me->isInCombat() && !me->isMoving() &&
+    if ((master->getStandState() == UNIT_STAND_STATE_SIT || Feasting()) && !me->IsInCombat() && !me->isMoving() &&
         me->getStandState() == UNIT_STAND_STATE_STAND)
         me->SetStandState(UNIT_STAND_STATE_SIT);
 
@@ -2209,7 +2209,7 @@ void bot_minion_ai::UpdateRations()
     if (health_cd > RATIONS_CD)
         health_cd = uint32(-1);
 
-    if (me->isInCombat() || CCed(me))
+    if (me->IsInCombat() || CCed(me))
     {
         if (health_cd <= RATIONS_CD && me->HasAura(EAT))
         {
@@ -2227,7 +2227,7 @@ void bot_minion_ai::UpdateRations()
 
     //drink
     if (me->getPowerType() == POWER_MANA && !me->IsMounted() && !me->isMoving() &&
-        !me->isInCombat() && !IsCasting() && urand(0, 100) < 20 && GetManaPCT(me) < 80 &&
+        !me->IsInCombat() && !IsCasting() && urand(0, 100) < 20 && GetManaPCT(me) < 80 &&
         !me->HasAura(DRINK))
     {
         mana_cd = RATIONS_CD;
@@ -2241,7 +2241,7 @@ void bot_minion_ai::UpdateRations()
     }
 
     //eat
-    if (!me->IsMounted() && !me->isMoving() && !me->isInCombat() && !IsCasting() &&
+    if (!me->IsMounted() && !me->isMoving() && !me->IsInCombat() && !IsCasting() &&
         urand(0, 100) < 20 && GetHealthPCT(me) < 80 &&
         !me->HasAura(EAT))
     {
@@ -2482,7 +2482,7 @@ Unit* bot_minion_ai::FindRootTarget(float dist, uint32 spellId) const
 
     Unit* unit = NULL;
 
-    RootUnitCheck check(me, me->getVictim(), dist, spellId);
+    RootUnitCheck check(me, me->GetVictim(), dist, spellId);
     Trinity::UnitLastSearcher <RootUnitCheck> searcher(me, unit, check);
 
     TypeContainerVisitor<Trinity::UnitLastSearcher <RootUnitCheck>, WorldTypeMapContainer > world_unit_searcher(searcher);
@@ -2531,7 +2531,7 @@ Unit* bot_minion_ai::FindAOETarget(float dist, bool checkbots, bool targetfriend
             uint32 mCount = 0;
             for(AttackerSet::iterator iter = m_attackers.begin(); iter != m_attackers.end(); ++iter)
             {
-                if (!(*iter) || !(*iter)->isAlive()) continue;
+                if (!(*iter) || !(*iter)->IsAlive()) continue;
                 if ((*iter)->isMoving()) continue;
                 if ((*iter)->HasBreakableByDamageCrowdControlAura())
                     continue;
@@ -2540,7 +2540,7 @@ Unit* bot_minion_ai::FindAOETarget(float dist, bool checkbots, bool targetfriend
             }
             if (mCount > 1)
             {
-                Unit* u = master->getVictim();
+                Unit* u = master->GetVictim();
                 if (mCount > 3 && targetfriend == true)
                     unit = master;
                 else if (u && FindSplashTarget(dist + 8, u))
@@ -2552,7 +2552,7 @@ Unit* bot_minion_ai::FindAOETarget(float dist, bool checkbots, bool targetfriend
         for (uint8 i = 0; i != master->GetMaxNpcBots(); ++i)
         {
             Creature* bot = master->GetBotMap(i)->_Cre();
-            if (!bot || !bot->isAlive() || !bot->IsInWorld() || me->GetDistance(bot) > dist) continue;
+            if (!bot || !bot->IsAlive() || !bot->IsInWorld() || me->GetDistance(bot) > dist) continue;
 
             AttackerSet b_attackers = bot->getAttackers();
             if (b_attackers.size() > 1)
@@ -2560,7 +2560,7 @@ Unit* bot_minion_ai::FindAOETarget(float dist, bool checkbots, bool targetfriend
                 uint32 mCount = 0;
                 for(AttackerSet::iterator iter = b_attackers.begin(); iter != b_attackers.end(); ++iter)
                 {
-                    if (!(*iter) || !(*iter)->isAlive()) continue;
+                    if (!(*iter) || !(*iter)->IsAlive()) continue;
                     if ((*iter)->isMoving()) continue;
                     if ((*iter)->HasBreakableByDamageCrowdControlAura())
                         continue;
@@ -2569,7 +2569,7 @@ Unit* bot_minion_ai::FindAOETarget(float dist, bool checkbots, bool targetfriend
                 }
                 if (mCount > 1)
                 {
-                    Unit* u = bot->getVictim();
+                    Unit* u = bot->GetVictim();
                     if (mCount > 3 && targetfriend == true)
                         unit = bot;
                     else if (u && FindSplashTarget(dist + 8, u))
@@ -2588,7 +2588,7 @@ Unit* bot_minion_ai::FindAOETarget(float dist, bool checkbots, bool targetfriend
         if (checkbots && tPlayer->HaveBot())
             Bots = true;
         if (!tPlayer->IsInWorld() || tPlayer->IsBeingTeleported()) continue;
-        if (!tPlayer->isAlive() || me->GetMap() != tPlayer->FindMap()) continue;
+        if (!tPlayer->IsAlive() || me->GetMap() != tPlayer->FindMap()) continue;
         if (me->GetDistance(tPlayer) > 40) continue;
 
         AttackerSet m_attackers = tPlayer->getAttackers();
@@ -2597,14 +2597,14 @@ Unit* bot_minion_ai::FindAOETarget(float dist, bool checkbots, bool targetfriend
             uint32 mCount = 0;
             for (AttackerSet::iterator iter = m_attackers.begin(); iter != m_attackers.end(); ++iter)
             {
-                if (!(*iter) || !(*iter)->isAlive()) continue;
+                if (!(*iter) || !(*iter)->IsAlive()) continue;
                 if ((*iter)->isMoving()) continue;
                 if (me->GetDistance(*iter) < dist)
                     ++mCount;
             }
             if (mCount > 1)
             {
-                Unit* u = tPlayer->getVictim();
+                Unit* u = tPlayer->GetVictim();
                 if (mCount > 3 && targetfriend == true)
                     unit = tPlayer;
                 else if (u && FindSplashTarget(dist + 8, u))
@@ -2623,7 +2623,7 @@ Unit* bot_minion_ai::FindAOETarget(float dist, bool checkbots, bool targetfriend
         for (uint8 i = 0; i != tPlayer->GetMaxNpcBots(); ++i)
         {
             Creature* bot = tPlayer->GetBotMap(i)->_Cre();
-            if (!bot || !bot->isAlive() || me->GetMap() != bot->FindMap()) continue;
+            if (!bot || !bot->IsAlive() || me->GetMap() != bot->FindMap()) continue;
             if (!bot->IsInWorld()) continue;
             if (me->GetDistance(bot) > 40) continue;
 
@@ -2633,14 +2633,14 @@ Unit* bot_minion_ai::FindAOETarget(float dist, bool checkbots, bool targetfriend
                 uint32 mCount = 0;
                 for(AttackerSet::iterator iter = b_attackers.begin(); iter != b_attackers.end(); ++iter)
                 {
-                    if (!(*iter) || !(*iter)->isAlive()) continue;
+                    if (!(*iter) || !(*iter)->IsAlive()) continue;
                     if ((*iter)->isMoving()) continue;
                     if (me->GetDistance(*iter) < dist)
                         ++mCount;
                 }
                 if (mCount > 1)
                 {
-                    Unit* u = bot->getVictim();
+                    Unit* u = bot->GetVictim();
                     if (mCount > 3 && targetfriend == true)
                         unit = bot;
                     else if (u && FindSplashTarget(dist + 8, u))
@@ -2656,7 +2656,7 @@ Unit* bot_minion_ai::FindAOETarget(float dist, bool checkbots, bool targetfriend
 Unit* bot_minion_ai::FindSplashTarget(float dist, Unit* To, float splashdist) const
 {
     if (!To)
-        To = me->getVictim();
+        To = me->GetVictim();
     if (!To)
         return NULL;
 
@@ -2867,7 +2867,7 @@ void bot_minion_ai::_OnHealthUpdate(uint8 myclass, uint8 mylevel) const
     me->UpdateMaxHealth();//will use our values we just set (update base health and buffs)
     //sLog->outError("entities.player", "overall hp: %u", me->GetMaxHealth());
     me->SetHealth(uint32(0.5f + float(me->GetMaxHealth()) * pct / 100.f)); //restore pct
-    if (!me->isInCombat())
+    if (!me->IsInCombat())
         me->SetHealth(me->GetHealth() + m_basehp / 100 + me->getLevel() / 2); //regenerate
 }
 //Mana management for minions
@@ -3050,7 +3050,7 @@ void bot_pet_ai::_OnHealthUpdate(uint8 /*petType*/, uint8 mylevel) const
     me->SetModifierValue(UNIT_MOD_HEALTH, BASE_VALUE, float(m_totalhp));
     me->UpdateMaxHealth(); //will use values set (update base health and buffs)
     me->SetHealth(uint32(0.5f + float(me->GetMaxHealth()) * pct / 100.f)); //restore pct
-    if (!me->isInCombat())
+    if (!me->IsInCombat())
         me->SetHealth(me->GetHealth() + m_basehp / 100 + me->getLevel() / 2); //regenerate
 }
 //Mana for pets
@@ -3097,7 +3097,7 @@ void bot_minion_ai::_OnEvade()
             if (Spell* spell = me->GetCurrentSpell(CurrentSpellTypes(i)))
                 if (!spell->GetSpellInfo()->IsChanneled())
                     if (Unit* u = spell->m_targets.GetUnitTarget())
-                        if (!u->isAlive() && !IsInBotParty(u))
+                        if (!u->IsAlive() && !IsInBotParty(u))
                             me->InterruptSpell(CurrentSpellTypes(i), false, false);
 
     Creature* m_botsPet = me->GetBotsPet();
@@ -3106,16 +3106,16 @@ void bot_minion_ai::_OnEvade()
             if (Spell* spell = m_botsPet->GetCurrentSpell(CurrentSpellTypes(i)))
                 if (!spell->GetSpellInfo()->IsChanneled())
                     if (Unit* u = spell->m_targets.GetUnitTarget())
-                        if (!u->isAlive() && !IsInBotParty(u))
+                        if (!u->IsAlive() && !IsInBotParty(u))
                             m_botsPet->InterruptSpell(CurrentSpellTypes(i), false, false);
 
     if (Rand() > 10) return;
-    if (!master->isInCombat() && !me->isInCombat() && (!m_botsPet || !m_botsPet->isInCombat())) return;
+    if (!master->IsInCombat() && !me->IsInCombat() && (!m_botsPet || !m_botsPet->IsInCombat())) return;
     if (CheckAttackTarget(GetBotClassForCreature(me)))
         return;
     //ChatHandler ch(master);
     //ch.PSendSysMessage("_OnEvade() by bot %s", me->GetName().c_str());
-    if (master->isInCombat())
+    if (master->IsInCombat())
     {
         HostileRefManager& mgr = master->getHostileRefManager();
         if (!mgr.isEmpty())
@@ -3131,7 +3131,7 @@ void bot_minion_ai::_OnEvade()
             for (std::set<Unit*>::const_iterator i = Set.begin(); i != Set.end(); ++i)
             {
                 Unit* unit = (*i);
-                if (/*unit->IsFriendlyTo(master)*/IsInBotParty(unit) || !unit->isInCombat())
+                if (/*unit->IsFriendlyTo(master)*/IsInBotParty(unit) || !unit->IsInCombat())
                 {
                     //ch.PSendSysMessage("_OnEvade(): %s's hostile reference is removed from %s!", unit->GetName().c_str(), master->GetName().c_str());
                     mgr.deleteReference(unit);
@@ -3146,7 +3146,7 @@ void bot_minion_ai::_OnEvade()
         {
             Creature* cre = master->GetBotMap(i)->_Cre();
             if (!cre) continue;
-            if (cre->isInCombat())
+            if (cre->IsInCombat())
             {
                 cre->DeleteThreatList();
                 HostileRefManager& mgr = cre->getHostileRefManager();
@@ -3164,7 +3164,7 @@ void bot_minion_ai::_OnEvade()
                     {
                         Unit* unit = (*i);
                         if (!unit->InSamePhase(me)) continue;
-                        if (/*unit->IsFriendlyTo(master)*/IsInBotParty(unit) || !unit->isInCombat())
+                        if (/*unit->IsFriendlyTo(master)*/IsInBotParty(unit) || !unit->IsInCombat())
                         {
                             //ch.PSendSysMessage("_OnEvade(): %s's hostile reference is removed from %s!", unit->GetName().c_str(), cre->GetName().c_str());
                             mgr.deleteReference(unit);
@@ -3173,7 +3173,7 @@ void bot_minion_ai::_OnEvade()
                 }
                 //if (mgr.isEmpty())// has empty threat list and no hostile refs - we have all rights to stop combat
                 //{
-                //    if (cre->isInCombat())
+                //    if (cre->IsInCombat())
                 //    {
                 //        //ch.PSendSysMessage("_OnEvade(): %s's HostileRef is empty! Combatstop!", cre->GetName().c_str());
                 //        cre->ClearInCombat();
@@ -3182,7 +3182,7 @@ void bot_minion_ai::_OnEvade()
             }
 
             Creature* m_botsPet = cre->GetBotsPet();
-            if (!m_botsPet || !m_botsPet->isInCombat()) continue;
+            if (!m_botsPet || !m_botsPet->IsInCombat()) continue;
             m_botsPet->DeleteThreatList();
             HostileRefManager& mgr = m_botsPet->getHostileRefManager();
             if (!mgr.isEmpty())
@@ -3199,7 +3199,7 @@ void bot_minion_ai::_OnEvade()
                 {
                     Unit* unit = (*i);
                     if (!unit->InSamePhase(me)) continue;
-                    if (/*unit->IsFriendlyTo(master)*/IsInBotParty(unit) || !unit->isInCombat())
+                    if (/*unit->IsFriendlyTo(master)*/IsInBotParty(unit) || !unit->IsInCombat())
                     {
                         //ch.PSendSysMessage("_OnEvade(): %s's hostile reference is removed from %s!", unit->GetName().c_str(), m_botsPet->GetName().c_str());
                         mgr.deleteReference(unit);
@@ -3208,7 +3208,7 @@ void bot_minion_ai::_OnEvade()
             }
             //if (mgr.isEmpty())// has empty threat list and no hostile refs - we have all rights to stop combat
             //{
-            //    if (m_botsPet->isInCombat())
+            //    if (m_botsPet->IsInCombat())
             //    {
             //        //ch.PSendSysMessage("_OnEvade(): %s's HostileRef is empty! Combatstop!", pet->GetName().c_str());
             //        m_botsPet->ClearInCombat();
@@ -3355,7 +3355,7 @@ void bot_ai::ApplyBotDamageMultiplierEffect(SpellInfo const* spellInfo, uint8 ef
 //GossipHello
 bool bot_minion_ai::OnGossipHello(Player* player, Creature* creature)
 {
-    if (creature->isInCombat())
+    if (creature->IsInCombat())
     {
         player->CLOSE_GOSSIP_MENU();
         return true;
@@ -3830,7 +3830,7 @@ uint32 bot_pet_ai::GetPetOriginalEntry(uint32 entry)
 //PvP trinket for minions
 void bot_minion_ai::BreakCC(uint32 diff)
 {
-    if (pvpTrinket_cd <= diff && CCed(me, true) && (me->getVictim() || !me->getAttackers().empty()))
+    if (pvpTrinket_cd <= diff && CCed(me, true) && (me->GetVictim() || !me->getAttackers().empty()))
     {
         temptimer = GC_Timer;
         if (doCast(me, PVPTRINKET))
@@ -3862,7 +3862,7 @@ float bot_ai::InitAttackRange(float origRange, bool ranged) const
 //This means that anyone who attacks party will be attacked by whole bot party (see GetTarget())
 void bot_minion_ai::OnOwnerDamagedBy(Unit* attacker)
 {
-    if (me->getVictim())
+    if (me->GetVictim())
         return;
     if (InDuel(attacker))
         return;

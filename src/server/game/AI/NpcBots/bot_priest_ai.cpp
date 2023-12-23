@@ -58,7 +58,7 @@ public:
                     Player* tPlayer = itr->getSource();
                     if (!tPlayer || !tPlayer->IsInWorld() || me->GetMap() != tPlayer->FindMap() ||
                         tPlayer->IsBeingTeleported() || tPlayer->isPossessed() || tPlayer->isCharmed()) continue;
-                    if (tPlayer->isAlive())
+                    if (tPlayer->IsAlive())
                     {
                         if (me->GetExactDist(tPlayer) > 35) continue;
                         uint8 pct = 50 + tPlayer->getAttackers().size()*10;
@@ -95,7 +95,7 @@ public:
                     Player* tPlayer = itr->getSource();
                     if (!tPlayer || !tPlayer->IsInWorld() || me->GetMap() != tPlayer->GetMap() ||
                         tPlayer->IsBeingTeleported() || tPlayer->isPossessed() || tPlayer->isCharmed()) continue;
-                    if (tPlayer->isAlive())
+                    if (tPlayer->IsAlive())
                     {
                         if (me->GetExactDist(tPlayer) > 25) continue;
                         if (GetHealthPCT(tPlayer) < 85)
@@ -174,7 +174,7 @@ public:
         {
             ReduceCD(diff);
             if (IAmDead()) return;
-            if (!me->getVictim())
+            if (!me->GetVictim())
                 Evade();
             CheckAuras();
             if (wait == 0)
@@ -203,13 +203,13 @@ public:
             CureGroup(master, DISPELMAGIC, diff);
             CureGroup(master, CURE_DISEASE, diff);
             //ShieldGroup(master);
-            if (master->isInCombat() || me->isInCombat())
+            if (master->IsInCombat() || me->IsInCombat())
             {
                 CheckDispel(diff);
                 CheckSilence(diff);
             }
 
-            if (me->isInCombat())
+            if (me->IsInCombat())
                 CheckShackles(diff);
             else
                 DoNonCombatActions(diff);
@@ -225,7 +225,7 @@ public:
                 !IsCasting())
                 //general rule
             {
-                opponent = me->getVictim();
+                opponent = me->GetVictim();
                 if (opponent)
                 {
                     if (!IsCasting())
@@ -302,13 +302,13 @@ public:
         {
             if (hp > 98)
                 return false;
-            if (!target || !target->isAlive() || me->GetExactDist(target) > 40)
+            if (!target || !target->IsAlive() || me->GetExactDist(target) > 40)
                 return false;
-            if (Rand() > 50 + 20*target->isInCombat() + 50*master->GetMap()->IsRaid())
+            if (Rand() > 50 + 20*target->IsInCombat() + 50*master->GetMap()->IsRaid())
                 return false;
 
             //GUARDIAN SPIRIT
-            if (GUARDIAN_SPIRIT && Guardian_Spirit_Timer <= diff && target->isInCombat() &&
+            if (GUARDIAN_SPIRIT && Guardian_Spirit_Timer <= diff && target->IsInCombat() &&
                 !target->getAttackers().empty() && hp < (5 + std::min(20, uint8(target->getAttackers().size())*5)) &&
                 ((master->GetGroup() && master->GetGroup()->IsMember(target->GetGUID())) || target == master) &&
                 Rand() < 80 &&
@@ -342,7 +342,7 @@ public:
 
             //PAIN SUPPRESSION
             if (hp < 35 && PAIN_SUPPRESSION && Pain_Suppression_Timer <= diff &&
-                (target->isInCombat() || !target->getAttackers().empty()) && Rand() < 50 &&
+                (target->IsInCombat() || !target->getAttackers().empty()) && Rand() < 50 &&
                 !target->HasAura(PAIN_SUPPRESSION))
             {
                 if (me->IsNonMeleeSpellCasted(false))
@@ -398,7 +398,7 @@ public:
                 doCast(target, FLASH_HEAL))
                 return true;
             //maintain HoTs
-            Unit* u = target->getVictim();
+            Unit* u = target->GetVictim();
             Creature* boss = u && u->ToCreature() && u->ToCreature()->isWorldBoss() ? u->ToCreature() : NULL;
             bool tanking = tank == target && boss;
             //Renew
@@ -445,7 +445,7 @@ public:
                 }
             }
 
-            if (me->isInCombat() && !master->GetMap()->IsRaid()) return false;
+            if (me->IsInCombat() && !master->GetMap()->IsRaid()) return false;
 
             if (PW_FORTITUDE && !HasAuraName(target, PW_FORTITUDE) &&
                 doCast(target, PW_FORTITUDE))
@@ -583,7 +583,7 @@ public:
             {
                 if (ShieldTarget(me, diff)) return;
 
-                if (FADE && Fade_Timer <= diff && me->isInCombat())
+                if (FADE && Fade_Timer <= diff && me->IsInCombat())
                 {
                     if (b_attackers.empty()) return;
                     uint8 Tattackers = 0;

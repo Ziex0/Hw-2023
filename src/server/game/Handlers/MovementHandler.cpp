@@ -115,7 +115,7 @@ void WorldSession::HandleMoveWorldportAckOpcode()
         else if (Battleground* bg = _player->GetBattleground())
         {
             if (_player->IsInvitedForBattlegroundInstance(_player->GetBattlegroundId()))
-                if (!_player->isGameMaster())//trinity_nya
+                if (!_player->IsGameMaster())//trinity_nya
                     bg->AddPlayer(_player);
         }
     }
@@ -399,13 +399,13 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
                 // NOTE: this is actually called many times while falling
                 // even after the player has been teleported away
                 /// @todo discard movement packets after the player is rooted
-                if (plrMover->isAlive())
+                if (plrMover->IsAlive())
                 {
                     plrMover->EnvironmentalDamage(DAMAGE_FALL_TO_VOID, GetPlayer()->GetMaxHealth());
                     // player can be alive if GM/etc
                     // change the death state to CORPSE to prevent the death timer from
                     // starting in the next player update
-                    if (!plrMover->isAlive())
+                    if (!plrMover->IsAlive())
                         plrMover->KillPlayer();
                 }
             }
@@ -591,7 +591,7 @@ void WorldSession::HandleMoveWaterWalkAck(WorldPacket& recvData)
 
 void WorldSession::HandleSummonResponseOpcode(WorldPacket& recvData)
 {
-    if (!_player->isAlive() || _player->isInCombat())
+    if (!_player->IsAlive() || _player->IsInCombat())
         return;
 
     uint64 summoner_guid;

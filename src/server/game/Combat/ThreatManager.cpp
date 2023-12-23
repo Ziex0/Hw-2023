@@ -67,11 +67,11 @@ bool ThreatCalcHelper::isValidProcess(Unit* hatedUnit, Unit* hatingUnit, SpellIn
         return false;
 
     // not to GM
-    if (hatedUnit->GetTypeId() == TYPEID_PLAYER && hatedUnit->ToPlayer()->isGameMaster())
+    if (hatedUnit->GetTypeId() == TYPEID_PLAYER && hatedUnit->ToPlayer()->IsGameMaster())
         return false;
 
     // not to dead and not for dead
-    if (!hatedUnit->isAlive() || !hatingUnit->isAlive())
+    if (!hatedUnit->IsAlive() || !hatingUnit->IsAlive())
         return false;
 
     // not in same map or phase
@@ -150,7 +150,7 @@ void HostileReference::addThreat(float modThreat)
     if (isValid() && modThreat >= 0.0f)
     {
         Unit* victimOwner = getTarget()->GetCharmerOrOwner();
-        if (victimOwner && victimOwner->isAlive())
+        if (victimOwner && victimOwner->IsAlive())
             getSource()->addThreat(victimOwner, 0.0f);     // create a threat to the owner of a pet, if the pet attacks
     }
 }
@@ -179,7 +179,7 @@ void HostileReference::updateOnlineStatus()
     // target is no player or not gamemaster
     // target is not in flight
     if (isValid()
-        && (getTarget()->GetTypeId() != TYPEID_PLAYER || !getTarget()->ToPlayer()->isGameMaster())
+        && (getTarget()->GetTypeId() != TYPEID_PLAYER || !getTarget()->ToPlayer()->IsGameMaster())
         && !getTarget()->HasUnitState(UNIT_STATE_IN_FLIGHT)
         && getTarget()->IsInMap(getSourceUnit())
         && getTarget()->InSamePhase(getSourceUnit())
@@ -445,7 +445,7 @@ void ThreatManager::_addThreat(Unit* victim, float threat)
         HostileReference* hostileRef = new HostileReference(victim, this, 0);
         iThreatContainer.addReference(hostileRef);
         hostileRef->addThreat(threat); // now we add the real threat
-        if (victim->GetTypeId() == TYPEID_PLAYER && victim->ToPlayer()->isGameMaster())
+        if (victim->GetTypeId() == TYPEID_PLAYER && victim->ToPlayer()->IsGameMaster())
             hostileRef->setOnlineOfflineState(false); // GM is always offline
     }
 }

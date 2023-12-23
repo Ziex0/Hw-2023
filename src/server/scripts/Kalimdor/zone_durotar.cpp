@@ -203,7 +203,7 @@ class npc_tiger_matriarch_credit : public CreatureScript
 
                             if (Unit* summoner = (*itr)->ToTempSummon()->GetSummoner())
                                 if (!summoner->HasAura(SPELL_NO_SUMMON_AURA) && !summoner->HasAura(SPELL_SUMMON_ZENTABRA_TRIGGER)
-                                    && !summoner->isInCombat())
+                                    && !summoner->IsInCombat())
                                 {
                                     me->AddAura(SPELL_NO_SUMMON_AURA, summoner);
                                     me->AddAura(SPELL_DETECT_INVIS, summoner);

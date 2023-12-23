@@ -651,7 +651,7 @@ void Spell::InitExplicitTargets(SpellCastTargets const& targets)
             }
             // try to use attacked unit as a target
             else if ((m_caster->GetTypeId() == TYPEID_UNIT) && neededTargets & (TARGET_FLAG_UNIT_ENEMY | TARGET_FLAG_UNIT))
-                unit = m_caster->getVictim();
+                unit = m_caster->GetVictim();
 
             // didn't find anything - let's use self as target
             if (!unit && neededTargets & (TARGET_FLAG_UNIT_RAID | TARGET_FLAG_UNIT_PARTY | TARGET_FLAG_UNIT_ALLY))
@@ -1171,7 +1171,7 @@ void Spell::SelectImplicitAreaTargets(SpellEffIndex effIndex, SpellImplicitTarge
                         case TYPEID_PLAYER:
                         {
                             Unit* unitTarget = (*itr)->ToUnit();
-                            if (unitTarget->isAlive() || !playerCaster->isHonorOrXPTarget(unitTarget)
+                            if (unitTarget->IsAlive() || !playerCaster->isHonorOrXPTarget(unitTarget)
                                 || ((unitTarget->GetCreatureTypeMask() & (1 << (CREATURE_TYPE_HUMANOID-1))) == 0)
                                 || (unitTarget->GetDisplayId() != unitTarget->GetNativeDisplayId()))
                                 break;
@@ -2152,7 +2152,7 @@ void Spell::AddUnitTarget(Unit* target, uint32 effectMask, bool checkIfValid /*=
     targetInfo.targetGUID = targetGUID;                         // Store target GUID
     targetInfo.effectMask = effectMask;                         // Store all effects not immune
     targetInfo.processed  = false;                              // Effects not apply on target
-    targetInfo.alive      = target->isAlive();
+    targetInfo.alive      = target->IsAlive();
     targetInfo.damage     = 0;
     targetInfo.crit       = false;
     targetInfo.scaleAura  = false;
@@ -2346,7 +2346,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
         return;
     }
 
-    if (unit->isAlive() != target->alive)
+    if (unit->IsAlive() != target->alive)
         return;
 
     if (getState() == SPELL_STATE_DELAYED && !m_spellInfo->IsPositive() && (getMSTime() - target->timeDelay) <= unit->m_lastSanctuaryTime)
@@ -2552,7 +2552,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
 
             // cast at creature (or GO) quest objectives update at successful cast finished (+channel finished)
             // ignore pets or autorepeat/melee casts for speed (not exist quest for spells (hm...)
-            if (m_originalCaster && m_originalCaster->IsControlledByPlayer() && !spellHitTarget->ToCreature()->isPet() && !IsAutoRepeat() && !IsNextMeleeSwingSpell() && !IsChannelActive())
+            if (m_originalCaster && m_originalCaster->IsControlledByPlayer() && !spellHitTarget->ToCreature()->IsPet() && !IsAutoRepeat() && !IsNextMeleeSwingSpell() && !IsChannelActive())
                 if (Player* p = m_originalCaster->GetCharmerOrOwnerPlayerOrPlayerItself())
                     p->CastedCreatureOrGO(spellHitTarget->GetEntry(), spellHitTarget->GetGUID(), m_spellInfo->Id);
         }
@@ -2649,7 +2649,7 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
                 if (m_caster->GetTypeId() == TYPEID_PLAYER)
                     m_caster->ToPlayer()->UpdatePvP(true);
             }
-            if (unit->isInCombat() && !(m_spellInfo->AttributesEx3 & SPELL_ATTR3_NO_INITIAL_AGGRO))
+            if (unit->IsInCombat() && !(m_spellInfo->AttributesEx3 & SPELL_ATTR3_NO_INITIAL_AGGRO))
             {
                 m_caster->SetInCombatState(unit->GetCombatTimer() > 0, unit);
                 unit->getHostileRefManager().threatAssist(m_caster, 0.0f);
@@ -3180,7 +3180,7 @@ void Spell::cast(bool skipCheck)
         // This prevents spells such as Hunter's Mark from triggering pet attack
         if (this->GetSpellInfo()->DmgClass != SPELL_DAMAGE_CLASS_NONE)
             if (Pet* playerPet = playerCaster->GetPet())
-                if (playerPet->isAlive() && playerPet->isControlled() && (m_targets.GetTargetMask() & TARGET_FLAG_UNIT))
+                if (playerPet->IsAlive() && playerPet->isControlled() && (m_targets.GetTargetMask() & TARGET_FLAG_UNIT))
                     playerPet->AI()->OwnerAttacked(m_targets.GetObjectTarget()->ToUnit());
     }
 
@@ -3538,7 +3538,7 @@ void Spell::_handle_finish_phase()
     }
 
     if (m_caster->m_extraAttacks && GetSpellInfo()->HasEffect(SPELL_EFFECT_ADD_EXTRA_ATTACKS))
-        m_caster->HandleProcExtraAttackFor(m_caster->getVictim());
+        m_caster->HandleProcExtraAttackFor(m_caster->GetVictim());
 
     /// @todo trigger proc phase finish here
 }
@@ -3901,7 +3901,7 @@ void Spell::SendSpellStart()
     if (m_spellInfo->Attributes & SPELL_ATTR0_REQ_AMMO)
         castFlags |= CAST_FLAG_AMMO;
     if ((m_caster->GetTypeId() == TYPEID_PLAYER ||
-        (m_caster->GetTypeId() == TYPEID_UNIT && m_caster->ToCreature()->isPet()))
+        (m_caster->GetTypeId() == TYPEID_UNIT && m_caster->ToCreature()->IsPet()))
          && m_spellInfo->PowerType != POWER_HEALTH)
         castFlags |= CAST_FLAG_POWER_LEFT_SELF;
 
@@ -3955,7 +3955,7 @@ void Spell::SendSpellGo()
         castFlags |= CAST_FLAG_AMMO;                        // arrows/bullets visual
 
     if ((m_caster->GetTypeId() == TYPEID_PLAYER ||
-        (m_caster->GetTypeId() == TYPEID_UNIT && m_caster->ToCreature()->isPet()))
+        (m_caster->GetTypeId() == TYPEID_UNIT && m_caster->ToCreature()->IsPet()))
         && m_spellInfo->PowerType != POWER_HEALTH)
         castFlags |= CAST_FLAG_POWER_LEFT_SELF; // should only be sent to self, but the current messaging doesn't make that possible
 
@@ -4746,7 +4746,7 @@ SpellCastResult Spell::CheckCast(bool strict)
 				return SPELL_FAILED_NOT_IN_ARENA;
 				
     // check death state
-    if (!m_caster->isAlive() && !(m_spellInfo->Attributes & SPELL_ATTR0_PASSIVE) && !((m_spellInfo->Attributes & SPELL_ATTR0_CASTABLE_WHILE_DEAD) || (IsTriggered() && !m_triggeredByAuraSpell)))
+    if (!m_caster->IsAlive() && !(m_spellInfo->Attributes & SPELL_ATTR0_PASSIVE) && !((m_spellInfo->Attributes & SPELL_ATTR0_CASTABLE_WHILE_DEAD) || (IsTriggered() && !m_triggeredByAuraSpell)))
         return SPELL_FAILED_CASTER_DEAD;
 
     // check cooldowns to prevent cheating
@@ -4857,7 +4857,7 @@ SpellCastResult Spell::CheckCast(bool strict)
         if (m_spellInfo->ExcludeCasterAuraSpell && m_caster->HasAura(sSpellMgr->GetSpellIdForDifficulty(m_spellInfo->ExcludeCasterAuraSpell, m_caster)))
             return SPELL_FAILED_CASTER_AURASTATE;
 
-        if (reqCombat && m_caster->isInCombat() && !m_spellInfo->CanBeUsedInCombat())
+        if (reqCombat && m_caster->IsInCombat() && !m_spellInfo->CanBeUsedInCombat())
             return SPELL_FAILED_AFFECTING_COMBAT;
     }
 
@@ -4974,7 +4974,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                 return SPELL_FAILED_NOT_IN_ARENA;
 
     // zone check
-    if (m_caster->GetTypeId() == TYPEID_UNIT || !m_caster->ToPlayer()->isGameMaster())
+    if (m_caster->GetTypeId() == TYPEID_UNIT || !m_caster->ToPlayer()->IsGameMaster())
     {
         uint32 zone, area;
         m_caster->GetZoneAndAreaId(zone, area);
@@ -5139,7 +5139,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                 if (!pet->GetCurrentFoodBenefitLevel(foodItem->GetTemplate()->ItemLevel))
                     return SPELL_FAILED_FOOD_LOWLEVEL;
 
-                if (m_caster->isInCombat() || pet->isInCombat())
+                if (m_caster->IsInCombat() || pet->IsInCombat())
                     return SPELL_FAILED_AFFECTING_COMBAT;
 
                 break;
@@ -5281,7 +5281,7 @@ SpellCastResult Spell::CheckCast(bool strict)
             {
                 Creature* pet = m_caster->GetGuardianPet();
 
-                if (pet && pet->isAlive())
+                if (pet && pet->IsAlive())
                     return SPELL_FAILED_ALREADY_HAVE_SUMMON;
 
                 break;
@@ -5511,7 +5511,7 @@ SpellCastResult Spell::CheckCast(bool strict)
             {
                 // not allow cast fly spells if not have req. skills  (all spells is self target)
                 // allow always ghost flight spells
-                if (m_originalCaster && m_originalCaster->GetTypeId() == TYPEID_PLAYER && m_originalCaster->isAlive())
+                if (m_originalCaster && m_originalCaster->GetTypeId() == TYPEID_PLAYER && m_originalCaster->IsAlive())
                 {
                     Battlefield* Bf = sBattlefieldMgr->GetBattlefieldToZoneId(m_originalCaster->GetZoneId());
                     if (AreaTableEntry const* area = GetAreaEntryByAreaID(m_originalCaster->GetAreaId()))
@@ -5581,7 +5581,7 @@ SpellCastResult Spell::CheckPetCast(Unit* target)
 
     // dead owner (pets still alive when owners ressed?)
     if (Unit* owner = m_caster->GetCharmerOrOwner())
-        if (!owner->isAlive())
+        if (!owner->IsAlive())
             return SPELL_FAILED_CASTER_DEAD;
 
     if (!target && m_targets.GetUnitTarget())
@@ -6801,7 +6801,7 @@ bool SpellEvent::IsDeletable() const
 
 bool Spell::IsValidDeadOrAliveTarget(Unit const* target) const
 {
-    if (target->isAlive())
+    if (target->IsAlive())
         return !m_spellInfo->IsRequiringDeadTarget();
     if (m_spellInfo->IsAllowingDeadTarget())
         return true;

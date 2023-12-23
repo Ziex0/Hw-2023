@@ -203,7 +203,7 @@ public:
             for (i = threatlist.begin(); i != threatlist.end(); ++i)
             {
                 Unit* unit = ObjectAccessor::GetUnit(*me, (*i)->getUnitGuid());
-                if (unit && unit->isAlive())
+                if (unit && unit->IsAlive())
                 {
                     float threat = me->getThreatManager().getThreat(unit);
                     summonedUnit->AddThreat(unit, threat);

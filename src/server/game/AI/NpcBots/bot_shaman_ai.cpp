@@ -106,7 +106,7 @@ public:
         {
             if (!BLOODLUST || Bloodlust_Timer > diff || me->GetDistance(master) > 18 || IsCasting() || Rand() > 15)
                 return;
-            if (!me->isInCombat() || !master->isInCombat())
+            if (!me->IsInCombat() || !master->IsInCombat())
                 return;
             if (HasAuraName(master, BLOODLUST))
             {
@@ -114,7 +114,7 @@ public:
                 return;
             }
 
-            if (Unit* u = me->getVictim())
+            if (Unit* u = me->GetVictim())
             {
                 Creature* cre = u->ToCreature();
                 if (u->GetMaxHealth() > me->GetHealth() * 2 ||
@@ -163,7 +163,7 @@ public:
                 return;
             //Summon
             //TODO: role-based totems (attack/heal)
-            if (me->isInCombat())
+            if (me->IsInCombat())
             {
                 if (WINDFURY_TOTEM && !_totems[T_AIR].first && !master->m_SummonSlot[T_AIR+1])
                 {
@@ -216,7 +216,7 @@ public:
                     }
                     else if (SEARING_TOTEM && Searing_Totem_Timer <= diff)
                     {
-                        if (Unit* u = me->getVictim())
+                        if (Unit* u = me->GetVictim())
                         {
                             if (me->GetExactDist(u) < (u->isMoving() ? 10 : 25))
                             {
@@ -328,7 +328,7 @@ public:
             {
                 Player* tPlayer = itr->getSource();
                 if (!tPlayer || !tPlayer->IsInWorld() || tPlayer->GetMapId() != me->GetMapId() ||
-                    (!tPlayer->isAlive() && !tPlayer->HaveBot())) continue;
+                    (!tPlayer->IsAlive() && !tPlayer->HaveBot())) continue;
                 if (me->GetExactDist(tPlayer) > 20) continue;
                 if (tPlayer->getPowerType() != POWER_MANA) continue;
                 if (GetManaPCT(tPlayer) < 35)
@@ -375,7 +375,7 @@ public:
         {
             ReduceCD(diff);
             if (IAmDead()) return;
-            if (me->getVictim())
+            if (me->GetVictim())
             {
                 if (isTwoHander())
                     DoMeleeAttackIfReady();
@@ -410,10 +410,10 @@ public:
             CheckManaTide(diff);
             CheckTotems(diff);
 
-            if (master->isInCombat() || me->isInCombat())
+            if (master->IsInCombat() || me->IsInCombat())
                 CheckDispel(diff);
 
-            if (!me->isInCombat())
+            if (!me->IsInCombat())
                 DoNonCombatActions(diff);
             //buff myself
             if (LIGHTNING_SHIELD && tank != me && !Shielded(me))
@@ -440,7 +440,7 @@ public:
             if (!WIND_SHEAR || Wind_Shear_Timer > diff || Rand() > 60)
                 return;
 
-            Unit* u = me->getVictim();
+            Unit* u = me->GetVictim();
             if (u && u->IsNonMeleeSpellCasted(false))
             {
                 temptimer = GC_Timer;
@@ -467,7 +467,7 @@ public:
 
         void DoNormalAttack(uint32 diff)
         {
-            opponent = me->getVictim();
+            opponent = me->GetVictim();
             if (opponent)
             {
                 if (!IsCasting())
@@ -580,9 +580,9 @@ public:
 
         void CheckHexy2(uint32 diff)
         {
-            if (HEX && Hexy == false && Hex_Timer < diff && me->getVictim())
+            if (HEX && Hexy == false && Hex_Timer < diff && me->GetVictim())
             {
-                if (Unit* target = FindPolyTarget(20, me->getVictim()))
+                if (Unit* target = FindPolyTarget(20, me->GetVictim()))
                 {
                     if (doCast(target, HEX))
                     {
@@ -645,10 +645,10 @@ public:
             if (!WATER_WALKING && !WATER_BREATHING && !EARTH_SHIELD)
                 return false;
 
-            if (GC_Timer > diff || !target || !target->isAlive() || Rand() > 40) return false;
+            if (GC_Timer > diff || !target || !target->IsAlive() || Rand() > 40) return false;
             
             if (EARTH_SHIELD && Earthy == false && ((!tank && target == master) || target == tank) &&
-                (target->isInCombat() || !target->isMoving()) &&
+                (target->IsInCombat() || !target->isMoving()) &&
                 me->GetExactDist(target) < 40 && Rand() < 75)
             {
                 bool cast = !Shielded(target);
@@ -665,7 +665,7 @@ public:
             }
 
             if (me->GetExactDist(target) > 30) return false;
-            if (me->isInCombat() && !master->GetMap()->IsRaid()) return false;
+            if (me->IsInCombat() && !master->GetMap()->IsRaid()) return false;
 
             if (target->HasUnitMovementFlag(MOVEMENTFLAG_SWIMMING))
             {
@@ -706,9 +706,9 @@ public:
         {
             if (hp > 97)
                 return false;
-            if (!target || !target->isAlive() || me->GetExactDist(target) > 40)
+            if (!target || !target->IsAlive() || me->GetExactDist(target) > 40)
                 return false;
-            if (Rand() > 50 + 20*target->isInCombat() + 50*master->GetMap()->IsRaid())
+            if (Rand() > 50 + 20*target->IsInCombat() + 50*master->GetMap()->IsRaid())
                 return false;
 
             //PLACEHOLDER: Instant spell req. interrupt current spell

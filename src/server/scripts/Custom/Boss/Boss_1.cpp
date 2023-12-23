@@ -252,28 +252,28 @@ public:
 		        //Aura of Dread Timer
 		        if (AuraOfDread_Timer <= diff)
 		        {
-			        DoCast (me->getVictim(), SPELL_AURA_OF_DREAD);
+			        DoCast (me->GetVictim(), SPELL_AURA_OF_DREAD);
 			        AuraOfDread_Timer = 2500;
 		        } else AuraOfDread_Timer -= diff;
 
 		        //Sunder Armor Timer
 		        if (SunderArmor_Timer <= diff)
 		        {
-			        DoCast (me->getVictim(), SPELL_SUNDER_ARMOR);
+			        DoCast (me->GetVictim(), SPELL_SUNDER_ARMOR);
 			        SunderArmor_Timer = 15000;
                 } else SunderArmor_Timer -= diff;
 
 		        //Burning Fists Timer
 			    if (BurningFists_Timer <= diff)
 		        {
-			        DoCast (me->getVictim(), SPELL_BURNING_FISTS);
+			        DoCast (me->GetVictim(), SPELL_BURNING_FISTS);
 			        BurningFists_Timer = 25001;
                 } else BurningFists_Timer -= diff;
 
 		    	//Unholy Power Timer
 		     	if (UnholyPower_Timer <= diff)
 		        {
-		        	DoCast (me->getVictim(), SPELL_UNHOLY_POWER);
+		        	DoCast (me->GetVictim(), SPELL_UNHOLY_POWER);
 		        	UnholyPower_Timer = 25000;
 		            me->MonsterTextEmote(EMOTE_STRENGTH, 0, true);
                 } else UnholyPower_Timer -= diff;

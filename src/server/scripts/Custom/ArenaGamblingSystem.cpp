@@ -77,15 +77,15 @@ void GamblingSystem::OnUpdate(uint32 diff)
 // Database Interaction
 void GamblingSystem::LoadConfigData()
 {
-    m_minRequiredLevel = 255;
+    m_minRequiredLevel   = 255;
     m_maxLevelDiff       = 5;
-    m_maxBet           = 100;
-    m_awardFled           = false;
+    m_maxBet             = 100;
+    m_awardFled          = false;
     m_enableGM           = false;
     m_enableSameip       = false;
     m_enableLimits       = false;
     m_onlyCurrency       = false;
-    m_equalDuels       = false;
+    m_equalDuels         = false;
     if(QueryResult queryResult = CharacterDatabase.Query("SELECT `optionIndex`, `optionValue` FROM `custom_duel_config`"))
     {
         do
@@ -93,14 +93,14 @@ void GamblingSystem::LoadConfigData()
             Field *Fields = queryResult->Fetch();
             switch(Fields[0].GetUInt32())
             {
-                case GAMBLER_CONFIG_OPTION_MAPID:                m_arenaCoords.m_mapId        = Fields[1].GetUInt32();    break;
-                case GAMBLER_CONFIG_OPTION_COORDSX:                m_arenaCoords.m_positionX    = Fields[1].GetFloat();        break;
-                case GAMBLER_CONFIG_OPTION_COORDSY:                m_arenaCoords.m_positionY    = Fields[1].GetFloat();        break;
-                case GAMBLER_CONFIG_OPTION_COORDSZ:                m_arenaCoords.m_positionZ    = Fields[1].GetFloat();        break;
-                case GAMBLER_CONFIG_OPTION_COORDSO:                m_arenaCoords.m_orientation    = Fields[1].GetFloat();        break;
-                case GAMBLER_CONFIG_OPTION_MIN_REQUIREDLEVEL:    m_minRequiredLevel            = Fields[1].GetUInt32();    break;
-                case GAMBLER_CONFIG_OPTION_MAX_LEVELDIFF:        m_maxLevelDiff                = Fields[1].GetUInt32();    break;
-                case GAMBLER_CONFIG_OPTION_AWARD_FLED:            m_awardFled                    = Fields[1].GetBool();        break;
+                case GAMBLER_CONFIG_OPTION_MAPID:                  m_arenaCoords.m_mapId          = Fields[1].GetUInt32();    break;
+                case GAMBLER_CONFIG_OPTION_COORDSX:                m_arenaCoords.m_positionX      = Fields[1].GetFloat();     break;
+                case GAMBLER_CONFIG_OPTION_COORDSY:                m_arenaCoords.m_positionY      = Fields[1].GetFloat();     break;
+                case GAMBLER_CONFIG_OPTION_COORDSZ:                m_arenaCoords.m_positionZ      = Fields[1].GetFloat();     break;
+                case GAMBLER_CONFIG_OPTION_COORDSO:                m_arenaCoords.m_orientation    = Fields[1].GetFloat();     break;
+                case GAMBLER_CONFIG_OPTION_MIN_REQUIREDLEVEL:      m_minRequiredLevel             = Fields[1].GetUInt32();    break;
+                case GAMBLER_CONFIG_OPTION_MAX_LEVELDIFF:          m_maxLevelDiff                 = Fields[1].GetUInt32();    break;
+                case GAMBLER_CONFIG_OPTION_AWARD_FLED:             m_awardFled                    = Fields[1].GetBool();      break;
                 case GAMBLER_CONFIG_OPTION_MAX_BET:
                     m_maxBet                    = Fields[1].GetUInt32();
                     if(m_maxBet > GAMBLER_SYSTEM_TOTAL_MAX_BET){
@@ -111,7 +111,7 @@ void GamblingSystem::LoadConfigData()
                 case GAMBLER_CONFIG_OPTION_ENABLE_SAMEIP:        m_enableSameip                = Fields[1].GetBool();        break;
                 case GAMBLER_CONFIG_OPTION_ENABLE_LIMITS:        m_enableLimits                = Fields[1].GetBool();        break;
                 case GAMBLER_CONFIG_OPTION_ONLY_CURRENCY:        m_onlyCurrency                = Fields[1].GetBool();        break;
-                case GAMBLER_CONFIG_OPTION_EQUAL_DUELS:            m_equalDuels                = Fields[1].GetBool();        break;
+                case GAMBLER_CONFIG_OPTION_EQUAL_DUELS:          m_equalDuels                  = Fields[1].GetBool();        break;
             }
         }while(queryResult->NextRow());
     }
@@ -196,7 +196,7 @@ bool GamblingSystem::CanHaveMatch(Player *pChallenger, Player *pDefender)
     }
 
     // if gm dueling is enabled in configuration
-    if(m_enableGM == 1){
+    if(m_enableGM > 3){
         // No gamemasters
          if(pChallenger->GetSession()->GetSecurity() > 0 || pDefender->GetSession()->GetSecurity() > 0)
             return false;
@@ -404,7 +404,7 @@ void GamblingSystem::AcceptChallenge(Player *pPlayer)
             return;
         }
         // Don't start the duel if they are already InCombat
-        if(secondPlayer->isInCombat() || pPlayer->isInCombat())
+        if(secondPlayer->IsInCombat() || pPlayer->IsInCombat())
         {
             SendMessageToPlayers(matchData, GAMBLER_SYSTEM_MSG_CANT_START_DUEL);
             _deleteMatchData(matchData->GetMatchId());
@@ -720,4 +720,4 @@ void GamblerDuelScript::OnLogout(Player *pPlayer)
         return;}
     else if(matchData->MatchStarted() && (matchData->GetChallengerGUID() == pPlayer->GetGUIDLow() || matchData->GetDefenderGUID() == pPlayer->GetGUIDLow()))
             pPlayer->DuelComplete(DUEL_FLED);
-}
+}

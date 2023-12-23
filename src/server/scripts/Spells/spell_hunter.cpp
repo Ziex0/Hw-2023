@@ -252,7 +252,7 @@ class spell_hun_disengage : public SpellScriptLoader
             SpellCastResult CheckCast()
             {
                 Unit* caster = GetCaster();
-                if (caster->GetTypeId() == TYPEID_PLAYER && !caster->isInCombat())
+                if (caster->GetTypeId() == TYPEID_PLAYER && !caster->IsInCombat())
                     return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
 
                 return SPELL_CAST_OK;
@@ -482,7 +482,7 @@ class spell_hun_pet_carrion_feeder : public SpellScriptLoader
 
             bool Load()
             {
-                if (!GetCaster()->isPet())
+                if (!GetCaster()->IsPet())
                     return false;
                 return true;
             }
@@ -539,7 +539,7 @@ class spell_hun_pet_heart_of_the_phoenix : public SpellScriptLoader
 
             bool Load()
             {
-                if (!GetCaster()->isPet())
+                if (!GetCaster()->IsPet())
                     return false;
                 return true;
             }

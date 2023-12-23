@@ -1398,13 +1398,14 @@ void AddBattlegroundScripts()
 	void AddSC_SpellRegulator();
 	void AddSpellRegulatorScripts();
 	void AddSC_GMIsland_Theminator();
-	void AddSC_Security_Scripts();
+	//void AddSC_Security_Scripts();
 	void AddSC_Packet_Protection();
 
 	//TELE
 	void AddSc_Scripttele_icc();
 	void AddSc_ScriptDawn_sand();
 	void AddSc_ScriptAshes_Fates();
+	void AddSc_Scriptblood_forg();
 
 #endif
 
@@ -1506,13 +1507,14 @@ void AddCustomScripts()
 	AddSC_beastmaster_npc();
 	AddSC_SpellRegulator();
 	AddSC_GMIsland_Theminator();
-	AddSC_Security_Scripts();
+	//AddSC_Security_Scripts();
 	AddSC_Packet_Protection();
 
 	//TELE
 	AddSc_Scripttele_icc();
 	AddSc_ScriptDawn_sand();
 	AddSc_ScriptAshes_Fates();
+	AddSc_Scriptblood_forg();
 	
 #endif
 }

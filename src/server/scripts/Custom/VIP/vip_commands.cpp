@@ -141,7 +141,7 @@ public:
             if (map->IsBattlegroundOrArena())
             {
                 // only allow if gm mode is on
-                if (!_player->isGameMaster())
+                if (!_player->IsGameMaster())
                 {
                     handler->PSendSysMessage(LANG_CANNOT_GO_TO_BG_GM, chrNameLink.c_str());
                     handler->SetSentErrorMessage(true);
@@ -176,7 +176,7 @@ public:
                 else
                 {
                     // we are not in group, let's verify our GM mode
-                    if (!_player->isGameMaster())
+                    if (!_player->IsGameMaster())
                     {
                         handler->PSendSysMessage(LANG_CANNOT_GO_TO_INST_GM, chrNameLink.c_str());
                         handler->SetSentErrorMessage(true);
@@ -290,7 +290,7 @@ public:
             if (map->IsBattlegroundOrArena())
             {
                 // only allow if gm mode is on
-                if (!_player->isGameMaster())
+                if (!_player->IsGameMaster())
                 {
                     handler->PSendSysMessage(LANG_CANNOT_GO_TO_BG_GM, nameLink.c_str());
                     handler->SetSentErrorMessage(true);
@@ -445,7 +445,7 @@ public:
 {
                 Player* plr = handler->GetSession()->GetPlayer();
                  
-                if (plr->isInCombat())
+                if (plr->IsInCombat())
                 {plr->GetSession()->SendNotification("You're in combat!");      
                                 return true;
                 }
@@ -586,7 +586,7 @@ public:
             return false;
         }
  
-        if (me->isInCombat())
+        if (me->IsInCombat())
         {
             handler->SendSysMessage(LANG_YOU_IN_COMBAT);
             handler->SetSentErrorMessage(true);
@@ -618,7 +618,7 @@ public:
 	static bool HandleBuffCommand(ChatHandler * handler, const char * args)
     {
         Player * pl = handler->GetSession()->GetPlayer();
-		if(pl->isInCombat())
+		if(pl->IsInCombat())
 		{
 			pl->GetSession()->SendNotification("You can't use this in combat!");
 			return false;
@@ -708,7 +708,7 @@ public:
 
         Player* me = handler->GetSession()->GetPlayer();
 
-        if (me->isInCombat())
+        if (me->IsInCombat())
         {
             handler->SendSysMessage(LANG_YOU_IN_COMBAT);
             handler->SetSentErrorMessage(true);

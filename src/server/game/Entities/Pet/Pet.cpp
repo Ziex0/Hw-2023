@@ -688,7 +688,7 @@ void Pet::LoseHappiness()
     if (curValue <= 0)
         return;
     int32 addvalue = 670;                                   //value is 70/35/17/8/4 (per min) * 1000 / 8 (timer 7.5 secs)
-    if (isInCombat())                                        //we know in combat happiness fades faster, multiplier guess
+    if (IsInCombat())                                        //we know in combat happiness fades faster, multiplier guess
         addvalue = int32(addvalue * 1.5f);
     ModifyPower(POWER_HAPPINESS, -addvalue);
 }
@@ -716,7 +716,7 @@ void Pet::GivePetXP(uint32 xp)
     if (xp < 1)
         return;
 
-    if (!isAlive())
+    if (!IsAlive())
         return;
 
     uint8 maxlevel = std::min((uint8)sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL), GetOwner()->getLevel());
@@ -843,7 +843,7 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
 
     //Determine pet type
     PetType petType = MAX_PET_TYPE;
-    if (isPet() && GetOwner()->GetTypeId() == TYPEID_PLAYER)
+    if (IsPet() && GetOwner()->GetTypeId() == TYPEID_PLAYER)
     {
         if (GetOwner()->GetClass() == CLASS_WARLOCK
                 || GetOwner()->GetClass() == CLASS_SHAMAN        // Fire Elemental

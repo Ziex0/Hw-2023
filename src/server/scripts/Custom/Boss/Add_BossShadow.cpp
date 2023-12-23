@@ -13,9 +13,6 @@ enum Spells
     SPELL_FRENZY                                  = 58841,
     SPELL_CLONE_PLAYER                            = 57507, //casted on player during insanity
     SPELL_INSANITY_PHASING_1                      = 57508,
-    SPELL_INSANITY_PHASING_2                      = 57509,
-    SPELL_INSANITY_PHASING_3                      = 57510,
-    SPELL_INSANITY_PHASING_4                      = 57511,
     SPELL_INSANITY_PHASING_5                      = 57512
 };
 
@@ -74,7 +71,7 @@ public:
             if (spell->Id == SPELL_INSANITY)
             {
                 // Not good target or too many players
-                if (target->GetTypeId() != TYPEID_PLAYER || insanityHandled > 4)
+                if (target->GetTypeId() != TYPEID_PLAYER || insanityHandled > 2)
                     return;
                 // First target - start channel visual and set self as unnattackable
                 if (!insanityHandled)
@@ -92,7 +89,7 @@ public:
                 for (Map::PlayerList::const_iterator i = players.begin(); i != players.end(); ++i)
                 {
                     Player* player = i->getSource();
-                    if (!player || !player->isAlive())
+                    if (!player || !player->IsAlive())
                         continue;
                     // Summon insanity
                     if (Unit* summon = me->SummonCreature(MOB_INSANITY, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation(), TEMPSUMMON_CORPSE_DESPAWN, 0))
@@ -154,14 +151,6 @@ public:
                 case 16:
                     spell = SPELL_INSANITY_PHASING_1;
                     break;
-                case 32:
-                    spell = SPELL_INSANITY_PHASING_2;
-                    break;
-                case 64:
-                    spell = SPELL_INSANITY_PHASING_3;
-                    break;
-                case 128:
-                    spell = SPELL_INSANITY_PHASING_4;
                     break;
                 case 256:
                     spell = SPELL_INSANITY_PHASING_5;
@@ -217,7 +206,7 @@ public:
 		void UpdateAI(uint32 diff)
 
         {
-             if (!me->getVictim())
+             if (!me->GetVictim())
             {
                DoCast(me, SPELL_STEALTH);
             }
@@ -239,7 +228,7 @@ public:
 
             if (Slash_Timer <= diff)
             {
-                DoCast(me->getVictim(), SPELL_SLASH);
+                DoCast(me->GetVictim(), SPELL_SLASH);
                 Slash_Timer = 5000;
             } else Slash_Timer -= diff;
 

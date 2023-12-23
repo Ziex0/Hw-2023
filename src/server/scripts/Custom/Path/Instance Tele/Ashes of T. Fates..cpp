@@ -33,7 +33,7 @@ public:
         }
 				void ReceiveEmote(Player *pPlayer, uint32 uiTextEmote)
 		{
-			if (pPlayer->isInCombat())
+			if (pPlayer->IsInCombat())
 				{ pPlayer->GetSession()->SendAreaTriggerMessage("|cffff0000You are in combat!|r"); } 
 				return;
 		}

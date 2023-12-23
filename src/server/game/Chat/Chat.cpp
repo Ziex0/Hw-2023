@@ -228,7 +228,7 @@ void ChatHandler::SendCustomOfficerChat(const char* message)
     char msg[1024];
     char* classStr = "|TInterface\\ICONS\\INV_Misc_QuestionMark:14:14:0:-1|t";
     char* raceStr = "|TInterface\\ICONS\\INV_Misc_QuestionMark:14:14:0:-2|t";
-    char* gmStr = pPlayer->isGameMaster() ? "|Tinterface\\ChatFrame\\UI-ChatIcon-Blizz.blp:12:22:1:-1|t|r" : "";
+    char* gmStr = pPlayer->IsGameMaster() ? "|Tinterface\\ChatFrame\\UI-ChatIcon-Blizz.blp:12:22:1:-1|t|r" : "";
 
     if (pPlayer->GetClass() == CLASS_WARRIOR)
         classStr = "|TInterface\\ICONS\\inv_sword_27:14:14:0:-1|t";
@@ -280,7 +280,7 @@ void ChatHandler::SendCustomOfficerChat(const char* message)
 
 	vipcolor_config << "Channel.Name.Color.Lv" << std::to_string(m_session->GetSecurity()).c_str();
     
-	nameLink << "|Hplayer:" << pPlayer->GetName().c_str() << "|h|cFF" << ConfigMgr::GetStringDefault(pPlayer->isGameMaster() ? "Channel.Name.Color.GM" : vipcolor_config.str().c_str(), "00FF00").c_str() << "[" << pPlayer->GetName().c_str() << "]|r|h";
+	nameLink << "|Hplayer:" << pPlayer->GetName().c_str() << "|h|cFF" << ConfigMgr::GetStringDefault(pPlayer->IsGameMaster() ? "Channel.Name.Color.GM" : vipcolor_config.str().c_str(), "00FF00").c_str() << "[" << pPlayer->GetName().c_str() << "]|r|h";
 
     snprintf(msg, 1024, "|cff0FFF93[World Channel]|r %s %s %s %s|cff00FF00: %s%s", raceStr, classStr, gmStr, nameLink.str().c_str(), m_session->GetVipLevel() > 0 ? "|cffFFA500" : "", message);
 

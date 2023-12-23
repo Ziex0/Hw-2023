@@ -852,7 +852,7 @@ public:
     void BlockDamage(uint32 amount);
 
     Unit* GetAttacker() const { return m_attacker; }
-    Unit* getVictim() const { return m_victim; }
+    Unit* GetVictim() const { return m_victim; }
     SpellInfo const* GetSpellInfo() const { return m_spellInfo; }
     SpellSchoolMask GetSchoolMask() const { return m_schoolMask; }
     DamageEffectType GetDamageType() const { return m_damageType; }
@@ -1309,7 +1309,7 @@ class Unit : public WorldObject
         void RemoveAllAttackers();
         AttackerSet const& getAttackers() const { return m_attackers; }
         bool isAttackingPlayer() const;
-        Unit* getVictim() const { return m_attacking; }
+        Unit* GetVictim() const { return m_attacking; }
 
         void CombatStop(bool includingCast = false);
         void CombatStopWithPets(bool includingCast = false);
@@ -1327,7 +1327,7 @@ class Unit : public WorldObject
         void AddUnitTypeMask(uint32 mask) { m_unitTypeMask |= mask; }
         bool isSummon() const   { return m_unitTypeMask & UNIT_MASK_SUMMON; }
         bool isGuardian() const { return m_unitTypeMask & UNIT_MASK_GUARDIAN; }
-        bool isPet() const      { return m_unitTypeMask & UNIT_MASK_PET; }
+        bool IsPet() const      { return m_unitTypeMask & UNIT_MASK_PET; }
         bool isHunterPet() const{ return m_unitTypeMask & UNIT_MASK_HUNTER_PET; }
         bool isTotem() const    { return m_unitTypeMask & UNIT_MASK_TOTEM; }
         bool IsVehicle() const  { return m_unitTypeMask & UNIT_MASK_VEHICLE; }
@@ -1509,7 +1509,7 @@ class Unit : public WorldObject
 
         bool isInFlight()  const { return HasUnitState(UNIT_STATE_IN_FLIGHT); }
 
-        bool isInCombat()  const { return HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IN_COMBAT); }
+        bool IsInCombat()  const { return HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IN_COMBAT); }
         void CombatStart(Unit* target, bool initialAggro = true);
         void SetInCombatState(bool PvP, Unit* enemy = NULL);
         void SetInCombatWith(Unit* enemy);
@@ -1623,7 +1623,7 @@ class Unit : public WorldObject
 
         void BuildHeartBeatMsg(WorldPacket* data) const;
 
-        bool isAlive() const { return (m_deathState == ALIVE); }
+        bool IsAlive() const { return (m_deathState == ALIVE); }
         bool isDying() const { return (m_deathState == JUST_DIED); }
         bool isDead() const { return (m_deathState == DEAD || m_deathState == CORPSE); }
         DeathState getDeathState() const { return m_deathState; }
@@ -2124,8 +2124,8 @@ class Unit : public WorldObject
         virtual bool isBeingLoaded() const { return false;}
         bool IsDuringRemoveFromWorld() const {return m_duringRemoveFromWorld;}
 
-        Pet* ToPet() { if (isPet()) return reinterpret_cast<Pet*>(this); else return NULL; }
-        Pet const* ToPet() const { if (isPet()) return reinterpret_cast<Pet const*>(this); else return NULL; }
+        Pet* ToPet() { if (IsPet()) return reinterpret_cast<Pet*>(this); else return NULL; }
+        Pet const* ToPet() const { if (IsPet()) return reinterpret_cast<Pet const*>(this); else return NULL; }
 
         Totem* ToTotem() { if (isTotem()) return reinterpret_cast<Totem*>(this); else return NULL; }
         Totem const* ToTotem() const { if (isTotem()) return reinterpret_cast<Totem const*>(this); else return NULL; }

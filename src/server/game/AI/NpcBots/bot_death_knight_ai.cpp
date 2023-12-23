@@ -364,11 +364,11 @@ public:
 
             Unit* target = NULL;
 
-            if (master->isAlive() && isMeleeClass(master->GetClass()) && master->isInCombat() &&
+            if (master->IsAlive() && isMeleeClass(master->GetClass()) && master->IsInCombat() &&
                 GetHealthPCT(master) > 80 && me->GetDistance(master) < 30 &&
                 master->getAttackers().empty() && !CCed(master, true))
             {
-                if (Unit* u = master->getVictim())
+                if (Unit* u = master->GetVictim())
                     if (u->GetHealth() > me->GetMaxHealth() / 2)
                         target = master;
             }
@@ -376,7 +376,7 @@ public:
             if (!target && isMeleeClass(me->GetBotClass()) && GetHealthPCT(me) > 80 &&
                 me->getAttackers().empty() && !CCed(me, true))
             {
-                if (Unit* u = me->getVictim())
+                if (Unit* u = me->GetVictim())
                     if (u->GetHealth() > me->GetMaxHealth() / 2)
                         target = me;
             }
@@ -391,11 +391,11 @@ public:
                         Player* player = itr->getSource();
                         if (player == master) continue;
                         if (!player || !player->IsInWorld() || player->IsBeingTeleported()) continue;
-                        if (!player->isAlive() || me->GetMap() != player->FindMap()) continue;
-                        if (!isMeleeClass(player->GetClass()) || !player->isInCombat()) continue;
+                        if (!player->IsAlive() || me->GetMap() != player->FindMap()) continue;
+                        if (!isMeleeClass(player->GetClass()) || !player->IsInCombat()) continue;
                         if (GetHealthPCT(player) < 80 || me->GetDistance(player) > 30) continue;
                         if (!player->getAttackers().empty() || CCed(player, true)) continue;
-                        if (Unit* u = player->getVictim())
+                        if (Unit* u = player->GetVictim())
                         {
                             if (u->GetHealth() > (me->GetMaxHealth() * 2) / 3)
                             {
@@ -440,7 +440,7 @@ public:
 
             for (AttackerSet::const_iterator itr = b_attackers.begin(); itr != b_attackers.end(); ++itr)
             {
-                if (!(*itr) || !(*itr)->isAlive()) continue;
+                if (!(*itr) || !(*itr)->IsAlive()) continue;
                 if (Spell* spell = (*itr)->GetCurrentSpell(CURRENT_GENERIC_SPELL))
                 {
                     if (spell->m_targets.GetUnitTargetGUID() == me->GetGUID())
@@ -533,7 +533,7 @@ public:
         {
             ReduceCD(diff);
             if (IAmDead()) return;
-            if (me->getVictim())
+            if (me->GetVictim())
                 DoMeleeAttackIfReady();
             else
                 Evade();
@@ -543,7 +543,7 @@ public:
 
             if (runicpowertimer <= diff)
             {
-                if (!me->isInCombat())
+                if (!me->IsInCombat())
                 {
                     if (getpower() > uint32(30 * runicpowerLossMult))
                         me->SetPower(POWER_RUNIC_POWER, runicpower - uint32(30 * runicpowerLossMult)); //-3 runic power every 2 sec
@@ -554,7 +554,7 @@ public:
             }
             if (runicpowertimer2 <= diff)
             {
-                if (me->isInCombat())
+                if (me->IsInCombat())
                 {
                     if (getpower() < me->GetMaxPower(POWER_RUNIC_POWER))
                         me->SetPower(POWER_RUNIC_POWER, runicpower + uint32(20 * runicpowerIncomeMult)); //+2 runic power every 5 sec
@@ -581,14 +581,14 @@ public:
                     GC_Timer = temptimer;
                 }
             }
-            if (!me->isInCombat())
+            if (!me->IsInCombat())
                 DoNonCombatActions(diff);
 
             CheckPresence(diff);
 
             //HORN OF WINTER
-            if (HORN_OF_WINTER && HornOfWinter_cd <= (me->isInCombat() ? 45000 : diff) && Rand() < 30 &&
-                (me->isInCombat() || (me->GetDistance(master) < 28 && master->IsWithinLOSInMap(me))))
+            if (HORN_OF_WINTER && HornOfWinter_cd <= (me->IsInCombat() ? 45000 : diff) && Rand() < 30 &&
+                (me->IsInCombat() || (me->GetDistance(master) < 28 && master->IsWithinLOSInMap(me))))
             {
                 Aura* horn = master->GetAura(HORN_OF_WINTER);
                 if (!horn || horn->GetDuration() < 5000)
@@ -606,7 +606,7 @@ public:
             if (BONE_SHIELD && BoneShield_cd <= diff && GC_Timer <= diff && HaveRune(RUNE_UNHOLY) && Rand() < 25)
             {
                 Aura* bone = me->GetAura(BONE_SHIELD);
-                if (!bone || bone->GetCharges() < 2 || (!me->isInCombat() && bone->GetDuration() < 60000))
+                if (!bone || bone->GetCharges() < 2 || (!me->IsInCombat() && bone->GetDuration() < 60000))
                 {
                     if (doCast(me, BONE_SHIELD))
                     {
@@ -619,7 +619,7 @@ public:
                 BoneShield_cd = 1000; //fail
             }
 
-            if (me->isInCombat())
+            if (me->IsInCombat())
             {
                 //ICEBOUND FORTITUDE
                 if (ICEBOUND_FORTITUDE && IceboundFortitude_cd <= diff && getpower() >= 200 &&
@@ -646,7 +646,7 @@ public:
 
         void Attack(uint32 diff)
         {
-            opponent = me->getVictim();
+            opponent = me->GetVictim();
             if (opponent)
             {
                 if (!IsCasting())
@@ -702,7 +702,7 @@ public:
             //END SELFHEAL
 
             //MARK OF BLOOD
-            Unit* u = opponent->getVictim();
+            Unit* u = opponent->GetVictim();
             if (MARK_OF_BLOOD && MarkOfBlood_cd <= diff && GC_Timer <= diff && HaveRune(RUNE_BLOOD) &&
                 u && GetHealthPCT(u) < 85 && opponent->GetHealth() > u->GetMaxHealth() / 3 &&
                 (u == tank || u->GetTypeId() == TYPEID_PLAYER) &&
@@ -743,7 +743,7 @@ public:
                 Strangulate_cd = 500; //fail
             }
             //DARK COMMAND
-            if (DARK_COMMAND && DarkCommand_cd <= diff && dist < 30 && tank == me && opponent->getVictim() != me &&
+            if (DARK_COMMAND && DarkCommand_cd <= diff && dist < 30 && tank == me && opponent->GetVictim() != me &&
                 Rand() < 70)
             {
                 temptimer = GC_Timer;
@@ -756,8 +756,8 @@ public:
             }
             ////DEATH GRIP - DISABLED
             //if (DEATH_GRIP && DeathGrip_cd <= diff && dist < 30 &&
-            //    (tank == me && opponent->getVictim() != me) ||
-            //    (opponent->getVictim() == me && opponent->ToPlayer() && opponent->IsNonMeleeSpellCasted(false)) &&
+            //    (tank == me && opponent->GetVictim() != me) ||
+            //    (opponent->GetVictim() == me && opponent->ToPlayer() && opponent->IsNonMeleeSpellCasted(false)) &&
             //    Rand() < 75)
             //{
             //    temptimer = GC_Timer;
@@ -772,7 +772,7 @@ public:
             //}
             //CHAINS OF ICE
             if (CHAINS_OF_ICE && GC_Timer <= diff && dist < 20 && HaveRune(RUNE_FROST) && opponent->isMoving() &&
-                !CCed(opponent) && opponent->getVictim() != tank && IsInBotParty(opponent->getVictim()) && Rand() < 25)
+                !CCed(opponent) && opponent->GetVictim() != tank && IsInBotParty(opponent->GetVictim()) && Rand() < 25)
             {
                 Aura* chains = opponent->GetAura(CHAINS_OF_ICE);
                 if (!chains || chains->GetDuration() < chains->GetMaxDuration() / 4)

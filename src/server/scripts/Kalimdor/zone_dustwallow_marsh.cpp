@@ -366,7 +366,7 @@ public:
 
         void AttackedBy(Unit* pAttacker)
         {
-            if (me->getVictim())
+            if (me->GetVictim())
                 return;
 
             if (me->IsFriendlyTo(pAttacker))
@@ -445,8 +445,8 @@ public:
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
             SetCombatMovement(true);
 
-            if (me->isInCombat())
-                if (Unit* unit = me->getVictim())
+            if (me->IsInCombat())
+                if (Unit* unit = me->GetVictim())
                     me->GetMotionMaster()->MoveChase(unit);
         }
 

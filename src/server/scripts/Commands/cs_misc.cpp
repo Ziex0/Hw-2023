@@ -319,7 +319,7 @@ public:
             if (map->IsBattlegroundOrArena())
             {
                 // only allow if gm mode is on
-                if (!_player->isGameMaster())
+                if (!_player->IsGameMaster())
                 {
                     handler->PSendSysMessage(LANG_CANNOT_GO_TO_BG_GM, chrNameLink.c_str());
                     handler->SetSentErrorMessage(true);
@@ -354,7 +354,7 @@ public:
                 else
                 {
                     // we are not in group, let's verify our GM mode
-                    if (!_player->isGameMaster())
+                    if (!_player->IsGameMaster())
                     {
                         handler->PSendSysMessage(LANG_CANNOT_GO_TO_INST_GM, chrNameLink.c_str());
                         handler->SetSentErrorMessage(true);
@@ -468,7 +468,7 @@ public:
             if (map->IsBattlegroundOrArena())
             {
                 // only allow if gm mode is on
-                if (!_player->isGameMaster())
+                if (!_player->IsGameMaster())
                 {
                     handler->PSendSysMessage(LANG_CANNOT_GO_TO_BG_GM, nameLink.c_str());
                     handler->SetSentErrorMessage(true);
@@ -662,7 +662,7 @@ public:
                 return false;
         }
 
-        if (target->isAlive())
+        if (target->IsAlive())
         {
             if (sWorld->getBoolConfig(CONFIG_DIE_COMMAND_MODE))
                 handler->GetSession()->GetPlayer()->Kill(target);
@@ -970,7 +970,7 @@ public:
         if (!handler->extractPlayerTarget(player_str, &player))
             return false;
 
-        if (player->isInFlight() || player->isInCombat())
+        if (player->isInFlight() || player->IsInCombat())
         {
             SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(7355);
             if (!spellInfo)
@@ -1779,7 +1779,7 @@ public:
         Unit* target = handler->getSelectedUnit();
         if (player->GetSelection() && target)
         {
-            if (target->GetTypeId() != TYPEID_UNIT || target->isPet())
+            if (target->GetTypeId() != TYPEID_UNIT || target->IsPet())
             {
                 handler->SendSysMessage(LANG_SELECT_CREATURE);
                 handler->SetSentErrorMessage(true);
@@ -2084,7 +2084,7 @@ public:
                 return false;
         }
 
-        if (!target->isAlive())
+        if (!target->IsAlive())
             return true;
 
         char* damageStr = strtok((char*)args, " ");
@@ -2445,7 +2445,7 @@ public:
         Player* player = handler->GetSession()->GetPlayer();
         Creature* creatureTarget = handler->getSelectedCreature();
 
-        if (!creatureTarget || creatureTarget->isPet() || creatureTarget->GetTypeId() == TYPEID_PLAYER)
+        if (!creatureTarget || creatureTarget->IsPet() || creatureTarget->GetTypeId() == TYPEID_PLAYER)
         {
             handler->PSendSysMessage(LANG_SELECT_CREATURE);
             handler->SetSentErrorMessage(true);
@@ -2631,7 +2631,7 @@ public:
                 {
                     pet->SavePetToDB(PET_SAVE_AS_CURRENT);
                     // not let dismiss dead pet
-                    if (pet->isAlive())
+                    if (pet->IsAlive())
                         player->RemovePet(pet, PET_SAVE_NOT_IN_SLOT);
                 }
             }

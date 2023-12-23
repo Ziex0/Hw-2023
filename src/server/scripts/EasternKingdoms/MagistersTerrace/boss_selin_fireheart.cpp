@@ -81,7 +81,7 @@ class boss_selin_fireheart : public CreatureScript
 
                 for (Creature* creature : Crystals)
                 {
-                    if (!creature->isAlive())
+                    if (!creature->IsAlive())
                         creature->Respawn();
 
                     creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
@@ -99,8 +99,8 @@ class boss_selin_fireheart : public CreatureScript
                     case ACTION_SWITCH_PHASE:
                         events.SetPhase(PHASE_NORMAL);
                         events.ScheduleEvent(EVENT_FEL_EXPLOSION, 2000, 0, PHASE_NORMAL);
-                        AttackStart(me->getVictim());
-                        me->GetMotionMaster()->MoveChase(me->getVictim());
+                        AttackStart(me->GetVictim());
+                        me->GetMotionMaster()->MoveChase(me->GetVictim());
                         break;
                     default:
                         break;
@@ -138,7 +138,7 @@ class boss_selin_fireheart : public CreatureScript
 
                 for (Creature* crystal : Crystals)
                 {
-                    if (crystal && crystal->isAlive())
+                    if (crystal && crystal->IsAlive())
                         crystal->Kill(crystal);
                 }
             }
@@ -163,7 +163,7 @@ class boss_selin_fireheart : public CreatureScript
                 if (type == POINT_MOTION_TYPE && id == 1)
                 {
                     Unit* CrystalChosen = ObjectAccessor::GetUnit(*me, CrystalGUID);
-                    if (CrystalChosen && CrystalChosen->isAlive())
+                    if (CrystalChosen && CrystalChosen->IsAlive())
                     {
                         CrystalChosen->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                         CrystalChosen->CastSpell(me, SPELL_MANA_RAGE, true);
@@ -217,13 +217,13 @@ class boss_selin_fireheart : public CreatureScript
                             Talk(SAY_EMPOWERED);
 
                             Creature* CrystalChosen = ObjectAccessor::GetCreature(*me, CrystalGUID);
-                            if (CrystalChosen && CrystalChosen->isAlive())
+                            if (CrystalChosen && CrystalChosen->IsAlive())
                                 CrystalChosen->Kill(CrystalChosen);
 
                             std::list<uint64> Crystals;
 
                             me->GetMotionMaster()->Clear();
-                            me->GetMotionMaster()->MoveChase(me->getVictim());
+                            me->GetMotionMaster()->MoveChase(me->GetVictim());
                             break;
                         }
                         default:
@@ -278,7 +278,7 @@ class npc_fel_crystal : public CreatureScript
                 if (InstanceScript* instance = me->GetInstanceScript())
                 {
                     Creature* Selin = ObjectAccessor::GetCreature(*me, instance->GetData(DATA_SELIN));
-                    if (Selin && Selin->isAlive())
+                    if (Selin && Selin->IsAlive())
                         Selin->AI()->DoAction(ACTION_SWITCH_PHASE);
                 }
             }

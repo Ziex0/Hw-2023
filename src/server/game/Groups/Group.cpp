@@ -612,7 +612,7 @@ bool Group::RemoveMember(uint64 guid, const RemoveMethod &method /*= GROUP_REMOV
         {
             Player* leader = ObjectAccessor::FindPlayer(GetLeaderGUID());
             uint32 mapId = sLFGMgr->GetDungeonMapId(GetGUID());
-            if (!mapId || !leader || (leader->isAlive() && leader->GetMapId() != mapId))
+            if (!mapId || !leader || (leader->IsAlive() && leader->GetMapId() != mapId))
             {
                 Disband();
                 return false;
@@ -2084,7 +2084,7 @@ void Group::UnbindInstance(uint32 mapid, uint8 difficulty, bool unload)
 
 void Group::_homebindIfInstance(Player* player)
 {
-    if (player && !player->isGameMaster() && sMapStore.LookupEntry(player->GetMapId())->IsDungeon())
+    if (player && !player->IsGameMaster() && sMapStore.LookupEntry(player->GetMapId())->IsDungeon())
         player->m_InstanceValid = false;
 }
 

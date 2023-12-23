@@ -117,7 +117,7 @@ class w_boss_romeo : public CreatureScript
                             return;
                         case EVENT_FLAME_BREATH:
                             Talk(SAY_FLAME_BREATH);
-                            if (Unit* target = me->getVictim())
+                            if (Unit* target = me->GetVictim())
                             DoCast(SPELL_FLAME_BREATH);
                             events.ScheduleEvent(EVENT_FLAME_BREATH, urand(10*IN_MILLISECONDS, 17*IN_MILLISECONDS));
                             return;
@@ -126,12 +126,12 @@ class w_boss_romeo : public CreatureScript
                             events.ScheduleEvent(EVENT_TAIL_SWEEP, urand(15*IN_MILLISECONDS, 20*IN_MILLISECONDS));
                             return;
                         case EVENT_FLAME_BUFFET:
-                            if (Unit* target = me->getVictim())
+                            if (Unit* target = me->GetVictim())
                             DoCast(SPELL_FLAME_BUFFET);
                             events.ScheduleEvent(EVENT_FLAME_BUFFET, 9*IN_MILLISECONDS);
                             return;
                         case EVENT_CLEAVE:
-                            if (Unit* target = me->getVictim())
+                            if (Unit* target = me->GetVictim())
                             DoCast(SPELL_CLEAVE);
                             events.ScheduleEvent(EVENT_CLEAVE, urand(15*IN_MILLISECONDS, 20*IN_MILLISECONDS));
                             return;

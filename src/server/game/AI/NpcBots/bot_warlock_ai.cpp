@@ -67,7 +67,7 @@ public:
         {
             ReduceCD(diff);
             if (IAmDead()) return;
-            if (!me->getVictim())
+            if (!me->GetVictim())
                 Evade();
             if (wait == 0)
                 wait = GetWait();
@@ -79,7 +79,7 @@ public:
             ////if pet is dead or unreachable
             //Creature* m_botsPet = me->GetBotsPet();
             //if (!m_botsPet || m_botsPet->FindMap() != master->GetMap() || (me->GetDistance2d(m_botsPet) > sWorld->GetMaxVisibleDistanceOnContinents() - 20.f))
-            //    if (master->getLevel() >= 10 && !me->isInCombat() && !IsCasting() && !me->IsMounted())
+            //    if (master->getLevel() >= 10 && !me->IsInCombat() && !IsCasting() && !me->IsMounted())
             //        SummonBotsPet(PET_VOIDWALKER);
 
             //TODO: implement healthstone
@@ -101,7 +101,7 @@ public:
                     GC_Timer = temptimer;
                 }
             }
-            if (!me->isInCombat())
+            if (!me->IsInCombat())
                 DoNonCombatActions();
 
             if (!CheckAttackTarget(CLASS_WARLOCK))
@@ -112,7 +112,7 @@ public:
 
         void DoNormalAttack(uint32 diff)
         {
-            opponent = me->getVictim();
+            opponent = me->GetVictim();
             if (opponent)
             {
                 if (!IsCasting())
@@ -446,7 +446,7 @@ public:
         {
             ReduceCD(diff);
             if (IAmDead()) return;
-            if (me->getVictim())
+            if (me->GetVictim())
                 DoMeleeAttackIfReady();
             CheckAuras();
             if (wait == 0)
@@ -457,7 +457,7 @@ public:
 
             //TODO: add checks to help owner
 
-            if (!me->isInCombat())
+            if (!me->IsInCombat())
                 DoNonCombatActions();
 
             if (!CheckAttackTarget(PET_TYPE_VOIDWALKER))
@@ -468,7 +468,7 @@ public:
 
         void DoNormalAttack(uint32 diff)
         {
-            opponent = me->getVictim();
+            opponent = me->GetVictim();
             if (opponent)
             {
                 if (!IsCasting())
@@ -483,7 +483,7 @@ public:
             float meleedist = me->GetDistance(opponent);
 
             //TORMENT
-            if (TORMENT && Torment_cd <= diff && meleedist < 5 && (!tank || tank == me || opponent->getVictim() == m_creatureOwner))
+            if (TORMENT && Torment_cd <= diff && meleedist < 5 && (!tank || tank == me || opponent->GetVictim() == m_creatureOwner))
             {
                 temptimer = GC_Timer;
                 if (doCast(opponent, TORMENT))

@@ -101,18 +101,26 @@ enum PlayerSpellState
 
 struct PlayerSpell
 {
-    PlayerSpellState state : 8;
+	PlayerSpellState state : 8;
     bool active            : 1;                             // show in spellbook
     bool dependent         : 1;                             // learned as result another spell learn, skill grow, quest reward, etc
     bool disabled          : 1;                             // first rank has been learned in result talent learn but currently talent unlearned, save max learned ranks
+
+	uint8 specMask         : 8;
+	bool IsInSpec(uint8 spec) { return (specMask & (1<<spec)); }
 };
 
 struct PlayerTalent
 {
     PlayerSpellState state : 8;
-    uint8 spec             : 8;
+	uint8 specMask         : 8;
+	uint8 spec			   : 8;
+	uint32 talentID;
+	bool inSpellBook;
+	bool IsInSpec(uint8 spec) { return (specMask & (1<<spec)); }
 };
 
+#define SPEC_MASK_ALL 255
 
 // Spell modifier (used for modify other spells)
 struct SpellModifier
@@ -1181,7 +1189,7 @@ class Player : public Unit, public GridObject<Player>
                                                             // mount_id can be used in scripting calls
         bool isAcceptWhispers() const { return m_ExtraFlags & PLAYER_EXTRA_ACCEPT_WHISPERS; }
         void SetAcceptWhispers(bool on) { if (on) m_ExtraFlags |= PLAYER_EXTRA_ACCEPT_WHISPERS; else m_ExtraFlags &= ~PLAYER_EXTRA_ACCEPT_WHISPERS; }
-        bool isGameMaster() const { return m_ExtraFlags & PLAYER_EXTRA_GM_ON; }
+        bool IsGameMaster() const { return m_ExtraFlags & PLAYER_EXTRA_GM_ON; }
         void SetGameMaster(bool on);
         bool isGMChat() const { return m_ExtraFlags & PLAYER_EXTRA_GM_CHAT; }
         void SetGMChat(bool on) { if (on) m_ExtraFlags |= PLAYER_EXTRA_GM_CHAT; else m_ExtraFlags &= ~PLAYER_EXTRA_GM_CHAT; }
@@ -1628,6 +1636,7 @@ class Player : public Unit, public GridObject<Player>
 
         void SendProficiency(ItemClass itemClass, uint32 itemSubclassMask);
         void SendInitialSpells();
+		void SendLearnPacket(uint32 spellId, bool learn);
         bool addSpell(uint32 spellId, bool active, bool learning, bool dependent, bool disabled, bool loading = false);
         void learnSpell(uint32 spell_id, bool dependent);
         void removeSpell(uint32 spell_id, bool disabled = false, bool learn_low_rank = true);
@@ -1653,6 +1662,10 @@ class Player : public Unit, public GridObject<Player>
         void LearnPetTalent(uint64 petGuid, uint32 talentId, uint32 talentRank);
 
         bool AddTalent(uint32 spellId, uint8 spec, bool learning);
+
+		//zie
+		void _removeTalentAurasAndSpells(uint32 spellId);
+
         bool HasTalent(uint32 spell_id, uint8 spec) const;
 
         uint32 CalculateTalentsPoints() const;
@@ -1660,10 +1673,14 @@ class Player : public Unit, public GridObject<Player>
         // Dual Spec
         void UpdateSpecCount(uint8 count);
         uint32 GetActiveSpec() { return m_activeSpec; }
+		uint8 GetActiveSpecMask() const { return (1<<m_activeSpec); }
         void SetActiveSpec(uint8 spec){ m_activeSpec = spec; }
         uint8 GetSpecsCount() { return m_specsCount; }
         void SetSpecsCount(uint8 count) { m_specsCount = count; }
         void ActivateSpec(uint8 spec);
+		void GetTalentTreePoints(uint8 (&specPoints)[3]) const;
+		uint8 GetMostPointsTalentTree() const;
+		bool IsHealerTalentSpec() const;
 
         void InitGlyphsForLevel();
         void SetGlyphSlot(uint8 slot, uint32 slottype) { SetUInt32Value(PLAYER_FIELD_GLYPH_SLOTS_1 + slot, slottype); }
@@ -2010,7 +2027,7 @@ class Player : public Unit, public GridObject<Player>
         void SetCanBlock(bool value);
         bool CanTitanGrip() const { return m_canTitanGrip; }
         void SetCanTitanGrip(bool value) { m_canTitanGrip = value; }
-        bool CanTameExoticPets() const { return isGameMaster() || HasAuraType(SPELL_AURA_ALLOW_TAME_PET_TYPE); }
+        bool CanTameExoticPets() const { return IsGameMaster() || HasAuraType(SPELL_AURA_ALLOW_TAME_PET_TYPE); }
 
         void SetRegularAttackTime();
         void SetBaseModValue(BaseModGroup modGroup, BaseModType modType, float value) { m_auraBaseMod[modGroup][modType] = value; }
@@ -2341,7 +2358,8 @@ class Player : public Unit, public GridObject<Player>
         bool HasTitle(CharTitlesEntry const* title) { return HasTitle(title->bit_index); }
         void SetTitle(CharTitlesEntry const* title, bool lost = false);
 		
-		
+		const PlayerTalentMap& GetTalentMap();
+		uint32 GetNextSave() const { return m_nextSave; }
 
         //bool isActiveObject() const { return true; }
         bool canSeeSpellClickOn(Creature const* creature) const;

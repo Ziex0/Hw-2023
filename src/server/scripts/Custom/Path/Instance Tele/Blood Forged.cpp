@@ -9,17 +9,17 @@
 #include "ScriptPCH.h"
 #include "Language.h"
 
-class Dawn_sand : public CreatureScript
+class blood_forg : public CreatureScript
 {
 public:
-	Dawn_sand()
-		: CreatureScript("Dawn_sand") 
+	blood_forg()
+		: CreatureScript("blood_forg") 
 	{
 	}
 	
-	struct Dawn_sandAI : public ScriptedAI
+	struct blood_forgAI : public ScriptedAI
 	{
-		Dawn_sandAI(Creature *c) : ScriptedAI(c){}
+		blood_forgAI(Creature *c) : ScriptedAI(c){}
 		
 		void Reset()
 		{
@@ -33,7 +33,7 @@ public:
         }
 				void ReceiveEmote(Player *pPlayer, uint32 uiTextEmote)
 		{
-			if (pPlayer->IsInCombat())
+			if (pPlayer->isInCombat())
 				{ pPlayer->GetSession()->SendAreaTriggerMessage("|cffff0000You are in combat!|r"); } 
 				return;
 		}
@@ -41,7 +41,7 @@ public:
 
 	CreatureAI* GetAI(Creature* pCreature) const
     {
-		return new Dawn_sandAI(pCreature);
+		return new blood_forgAI(pCreature);
     }
 
 	void CreatureWhisperBasedOnBool(const char *text, Creature *pCreature, Player *pPlayer, bool value)
@@ -52,11 +52,10 @@ public:
 
 	void MainMenu(Player *pPlayer, Creature *pCreature)
 	{
-
-		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|TInterface/icons/Achievement_BG_DefendXtowers_AV:35|t Kael'thas Sunstrider ", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|TInterface/icons/Achievement_BG_DefendXtowers_AV:35|t Grobbulus ", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|TInterface/icons/Achievement_BG_DefendXtowers_AV:35|t Forgemaster ", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|TInterface/icons/Achievement_BG_DefendXtowers_AV:35|t Devourer of Souls ", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
+		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|TInterface/ICONS/Thrown_1H_Harpoon_D_01Blue:35|t|r| Olympian Heavens ", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|TInterface/ICONS/Thrown_1H_Harpoon_D_01Blue:35|t|r| Celestial Empire ", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|TInterface/ICONS/Thrown_1H_Harpoon_D_01Blue:35|t|r| Shade of Eranikus ", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|TInterface/ICONS/Thrown_1H_Harpoon_D_01Blue:35|t|r| Baron Rivendare ", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
 
 
 		pPlayer->SEND_GOSSIP_MENU(907, pCreature->GetGUID());
@@ -75,24 +74,24 @@ public:
 
 		switch (uiAction)
 		{
-			case GOSSIP_ACTION_INFO_DEF + 1: 
+			case GOSSIP_ACTION_INFO_DEF + 1: //LK
 				pPlayer->CLOSE_GOSSIP_MENU();
-				pPlayer->TeleportTo(550, 638.2289f, -0.7779f, 47.5418f, 6.2721f);
+				pPlayer->TeleportTo(209, 1506.0001f, 823.4819f, 12.8685f, 0.2613f);
 
 				break;
-			case GOSSIP_ACTION_INFO_DEF + 2: 
+			case GOSSIP_ACTION_INFO_DEF + 2: //Sartharion
 				pPlayer->CLOSE_GOSSIP_MENU();
-				pPlayer->TeleportTo(533, 3212.1162f, -3189.5527f, 295.12039f, 5.4591f);
+				pPlayer->TeleportTo(209, 1884.2661f, 995.1323f, 9.6818f, 2.1429f);
 
 				break;
-			case GOSSIP_ACTION_INFO_DEF + 3: 
+			case GOSSIP_ACTION_INFO_DEF + 3: //anomalus
 				pPlayer->CLOSE_GOSSIP_MENU();
-				pPlayer->TeleportTo(658, 694.7522f, -111.6783f, 514.7655f, 4.7007f);
+				pPlayer->TeleportTo(109, -659.78821f, 51.2727f, -89.9459f, 4.7023f);
 
 				break;
-			case GOSSIP_ACTION_INFO_DEF + 4: 
+			case GOSSIP_ACTION_INFO_DEF + 4: // ionar
 				pPlayer->CLOSE_GOSSIP_MENU();
-				pPlayer->TeleportTo(632, 5482.2685f, 2500.5654f, 706.8743f, 5.5896f);
+				pPlayer->TeleportTo(329, 4032.8151f, -3371.3435f, 115.6502f, 1.6281f);
 
 				break;
 			/*case GOSSIP_ACTION_INFO_DEF + 3:
@@ -131,7 +130,7 @@ public:
 	}
 };
 
-void AddSc_ScriptDawn_sand()
+void AddSc_Scriptblood_forg()
 {
-	new Dawn_sand();
+	new blood_forg();
 }

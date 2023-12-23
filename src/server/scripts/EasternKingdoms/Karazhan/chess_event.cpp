@@ -5,22 +5,22 @@
 #define HORDE_CREATURE_FACTION 1689
 #define DUST_COVERED_CHEST  185119
 
-#define GOSSIP_POSSES "Ich übernehme!" //need correction                                                                                 
+#define GOSSIP_POSSES "I take over!" //need correction                                                                                 
 
-#define EVENT_START "Lasst uns Schach spielen!"
+#define EVENT_START "Let's play chess!"
 #define NPC_ATTACK_RADIUS 7
 
-#define SAY_AT_EVENT_START "Sehr gutw. Lasst das Spiel beginnen."
+#define SAY_AT_EVENT_START "Very good. Let the game begin."
 #define SOUND_START 10338
 
 #define SAY_LOSE_KNIGHT_P "Yes...all according to plan."
 #define SOUND_KNIGHT_LOSE_P 10349
-#define SAY_LOSE_KNIGHT_M "Ja... natürlich."
+#define SAY_LOSE_KNIGHT_M "Yes, of course."
 #define SOUND_KNIGHT_LOSE_M 10350
 
 #define SAY_LOSE_PAWN_P_1 "A transparent stratagem."
 #define SOUND_LOSE_PAWN_P_1 10339
-#define SAY_LOSE_PAWN_P_2 "Sehen wir mal."
+#define SAY_LOSE_PAWN_P_2 "We will see."
 #define SOUND_LOSE_PAWN_P_2 10340
 #define SAY_LOSE_PAWN_P_3 "Ah, the wheels have begun to turn."
 #define SOUND_LOSE_PAWN_P_3 10341
@@ -147,7 +147,7 @@ public:
         {
           if(search_time < diff )
             {
-              if(me->GetDistance2d(unit_on_me) != 0 || unit_on_me->isAlive())
+              if(me->GetDistance2d(unit_on_me) != 0 || unit_on_me->IsAlive())
                 {
                   unit_on_me = NULL;
                 }
@@ -209,7 +209,7 @@ public:
 
       void MoveInLineOfSight(Unit *who)
       {
-        if (me->getVictim() && who->isTargetableForAttack() && ( me->IsHostileTo( who )) && who->isInAccessiblePlaceFor(me) )
+        if (me->GetVictim() && who->isTargetableForAttack() && ( me->IsHostileTo( who )) && who->isInAccessiblePlaceFor(me) )
           {
             if (!me->CanFly() && me->GetDistanceZ(who) > CREATURE_Z_ATTACK_RANGE)
               return;
@@ -328,7 +328,7 @@ public:
           {
             switch(victim->GetEntry())
               {
-                /*            case NPC_ROOK_H: npc_medivh->Say(SAY_LOSE_ROOK_P,LANG_UNIVERSAL,NULL);break;
+                /*case NPC_ROOK_H: npc_medivh->Say(SAY_LOSE_ROOK_P,LANG_UNIVERSAL,NULL);break;
               case NPC_ROOK_A: npc_medivh->Say(SAY_LOSE_ROOK_M,LANG_UNIVERSAL,NULL);break;
               case NPC_QUEEN_H: npc_medivh->Say(SAY_LOSE_QUEEN_P,LANG_UNIVERSAL,NULL);break;
               case NPC_QUEEN_A: npc_medivh->Say(SAY_LOSE_QUEEN_M,LANG_UNIVERSAL,NULL);break;
@@ -352,13 +352,13 @@ public:
                   }
                   break;*/
 			 case NPC_KING_H:
-                //              npc_medivh->Say(SAY_MEDIVH_WIN,LANG_UNIVERSAL,NULL);
+                //npc_medivh->Say(SAY_MEDIVH_WIN,LANG_UNIVERSAL,NULL);
                 instance->SetData(TYPE_CHESS,FAIL);
                 break;
               case NPC_KING_A:
-                //      npc_medivh->Say(SAY_PLAYER_WIN,LANG_UNIVERSAL,NULL);
+                //npc_medivh->Say(SAY_PLAYER_WIN,LANG_UNIVERSAL,NULL);
                 instance->SetData(TYPE_CHESS,DONE);
-                npc_medivh->SummonGameObject(DUST_COVERED_CHEST,-11058.00f,-1903.00f,221.00f,2.24f,0,0,0,0,7200000);
+                npc_medivh->SummonGameObject(DUST_COVERED_CHEST,-11058.00f, -1903.00f, 221.00f, 2.24f, 0,0,0,0,7200000);
                 break;
               default:
                 break;
@@ -392,13 +392,13 @@ public:
                   }
                   break;*/
               case NPC_KING_A:
-                //              npc_medivh->Say(SAY_MEDIVH_WIN,LANG_UNIVERSAL,NULL);
+                //npc_medivh->Say(SAY_MEDIVH_WIN,LANG_UNIVERSAL,NULL);
                 instance->SetData(TYPE_CHESS,FAIL);
                 break;
               case NPC_KING_H:
                 //npc_medivh->Say(SAY_PLAYER_WIN,LANG_UNIVERSAL,NULL);
                 instance->SetData(TYPE_CHESS,DONE);
-                npc_medivh->SummonGameObject(DUST_COVERED_CHEST,-11058,-1903,221,2.24,0,0,0,0,7200000);
+                npc_medivh->SummonGameObject(DUST_COVERED_CHEST,-11058.00f, -1903.00f, 221.00f, 2.24f, 0,0,0,0,7200000);
                 break;
               default:
                 break;
@@ -456,7 +456,7 @@ std::list<Unit*> returnList;
 
         if(instance->GetData(TYPE_CHESS) == DONE || instance->GetData(TYPE_CHESS) == FAIL)
           {
-            if(me->isInCombat())
+            if(me->IsInCombat())
               me->CombatStop();
 
             if(me->isPossessed())
@@ -494,7 +494,7 @@ std::list<Unit*> returnList;
                 else  move_timer -= diff;
               }
 
-            if(!me->getVictim())
+            if(!me->GetVictim())
               {
                 if(!canmove)
                   return;
@@ -544,7 +544,7 @@ std::list<Unit*> returnList;
               default:
                 break;
               }
-              if(me->getVictim() || !me->IsWithinDistInMap(me->getVictim(), NPC_ATTACK_RADIUS))
+              if(me->GetVictim() || !me->IsWithinDistInMap(me->GetVictim(), NPC_ATTACK_RADIUS))
                 {
                   me->CombatStop();
                   return;

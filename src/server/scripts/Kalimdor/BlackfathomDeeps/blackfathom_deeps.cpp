@@ -119,10 +119,10 @@ public:
             {
                 if (Player* player = i->getSource())
                 {
-                    if (player->isGameMaster())
+                    if (player->IsGameMaster())
                         continue;
 
-                    if (player->isAlive())
+                    if (player->IsAlive())
                     {
                         me->SetInCombatWith(player);
                         player->SetInCombatWith(me);

@@ -68,13 +68,13 @@ public:
 				return;
 			if (AHUNE_Timer < diff)
 			{
-				DoCast(me->getVictim(), SPELL_FIREBOLT);
+				DoCast(me->GetVictim(), SPELL_FIREBOLT);
 				AHUNE_Timer = 4000;
 			}
 
 			if (FIREBOLT_Timer < diff)
 			{
-				DoCast(me->getVictim(), SPELL_FIREBOLT);
+				DoCast(me->GetVictim(), SPELL_FIREBOLT);
 				FIREBOLT_Timer = 10000;
 			}
 			else
@@ -82,7 +82,7 @@ public:
 
 			if (CHAINLIGHTNING_Timer < diff)
 			{
-				DoCast(me->getVictim(), SPELL_CHAINLIGHTNING);
+				DoCast(me->GetVictim(), SPELL_CHAINLIGHTNING);
 				CHAINLIGHTNING_Timer = 12000;
 			}
 			else
@@ -90,7 +90,7 @@ public:
 
 			if (ENGRAGE_Timer < diff)
 			{
-				DoCast(me->getVictim(), SPELL_ENGRAGE);
+				DoCast(me->GetVictim(), SPELL_ENGRAGE);
 				ENGRAGE_Timer = 180000;
 			}
 			else
@@ -98,7 +98,7 @@ public:
 
 			if (SCREAM_Timer < diff)
 			{
-				DoCast(me->getVictim(), SPELL_SCREAM);
+				DoCast(me->GetVictim(), SPELL_SCREAM);
 				SCREAM_Timer = 20000;
 			}
 			else
@@ -106,7 +106,7 @@ public:
 
 			if (ACID_Timer < diff)
 			{
-				DoCast(me->getVictim(), SPELL_ACID);
+				DoCast(me->GetVictim(), SPELL_ACID);
 				ACID_Timer = 30000;
 			}
 			else
@@ -114,7 +114,7 @@ public:
 
 			if (SOUL_Timer < diff)
 			{
-				DoCast(me->getVictim(), SPELL_SOUL);
+				DoCast(me->GetVictim(), SPELL_SOUL);
 				SOUL_Timer = 15000;
 			}
 			else
@@ -122,7 +122,7 @@ public:
 
 			if (CLEAVE_Timer < diff)
 			{
-				DoCast(me->getVictim(), SPELL_CLEAVE);
+				DoCast(me->GetVictim(), SPELL_CLEAVE);
 				CLEAVE_Timer = 9000;
 			}
 			else

@@ -13,7 +13,7 @@ public:
 	
     bool OnGossipHello(Player *player, Creature *_creature)
     {
-        if (player->isInCombat())
+        if (player->IsInCombat())
         {
             player->CLOSE_GOSSIP_MENU();
             _creature->MonsterWhisper("You are in combat!", player->GetGUID());

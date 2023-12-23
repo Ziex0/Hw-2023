@@ -194,11 +194,11 @@ class boss_steelbreaker : public CreatureScript
                     //DoCastAOE(SPELL_SUPERCHARGE, true);
 
                     if (Creature* Brundir = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_BRUNDIR)))
-                        if (Brundir->isAlive())
+                        if (Brundir->IsAlive())
                             Brundir->AI()->DoAction(ACTION_SUPERCHARGE);
 
                     if (Creature* Molgeim = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_MOLGEIM)))
-                        if (Molgeim->isAlive())
+                        if (Molgeim->IsAlive())
                             Molgeim->AI()->DoAction(ACTION_SUPERCHARGE);
                 }
             }
@@ -232,7 +232,7 @@ class boss_steelbreaker : public CreatureScript
                             events.CancelEvent(EVENT_BERSERK);
                             break;
                         case EVENT_FUSION_PUNCH:
-                            if (me->IsWithinMeleeRange(me->getVictim()))
+                            if (me->IsWithinMeleeRange(me->GetVictim()))
                                 DoCastVictim(SPELL_FUSION_PUNCH);
                             events.ScheduleEvent(EVENT_FUSION_PUNCH, urand(13000, 22000));
                             break;
@@ -323,11 +323,11 @@ class boss_runemaster_molgeim : public CreatureScript
                     //DoCastAOE(SPELL_SUPERCHARGE, true);
 
                     if (Creature* Brundir = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_BRUNDIR)))
-                        if (Brundir->isAlive())
+                        if (Brundir->IsAlive())
                             Brundir->AI()->DoAction(ACTION_SUPERCHARGE);
 
                     if (Creature* Steelbreaker = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_STEELBREAKER)))
-                        if (Steelbreaker->isAlive())
+                        if (Steelbreaker->IsAlive())
                             Steelbreaker->AI()->DoAction(ACTION_SUPERCHARGE);
                 }
             }
@@ -364,12 +364,12 @@ class boss_runemaster_molgeim : public CreatureScript
                             {
                                 case 1:
                                     if (Creature* Steelbreaker = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_STEELBREAKER)))
-                                        if (Steelbreaker->isAlive())
+                                        if (Steelbreaker->IsAlive())
                                             target = Steelbreaker;
                                     break;
                                 case 2:
                                     if (Creature* Brundir = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_STEELBREAKER)))
-                                        if (Brundir->isAlive())
+                                        if (Brundir->IsAlive())
                                             target = Brundir;
                                     break;
                                 default:
@@ -480,11 +480,11 @@ class boss_stormcaller_brundir : public CreatureScript
                     //DoCastAOE(SPELL_SUPERCHARGE, true);
 
                     if (Creature* Molgeim = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_MOLGEIM)))
-                        if (Molgeim->isAlive())
+                        if (Molgeim->IsAlive())
                             Molgeim->AI()->DoAction(ACTION_SUPERCHARGE);
 
                     if (Creature* Steelbreaker = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_STEELBREAKER)))
-                        if (Steelbreaker->isAlive())
+                        if (Steelbreaker->IsAlive())
                             Steelbreaker->AI()->DoAction(ACTION_SUPERCHARGE);
                 }
 
@@ -568,12 +568,12 @@ class boss_stormcaller_brundir : public CreatureScript
                             //me->SetLevitate(false);
                             me->RemoveAurasDueToSpell(RAID_MODE(SPELL_LIGHTNING_TENDRILS_10M, SPELL_LIGHTNING_TENDRILS_25M));
                             me->RemoveAurasDueToSpell(SPELL_LIGHTNING_TENDRILS_VISUAL);
-                            DoStartMovement(me->getVictim());
+                            DoStartMovement(me->GetVictim());
                             events.CancelEvent(EVENT_GROUND);
                             me->getThreatManager().resetAllAggro();
                             break;
                         case EVENT_MOVE_POSITION:
-                            if (me->IsWithinMeleeRange(me->getVictim()))
+                            if (me->IsWithinMeleeRange(me->GetVictim()))
                             {
                                 float x = float(irand(-25, 25));
                                 float y = float(irand(-25, 25));

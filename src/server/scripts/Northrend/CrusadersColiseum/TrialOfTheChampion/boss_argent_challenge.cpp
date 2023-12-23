@@ -219,7 +219,7 @@ public:
 
                 if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 250, true))
                 {
-                    if (target && target->isAlive())
+                    if (target && target->IsAlive())
                     {
                         DoCast(target, SPELL_HAMMER_JUSTICE);
                         DoCast(target, SPELL_HAMMER_RIGHTEOUS);
@@ -294,7 +294,7 @@ public:
             bDone = false;
 
             if (Creature* pMemory = Unit::GetCreature(*me, MemoryGUID))
-                if (pMemory->isAlive())
+                if (pMemory->IsAlive())
                     pMemory->RemoveFromWorld();
         }
 
@@ -341,7 +341,7 @@ public:
             {
                 if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 250, true))
                 {
-                    if (target && target->isAlive())
+                    if (target && target->IsAlive())
                         DoCast(target, SPELL_HOLY_FIRE);
                 }
                  if (me->HasAura(SPELL_SHIELD))
@@ -354,7 +354,7 @@ public:
             {
                 if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 250, true))
                 {
-                    if (target && target->isAlive())
+                    if (target && target->IsAlive())
                         DoCast(target, SPELL_SMITE);
                 }
                 if (me->HasAura(SPELL_SHIELD))
@@ -376,7 +376,7 @@ public:
                             break;
                         case 1:
                             if (Creature* pMemory = Unit::GetCreature(*me, MemoryGUID))
-                                if (pMemory->isAlive())
+                                if (pMemory->IsAlive())
                                     DoCast(pMemory, SPELL_RENEW);
                             break;
                     }
@@ -439,7 +439,7 @@ public:
             {
                 if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
                 {
-                    if (target && target->isAlive())
+                    if (target && target->IsAlive())
                         DoCast(target, SPELL_OLD_WOUNDS);
                 }
                 uiOldWoundsTimer = 12000;
@@ -455,7 +455,7 @@ public:
             {
                 if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1))
                 {
-                    if (target && target->isAlive())
+                    if (target && target->IsAlive())
                         DoCast(target, SPELL_SHADOWS_PAST);
                 }
                 uiShadowPastTimer = 5000;
@@ -468,7 +468,7 @@ public:
         {
             if (TempSummon* summ = me->ToTempSummon())
                 if (Unit* summoner = summ->GetSummoner())
-                    if (summoner->isAlive())
+                    if (summoner->IsAlive())
                         summoner->GetAI()->SetData(1, 0);
         }
     };

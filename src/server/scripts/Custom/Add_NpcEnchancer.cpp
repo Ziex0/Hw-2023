@@ -1623,8 +1623,9 @@ public:
 					RemoveEnchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_FINGER2));
 					player->PlayerTalkClass->SendCloseGossip();
 					break;
-
 			}
+
+			return true;
         }
 
 

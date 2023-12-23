@@ -15,7 +15,7 @@ public:
     }
     bool OnGossipHello(Player* pPlayer, Creature* pCreature)
     {
-        if (pPlayer->isInCombat())
+        if (pPlayer->IsInCombat())
         {
             pPlayer->CLOSE_GOSSIP_MENU();
 			pPlayer->GetSession()->SendAreaTriggerMessage("|cffff0000You are in combat!|r");

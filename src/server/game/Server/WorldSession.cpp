@@ -521,7 +521,7 @@ void WorldSession::LogoutPlayer(bool save)
             bg->EventPlayerLoggedOut(_player);
 
         ///- Teleport to home if the player is in an invalid instance
-        if (!_player->m_InstanceValid && !_player->isGameMaster())
+        if (!_player->m_InstanceValid && !_player->IsGameMaster())
             _player->TeleportTo(_player->m_homebindMapId, _player->m_homebindX, _player->m_homebindY, _player->m_homebindZ, _player->GetOrientation());
 
         sOutdoorPvPMgr->HandlePlayerLeaveZone(_player, _player->GetZoneId());
@@ -933,7 +933,7 @@ void WorldSession::ReadMovementInfo(WorldPacket &data, MovementInfo* mi)
         MOVEMENTFLAG_FALLING_SLOW);
 
     /*! Cannot fly if no fly auras present. Exception is being a GM.
-        Note that we check for account level instead of Player::isGameMaster() because in some
+        Note that we check for account level instead of Player::IsGameMaster() because in some
         situations it may be feasable to use .gm fly on as a GM without having .gm on,
         e.g. aerial combat.
     */

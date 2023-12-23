@@ -199,23 +199,23 @@ class ArenaGambler : public CreatureScript
                             // General Error Message: Match not possible because:
                             ChatHandler(pPlayer->GetSession()).PSendSysMessage(ARENA_GAMBLER_MSG_MATCH_NOT_POSSIBLE);
                             // Reason is: no gamemasters
-                            if(pPlayer->GetSession()->GetSecurity() > 0 || pDefender->GetSession()->GetSecurity() > 0)
+                        if(pPlayer->GetSession()->GetSecurity() < 4 || pDefender->GetSession()->GetSecurity() < 4)
                             {
                             ChatHandler(pPlayer->GetSession()).PSendSysMessage(ARENA_GAMBLER_MSG_NO_GMS_ALLOWED);
                             }
                             // Reason is: you cannot duel your self!
-                            if(pPlayer->GetSession()->GetAccountId() == pDefender->GetSession()->GetAccountId())
+                        if(pPlayer->GetSession()->GetAccountId() == pDefender->GetSession()->GetAccountId())
                             {
                             ChatHandler(pPlayer->GetSession()).PSendSysMessage(ARENA_GAMBLER_MSG_SAME_ACC_ID);
                             }
                             // Reason is: multiboxing is not allowed, or players have the same ip.
-                            if(pPlayer->GetSession()->GetRemoteAddress().compare(pDefender->GetSession()->GetRemoteAddress()) == 0)
+                         if(pPlayer->GetSession()->GetRemoteAddress().compare(pDefender->GetSession()->GetRemoteAddress()) == 0)
                             {
                             ChatHandler(pPlayer->GetSession()).PSendSysMessage(ARENA_GAMBLER_MSG_MULTI_BOX);
                             }
                             // Reason is: your level is smaller than the minimum level required
                             uint32 m_minRequiredLevel = 0;
-                            if(pPlayer->getLevel() <= m_minRequiredLevel || pDefender->getLevel() <= m_minRequiredLevel )
+                        if(pPlayer->getLevel() <= m_minRequiredLevel || pDefender->getLevel() <= m_minRequiredLevel )
                             {
                             ChatHandler(pPlayer->GetSession()).PSendSysMessage(ARENA_GAMBLER_MSG_LOW_LEVEL);
                             }
@@ -223,7 +223,7 @@ class ArenaGambler : public CreatureScript
                             ChatHandler(pPlayer->GetSession()).PSendSysMessage(ARENA_GAMBLER_MSG_LOW_LEVEL);
                             // Reason is: level diffrance is too high
                             uint32 levelDiff = 0;
-                            if(pPlayer->getLevel() > pDefender->getLevel())
+                        if(pPlayer->getLevel() > pDefender->getLevel())
                             {
                                 levelDiff = pPlayer->getLevel() - pDefender->getLevel();
                             }

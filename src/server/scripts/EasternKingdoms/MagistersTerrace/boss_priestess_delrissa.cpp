@@ -169,7 +169,7 @@ public:
             {
                 if (Unit* pAdd = ObjectAccessor::GetUnit(*me, m_auiLackeyGUID[i]))
                 {
-                    if (!pAdd->getVictim())
+                    if (!pAdd->GetVictim())
                     {
                         who->SetInCombatWith(pAdd);
                         pAdd->AddThreat(who, 0.0f);
@@ -183,7 +183,7 @@ public:
         void InitializeLackeys()
         {
             //can be called if Creature are dead, so avoid
-            if (!me->isAlive())
+            if (!me->IsAlive())
                 return;
 
             uint8 j = 0;
@@ -278,7 +278,7 @@ public:
                 {
                     if (Unit* pAdd = ObjectAccessor::GetUnit(*me, m_auiLackeyGUID[i]))
                     {
-                        if (pAdd->isAlive() && pAdd->GetHealth() < health)
+                        if (pAdd->IsAlive() && pAdd->GetHealth() < health)
                             target = pAdd;
                     }
                 }
@@ -293,7 +293,7 @@ public:
 
                 if (urand(0, 1))
                     if (Unit* pAdd = ObjectAccessor::GetUnit(*me, m_auiLackeyGUID[rand32() % MAX_ACTIVE_LACKEY]))
-                        if (pAdd->isAlive())
+                        if (pAdd->IsAlive())
                             target = pAdd;
 
                 DoCast(target, SPELL_RENEW_NORMAL);
@@ -306,7 +306,7 @@ public:
 
                 if (urand(0, 1))
                     if (Unit* pAdd = ObjectAccessor::GetUnit(*me, m_auiLackeyGUID[rand32() % MAX_ACTIVE_LACKEY]))
-                        if (pAdd->isAlive() && !pAdd->HasAura(SPELL_SHIELD))
+                        if (pAdd->IsAlive() && !pAdd->HasAura(SPELL_SHIELD))
                             target = pAdd;
 
                 DoCast(target, SPELL_SHIELD);
@@ -325,7 +325,7 @@ public:
                         target = me;
                     else
                         if (Unit* pAdd = ObjectAccessor::GetUnit(*me, m_auiLackeyGUID[rand32() % MAX_ACTIVE_LACKEY]))
-                            if (pAdd->isAlive())
+                            if (pAdd->IsAlive())
                                 target = pAdd;
                 }
 
@@ -388,7 +388,7 @@ struct boss_priestess_lackey_commonAI : public ScriptedAI
         // in case she is not alive and Reset was for some reason called, respawn her (most likely party wipe after killing her)
         if (Creature* pDelrissa = ObjectAccessor::GetCreature(*me, instance->GetData(DATA_DELRISSA)))
         {
-            if (!pDelrissa->isAlive())
+            if (!pDelrissa->IsAlive())
                 pDelrissa->Respawn();
         }
     }
@@ -402,7 +402,7 @@ struct boss_priestess_lackey_commonAI : public ScriptedAI
         {
             if (Unit* pAdd = ObjectAccessor::GetUnit(*me, m_auiLackeyGUIDs[i]))
             {
-                if (!pAdd->getVictim() && pAdd != me)
+                if (!pAdd->GetVictim() && pAdd != me)
                 {
                     who->SetInCombatWith(pAdd);
                     pAdd->AddThreat(who, 0.0f);
@@ -412,7 +412,7 @@ struct boss_priestess_lackey_commonAI : public ScriptedAI
 
         if (Creature* pDelrissa = ObjectAccessor::GetCreature(*me, instance->GetData(DATA_DELRISSA)))
         {
-            if (pDelrissa->isAlive() && !pDelrissa->getVictim())
+            if (pDelrissa->IsAlive() && !pDelrissa->GetVictim())
             {
                 who->SetInCombatWith(pDelrissa);
                 pDelrissa->AddThreat(who, 0.0f);
@@ -439,7 +439,7 @@ struct boss_priestess_lackey_commonAI : public ScriptedAI
         if (uiLackeyDeathCount == MAX_ACTIVE_LACKEY)
         {
             //time to make her lootable and complete event if she died before lackeys
-            if (!pDelrissa->isAlive())
+            if (!pDelrissa->IsAlive())
             {
                 if (!pDelrissa->HasFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE))
                     pDelrissa->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
@@ -1096,7 +1096,7 @@ public:
 
             boss_priestess_lackey_commonAI::UpdateAI(diff);
 
-            if (me->IsWithinDistInMap(me->getVictim(), ATTACK_DISTANCE))
+            if (me->IsWithinDistInMap(me->GetVictim(), ATTACK_DISTANCE))
             {
                 if (Wing_Clip_Timer <= diff)
                 {

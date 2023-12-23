@@ -238,7 +238,7 @@ public:
                         }
                         break;
                     case 9:
-                        me->GetMotionMaster()->MoveChase(me->getVictim());
+                        me->GetMotionMaster()->MoveChase(me->GetVictim());
                         events.ScheduleEvent(EVENT_BELLOWING_ROAR, 1000);
                         break;
                     case 10:

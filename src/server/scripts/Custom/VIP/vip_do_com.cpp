@@ -82,7 +82,7 @@ public:
         //if (player->GetSession()->IsPremium() && sWorld->getBoolConfig(COMMAND_BANK_PREMIUM))
         {
             //Different Checks
-            if (player->isInCombat() || player->isInFlight() || player->GetMap()->IsBattlegroundOrArena() || player->HasStealthAura() || player->HasFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH) || player->isDead())
+            if (player->IsInCombat() || player->isInFlight() || player->GetMap()->IsBattlegroundOrArena() || player->HasStealthAura() || player->HasFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH) || player->isDead())
             {
                 handler->SendSysMessage(LANG_PREMIUM_CANT_DO);
                 handler->SetSentErrorMessage(true);
@@ -122,7 +122,7 @@ public:
 
 		Player* me = handler->GetSession()->GetPlayer();
 	
-		if (me->isInCombat())
+		if (me->IsInCombat())
         {
             handler->SendSysMessage(LANG_YOU_IN_COMBAT);
             handler->SetSentErrorMessage(true);

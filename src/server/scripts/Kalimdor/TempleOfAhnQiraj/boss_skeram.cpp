@@ -177,7 +177,7 @@ class boss_skeram : public CreatureScript
                     events.RescheduleEvent(EVENT_BLINK, 2000);
                 }
 
-                if (me->IsWithinMeleeRange(me->getVictim()))
+                if (me->IsWithinMeleeRange(me->GetVictim()))
                 {
                     events.RescheduleEvent(EVENT_EARTH_SHOCK, 2000);
                     DoMeleeAttackIfReady();
@@ -201,7 +201,7 @@ class PlayerOrPetCheck
         bool operator()(WorldObject* object) const
         {
             if (object->GetTypeId() != TYPEID_PLAYER)
-                if (!object->ToCreature()->isPet())
+                if (!object->ToCreature()->IsPet())
                     return true;
 
             return false;

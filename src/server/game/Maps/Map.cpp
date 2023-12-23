@@ -843,7 +843,7 @@ void Map::MoveAllCreaturesInMoveList()
                 //But this check is always needed to ensure safety
                 /// @todo pets will disappear if this is outside CreatureRespawnRelocation
                 //need to check why pet is frequently relocated to an unloaded cell
-                if (c->isPet())
+                if (c->IsPet())
                     ((Pet*)c)->Remove(PET_SAVE_NOT_IN_SLOT, true);
                 else
                     AddObjectToRemoveList(c);
@@ -2194,7 +2194,7 @@ uint32 Map::GetPlayersCountExceptGMs() const
 {
     uint32 count = 0;
     for (MapRefManager::const_iterator itr = m_mapRefManager.begin(); itr != m_mapRefManager.end(); ++itr)
-        if (!itr->getSource()->isGameMaster())
+        if (!itr->getSource()->IsGameMaster())
 		{
             ++count;
 			count += itr->getSource()->GetNpcBotsCount();
@@ -2250,7 +2250,7 @@ void Map::AddToActive(Creature* c)
     AddToActiveHelper(c);
 
     // also not allow unloading spawn grid to prevent creating creature clone at load
-    if (!c->isPet() && c->GetDBTableGUIDLow())
+    if (!c->IsPet() && c->GetDBTableGUIDLow())
     {
         float x, y, z;
         c->GetRespawnPosition(x, y, z);
@@ -2271,7 +2271,7 @@ void Map::RemoveFromActive(Creature* c)
     RemoveFromActiveHelper(c);
 
     // also allow unloading spawn grid
-    if (!c->isPet() && c->GetDBTableGUIDLow())
+    if (!c->IsPet() && c->GetDBTableGUIDLow())
     {
         float x, y, z;
         c->GetRespawnPosition(x, y, z);
@@ -2338,7 +2338,7 @@ bool InstanceMap::CanEnter(Player* player)
     }
 
     // allow GM's to enter
-    if (player->isGameMaster())
+    if (player->IsGameMaster())
         return Map::CanEnter(player);
 
     // cannot enter if the instance is full (player cap), GMs don't count
@@ -2352,7 +2352,7 @@ bool InstanceMap::CanEnter(Player* player)
 
     // cannot enter while an encounter is in progress on raids
     /*Group* group = player->GetGroup();
-    if (!player->isGameMaster() && group && group->InCombatToInstance(GetInstanceId()) && player->GetMapId() != GetId())*/
+    if (!player->IsGameMaster() && group && group->InCombatToInstance(GetInstanceId()) && player->GetMapId() != GetId())*/
     if (IsRaid() && GetInstanceScript() && GetInstanceScript()->IsEncounterInProgress())
     {
         player->SendTransferAborted(GetId(), TRANSFER_ABORT_ZONE_IN_COMBAT);
@@ -2368,7 +2368,7 @@ bool InstanceMap::CanEnter(Player* player)
         for (PlayerList::const_iterator i = playerList.begin(); i != playerList.end(); ++i)
             if (Player* iPlayer = i->getSource())
             {
-                if (iPlayer->isGameMaster()) // bypass GMs
+                if (iPlayer->IsGameMaster()) // bypass GMs
                     continue;
                 if (!player->GetGroup()) // player has not group and there is someone inside, deny entry
                 {

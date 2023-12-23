@@ -36,7 +36,7 @@ class npc_item_gambler : public CreatureScript
 		
 	bool OnGossipSelect(Player* player, Creature* pCreature, uint32 /*uiSender*/, uint32 uiAction)
     {
-		if (player->isInCombat())
+		if (player->IsInCombat())
 		{
 			pCreature->MonsterWhisper("You are in combat !!", player->GetGUID());
 			player->CLOSE_GOSSIP_MENU();
