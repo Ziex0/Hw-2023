@@ -53,7 +53,7 @@ public:
         }
 				void ReceiveEmote(Player *pPlayer, uint32 uiTextEmote)
 		{
-			if (pPlayer->IsInCombat())
+			if (pPlayer->isInCombat())
 				{ pPlayer->GetSession()->SendAreaTriggerMessage("|cffff0000You are in combat!|r"); } 
 				return;
 		}
@@ -83,10 +83,10 @@ public:
 		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/ICONS/Ability_DualWieldSpecialization:35:35|t|cffff0000 Player Tools ->", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 450);
 		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/icons/achievement_zone_ashenvale_01:35:35|t|cff0000ff Buff Me UP", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2500);
 		//pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/ICONS/Achievement_Zone_Blackrock_01:35:35|t|cffff0000 Free Mounts ->", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 177);
-		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/ICONS/Achievement_Zone_Azshara_01:35:35|t|cffff0000 The Heaven", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1110); 
+		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/ICONS/Achievement_Zone_Azshara_01:35:35|t|cffff0000 The Heaven Shop", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1110); 
 		//pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/ICONS/Achievement_Zone_Azshara_01:35:35|t|cffff0000 VIP Area", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999); 
-		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface\\icons\\Achievement_Dungeon_Icecrown_Frostmourne:35:35|t|r|cffD2691E Hells Legion", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9000); 
-		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface\\icons\\Achievement_Boss_Valanar:35:35|t|r|cff0000ff Frozen Throne", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1111);
+		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface\\icons\\Achievement_Dungeon_Icecrown_Frostmourne:35:35|t|r|cffD2691E Heaven Tier's Farming", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9000); 
+		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface\\icons\\Achievement_Boss_Valanar:35:35|t|r|cff0000ff High Level Tiers Questing", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1111);
 		
 		pPlayer->SEND_GOSSIP_MENU(907, pCreature->GetGUID());
 	}
@@ -284,7 +284,7 @@ public:
 
     bool OnGossipSelect(Player* pPlayer, Creature* pCreature, uint32 /*uiSender*/, uint32 uiAction)
     {
-		if (pPlayer->IsInCombat())
+		if (pPlayer->isInCombat())
 		{
 			pCreature->MonsterWhisper("You are in combat, wait until your combat is gone.", pPlayer->GetGUID());
 			pPlayer->CLOSE_GOSSIP_MENU();
@@ -328,7 +328,7 @@ public:
 			}
 
 			case GOSSIP_ACTION_INFO_DEF + 9000:
-				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|TInterface/Icons/Achievement_zone_wetlands_01:35|r| Legacy of Bornstellar (T3)", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9001);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|TInterface/Icons/Achievement_zone_wetlands_01:35|t|r| Legacy of Bornstellar (T3)", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9001);
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|TInterface/Icons/Achievement_zone_bloodmystisle_01:35|t|r| Dawn of Sands of Time (T4)", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9002);
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|TInterface/Icons/Achievement_zone_stonetalon_01:35:35|t|r| Ashes of T. Fates (T5)", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9003);
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|TInterface/Icons/Achievement_zone_zuldrak_09:35:35|t|r| Blood Forged (T6)", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9004);
@@ -342,22 +342,27 @@ public:
 					pPlayer->CLOSE_GOSSIP_MENU();
 					break;
 			   
-            case GOSSIP_ACTION_INFO_DEF +9002: 
+           case GOSSIP_ACTION_INFO_DEF +9002: 
 					pPlayer->SummonCreature(60027,pPlayer->GetPositionX() ,pPlayer->GetPositionY()+2, pPlayer->GetPositionZ(), 0,TEMPSUMMON_TIMED_DESPAWN,20000);
 					pPlayer->CLOSE_GOSSIP_MENU();
 					break;
 
-            case GOSSIP_ACTION_INFO_DEF +9003:
+           case GOSSIP_ACTION_INFO_DEF +9003:
 					pPlayer->SummonCreature(60028,pPlayer->GetPositionX() ,pPlayer->GetPositionY()+2, pPlayer->GetPositionZ(), 0,TEMPSUMMON_TIMED_DESPAWN,20000);
 					pPlayer->CLOSE_GOSSIP_MENU();
 					break;
 
-            case GOSSIP_ACTION_INFO_DEF +9004:
+					case GOSSIP_ACTION_INFO_DEF +9004:
 					pPlayer->SummonCreature(60029,pPlayer->GetPositionX() ,pPlayer->GetPositionY()+2, pPlayer->GetPositionZ(), 0,TEMPSUMMON_TIMED_DESPAWN,20000);
 					pPlayer->CLOSE_GOSSIP_MENU();
 					break;
+
+            /*case GOSSIP_ACTION_INFO_DEF +3:
+					pPlayer->SummonCreature(96000,pPlayer->GetPositionX() ,pPlayer->GetPositionY(), pPlayer->GetPositionZ()+2, 0,TEMPSUMMON_TIMED_DESPAWN,30000);
+					pPlayer->CLOSE_GOSSIP_MENU();
+					break;
 			   
-            /*case GOSSIP_ACTION_INFO_DEF +4:
+            case GOSSIP_ACTION_INFO_DEF +4:
 					pPlayer->SummonCreature(190106,pPlayer->GetPositionX()+2 ,pPlayer->GetPositionY(), pPlayer->GetPositionZ(), 0,TEMPSUMMON_TIMED_DESPAWN,30000);
 					pPlayer->CLOSE_GOSSIP_MENU();
 					break;
@@ -1466,17 +1471,17 @@ public:
 				
 				//custom zones
 				case GOSSIP_ACTION_INFO_DEF + 310:
-				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Scorched Guardian", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 304);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Scorched Guardian Relics", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 304);
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Unholy Dragon", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 305);
-				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Eve's Bags", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 306);
-				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Gold Dragon", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 307);
-				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "The Verdant Passage", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 308);
-				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Church of Holy Light", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 309);
-				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Dawn of Vengeance", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 311);
-				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Magistery Keep", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 313);
-				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Forgotten lands", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 314);
-				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Beast Me Up", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 315);
-				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Take Down The LK", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 316);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Eve's Bags Off Parts", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 306);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Gold Dragon Quest Lv.255", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 307);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "The Verdant Passage Weapons", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 308);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Church of Holy Light Starting Gear's", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 309);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Dawn of Vengeance (Tier1)", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 311);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Magistery Keep PvE Stuffs", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 313);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Forgotten lands Bags & Questing", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 314);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Beast Me Up Trinkets & Coins", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 315);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Take Down The LK PvE Stuffs", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 316);
 				
 				//pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "[More] ->", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3100);
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "<- [Back]", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 11);
@@ -1547,8 +1552,8 @@ public:
 				
 				//Mall non pvp
 			case GOSSIP_ACTION_INFO_DEF + 910:
-			pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Frozen City", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9101);
-			pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Dark Portal", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9102);
+			pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Starting Tier's Questing", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9101);
+			pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Dark Portal Mall", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9102);
 			pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "<- [Back]", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 11);
 			pPlayer->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pCreature->GetGUID());
 				break;
@@ -1647,12 +1652,13 @@ public:
 				
 				//Armor zones
 				case GOSSIP_ACTION_INFO_DEF + 610:
-				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Underworld Drake's", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 611);
-				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Curse of the Blood", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 612);
-				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Labyrinth Depths", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 613);
-				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Prison of Immol'thar", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 616);
-				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Forgotten quarries (Raid)", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 614);
-				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Reverse Blackwing Lair (Raid)", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 615);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Underworld Drake's Trinkets", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 611);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Curse of the Blood Weapons & Gear PvE", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 612);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Labyrinth Depths Off Parts & Cloaks", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 613);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Prison of Immol'thar PvE Gear & Weapons", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 616);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Supremacy of Jewelrys & Weapons ", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 617);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Forgotten quarries (Raid T2)", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 614);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Reverse Blackwing Lair PvE Weapons & Gear", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 615);
 				
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "<- [Back]", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 11);
 				pPlayer->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pCreature->GetGUID());
@@ -1695,11 +1701,17 @@ public:
 				pPlayer->TeleportTo(469, -7587.7597f, -1261.4300f, 482.0328f, 0.6100f);
 				break;
 				
+				//Supremacy of Jewelrys
+				case GOSSIP_ACTION_INFO_DEF + 617:
+				pPlayer->CLOSE_GOSSIP_MENU();
+				pPlayer->TeleportTo(0, -785.3831f, 1541.9107f, 21.7619f, 2.6789f);
+				break;
+
 				//event zones
 				case GOSSIP_ACTION_INFO_DEF + 810:
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Stair Event", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 811);
 				//pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Empty Event ", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 812);
-				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Impossible event ", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 813);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Impossible Event ", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 813);
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Maze Event ", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 814);
 				
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "<- [Back]", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 11);
