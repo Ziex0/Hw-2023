@@ -435,7 +435,7 @@ public:
         else
             unit = handler->getSelectedCreature();
 
-        if (!unit || unit->IsPet() || unit->isTotem())
+        if (!unit || unit->IsPet() || unit->IsTotem())
         {
             handler->SendSysMessage(LANG_SELECT_CREATURE);
             handler->SetSentErrorMessage(true);

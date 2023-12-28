@@ -25223,7 +25223,7 @@ bool Player::isHonorOrXPTarget(Unit* victim)
 
     if (victim->GetTypeId() == TYPEID_UNIT)
     {
-        if (victim->ToCreature()->isTotem() ||
+        if (victim->ToCreature()->IsTotem() ||
             victim->ToCreature()->IsPet() ||
             victim->ToCreature()->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_NO_XP_AT_KILL)
                 return false;

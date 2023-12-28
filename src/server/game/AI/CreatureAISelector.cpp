@@ -59,7 +59,7 @@ namespace FactorySelector
                 ai_factory = ai_registry.GetRegistryItem("GuardAI");
             else if (creature->HasUnitTypeMask(UNIT_MASK_CONTROLABLE_GUARDIAN))
                 ai_factory = ai_registry.GetRegistryItem("PetAI");
-            else if (creature->isTotem())
+            else if (creature->IsTotem())
                 ai_factory = ai_registry.GetRegistryItem("TotemAI");
             else if (creature->isTrigger())
             {

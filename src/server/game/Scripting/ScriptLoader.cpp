@@ -1400,7 +1400,6 @@ void AddBattlegroundScripts()
 	void AddSC_GMIsland_Theminator();
 	//void AddSC_Security_Scripts();
 	void AddSC_Packet_Protection();
-	void AddVASAutoBalanceScripts();
 
 	//TELE
 	void AddSc_Scripttele_icc();
@@ -1510,7 +1509,6 @@ void AddCustomScripts()
 	AddSC_GMIsland_Theminator();
 	//AddSC_Security_Scripts();
 	AddSC_Packet_Protection();
-	AddVASAutoBalanceScripts();
 
 	//TELE
 	AddSc_Scripttele_icc();
