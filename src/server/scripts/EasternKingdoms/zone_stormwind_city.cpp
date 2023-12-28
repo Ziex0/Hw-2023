@@ -402,7 +402,7 @@ public:
         {
             Talk(SAY_MARZON_2);
 
-            if (me->isSummon())
+            if (me->IsSummon())
             {
                 if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                 {
@@ -416,7 +416,7 @@ public:
         {
             me->DisappearAndDie();
 
-            if (me->isSummon())
+            if (me->IsSummon())
             {
                 if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                 {
@@ -431,7 +431,7 @@ public:
             if (uiType != POINT_MOTION_TYPE)
                 return;
 
-            if (me->isSummon())
+            if (me->IsSummon())
             {
                 Unit* summoner = me->ToTempSummon()->GetSummoner();
                 if (summoner && summoner->GetTypeId() == TYPEID_UNIT && summoner->IsAIEnabled)

@@ -12,11 +12,11 @@
 
 enum eTexts
 {
-	TEXT_ON_DANCE = -1700004,
-	TEXT_ON_SALUTE = -1700005,
-	TEXT_ON_SPIT = -1700006,
-	TEXT_ON_LAUGH = -1700007,
-	TEXT_ON_BYE = -1700008
+	TEXT_ON_DANCE = 95003,
+	TEXT_ON_SALUTE = 95004,
+	TEXT_ON_SPIT = 95005,
+	TEXT_ON_LAUGH = 95006,
+	TEXT_ON_BYE = 95007
 };
 
 enum eRidingSkills
@@ -80,6 +80,8 @@ public:
 		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/ICONS/Achievement_Zone_Netherstorm_01:35:35|t|r|cff0000ff Teleport Menu ->", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 11);
 		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/ICONS/INV_MISC_GEM_AMETHYST_03:35:35|t|r|cff0000ff Professions ->", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 196);
 		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/ICONS/ACHIEVEMENT_WIN_WINTERGRASP:35:35|t|r|cff0000ff Learn Spells ->", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 460);
+		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface\\icons\\Spell_Deathknight_ClassIcon:35:35|t|r|cffC41F3B Advance my weapon skills to max.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9);
+		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface\\icons\\Spell_Holy_SearingLightPriest:35:35|t|r|cffF58CBA Give me maximum riding skill.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 186);
 		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/ICONS/Ability_DualWieldSpecialization:35:35|t|r|cffff0000 Player Tools ->", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 450);
 		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/icons/achievement_zone_ashenvale_01:35:35|t|r|cff0000ff Buff Me UP", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2500);
 		//pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/ICONS/Achievement_Zone_Blackrock_01:35:35|t|rcffff0000 Free Mounts ->", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 177);
@@ -332,6 +334,8 @@ public:
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|TInterface/Icons/Achievement_zone_bloodmystisle_01:35:35|t|r Dawn of Sands of Time (T4)", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9002);
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|TInterface/Icons/Achievement_zone_stonetalon_01:35:35|t|r Ashes of T. Fates (T5)", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9003);
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|TInterface/Icons/Achievement_zone_zuldrak_09:35:35|t|r Blood Forged (T6)", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9004);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|TInterface/Icons/Achievement_zone_grizzlyhills_05:35:35|t|r Legacy of Vengeance (T1)", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9005);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|TInterface/Icons/Achievement_zone_zuldrak_12:35:35|t|r Smoldering Warlords (T2)", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9006);
 				
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "<- [Back]", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 11);
 				pPlayer->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pCreature->GetGUID());
@@ -352,22 +356,22 @@ public:
 					pPlayer->CLOSE_GOSSIP_MENU();
 					break;
 
-					case GOSSIP_ACTION_INFO_DEF +9004:
-					pPlayer->SummonCreature(60029,pPlayer->GetPositionX() ,pPlayer->GetPositionY()+2, pPlayer->GetPositionZ(), 0,TEMPSUMMON_TIMED_DESPAWN,20000);
+			case GOSSIP_ACTION_INFO_DEF +9004:
+					pPlayer->SummonCreature(60029,pPlayer->GetPositionX()+2 ,pPlayer->GetPositionY(), pPlayer->GetPositionZ(), 0,TEMPSUMMON_TIMED_DESPAWN,20000);
 					pPlayer->CLOSE_GOSSIP_MENU();
 					break;
 
-            /*case GOSSIP_ACTION_INFO_DEF +3:
-					pPlayer->SummonCreature(96000,pPlayer->GetPositionX() ,pPlayer->GetPositionY(), pPlayer->GetPositionZ()+2, 0,TEMPSUMMON_TIMED_DESPAWN,30000);
+            case GOSSIP_ACTION_INFO_DEF +9005:
+					pPlayer->SummonCreature(60030,pPlayer->GetPositionX(),pPlayer->GetPositionY()+2, pPlayer->GetPositionZ()+2, 0,TEMPSUMMON_TIMED_DESPAWN,20000);
 					pPlayer->CLOSE_GOSSIP_MENU();
 					break;
 			   
-            case GOSSIP_ACTION_INFO_DEF +4:
-					pPlayer->SummonCreature(190106,pPlayer->GetPositionX()+2 ,pPlayer->GetPositionY(), pPlayer->GetPositionZ(), 0,TEMPSUMMON_TIMED_DESPAWN,30000);
+            case GOSSIP_ACTION_INFO_DEF +9006:
+					pPlayer->SummonCreature(60031,pPlayer->GetPositionX()+2 ,pPlayer->GetPositionY(), pPlayer->GetPositionZ(), 0,TEMPSUMMON_TIMED_DESPAWN,20000);
 					pPlayer->CLOSE_GOSSIP_MENU();
 					break;
 			   
-            case GOSSIP_ACTION_INFO_DEF +5:
+            /*case GOSSIP_ACTION_INFO_DEF +5:
 					pPlayer->SummonCreature(190012,pPlayer->GetPositionX() ,pPlayer->GetPositionY()+2, pPlayer->GetPositionZ(), 0,TEMPSUMMON_TIMED_DESPAWN,30000);
 					pPlayer->CLOSE_GOSSIP_MENU();
 					break;
@@ -2567,8 +2571,8 @@ public:
 					pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "I want to get DRUNK!.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3012);
 					pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Ugh, Sober me up, I've had enough...", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3013);
 					pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Heal me.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 26);
-					pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Advance my weapon skills to max.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9);
-		            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Give me maximum riding skill.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 186);
+					//pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Advance my weapon skills to max.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9);
+		            //pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Give me maximum riding skill.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 186);
 					//pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Reset My talent and Spell. ( Carefull if you have Mounts or another spells)", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 187);
 					pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "<- [Back]", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 8);
 					pPlayer->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pCreature->GetGUID());

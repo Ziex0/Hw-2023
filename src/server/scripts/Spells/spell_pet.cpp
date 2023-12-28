@@ -1348,7 +1348,7 @@ public:
             if (GetCaster()->GetOwner()->ToPlayer())
             {
                 //  Pet's base damage changes depending on happiness
-                if (GetCaster()->IsPet() && GetCaster()->ToPet()->isHunterPet())
+                if (GetCaster()->IsPet() && GetCaster()->ToPet()->IsHunterPet())
                 {
                     switch (GetCaster()->ToPet()->GetHappinessState())
                     {

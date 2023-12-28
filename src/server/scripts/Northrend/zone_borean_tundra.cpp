@@ -562,7 +562,7 @@ public:
                 go_caribou->SetLootState(GO_JUST_DEACTIVATED);
 
             if (TempSummon* summon = me->ToTempSummon())
-                if (summon->isSummon())
+                if (summon->IsSummon())
                     if (Unit* temp = summon->GetSummoner())
                         if (Player* player = temp->ToPlayer())
                             player->KilledMonsterCredit(me->GetEntry(), 0);
@@ -1261,7 +1261,7 @@ public:
             if (uiType != POINT_MOTION_TYPE)
                 return;
 
-            if (me->isSummon())
+            if (me->IsSummon())
                 if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                     CAST_AI(npc_thassarian::npc_thassarianAI, summoner->ToCreature()->AI())->arthasInPosition = true;
         }
@@ -1293,7 +1293,7 @@ public:
 
             me->AddUnitState(UNIT_STATE_STUNNED);
             me->CastSpell(me, SPELL_STUN, true);
-            if (me->isSummon())
+            if (me->IsSummon())
                 if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                     CAST_AI(npc_thassarian::npc_thassarianAI, summoner->ToCreature()->AI())->arlosInPosition = true;
         }
@@ -1350,7 +1350,7 @@ public:
             if (uiType != POINT_MOTION_TYPE)
                 return;
 
-            if (me->isSummon())
+            if (me->IsSummon())
                 if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                     CAST_AI(npc_thassarian::npc_thassarianAI, summoner->ToCreature()->AI())->talbotInPosition = true;
         }
@@ -1461,7 +1461,7 @@ public:
                 me->AddUnitState(UNIT_STATE_STUNNED);
                 me->CastSpell(me, SPELL_STUN, true);
 
-                if (me->isSummon())
+                if (me->IsSummon())
                     if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                         CAST_AI(npc_thassarian::npc_thassarianAI, summoner->GetAI())->leryssaInPosition = true;
                 bDone = true;
@@ -1469,7 +1469,7 @@ public:
             else
             {
                 me->SetStandState(UNIT_STAND_STATE_SIT);
-                if (me->isSummon())
+                if (me->IsSummon())
                     if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                     summoner->SetStandState(UNIT_STAND_STATE_SIT);
                 phaseTimer = 1500;
@@ -1486,7 +1486,7 @@ public:
                 switch (phase)
                 {
                     case 1:
-                        if (me->isSummon())
+                        if (me->IsSummon())
                             if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                                 if (Creature* thassarian = summoner->ToCreature())
                                     thassarian->AI()->Talk(SAY_THASSARIAN_4);
@@ -1499,7 +1499,7 @@ public:
                         ++phase;
                         break;
                     case 3:
-                        if (me->isSummon())
+                        if (me->IsSummon())
                             if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                                 if (Creature* thassarian = summoner->ToCreature())
                                     thassarian->AI()->Talk(SAY_THASSARIAN_5);
@@ -1512,7 +1512,7 @@ public:
                         ++phase;
                         break;
                     case 5:
-                        if (me->isSummon())
+                        if (me->IsSummon())
                             if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                                 if (Creature* thassarian = summoner->ToCreature())
                                     thassarian->AI()->Talk(SAY_THASSARIAN_6);
@@ -1526,7 +1526,7 @@ public:
                         ++phase;
                         break;
                     case 7:
-                        if (me->isSummon())
+                        if (me->IsSummon())
                             if (Unit* summoner = me->ToTempSummon()->GetSummoner())
                                 if (Creature* thassarian = summoner->ToCreature())
                                 {
