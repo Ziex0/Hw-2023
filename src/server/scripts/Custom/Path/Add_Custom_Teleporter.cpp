@@ -330,12 +330,12 @@ public:
 			}
 
 			case GOSSIP_ACTION_INFO_DEF + 9000:
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|TInterface/Icons/Achievement_zone_grizzlyhills_05:35:35|t|r Legacy of Vengeance (T1)", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9005);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|TInterface/Icons/Achievement_zone_zuldrak_12:35:35|t|r Smoldering Warlords (T2)", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9006);
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|TInterface/Icons/Achievement_zone_wetlands_01:35:35|t|r Legacy of Bornstellar (T3)", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9001);
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|TInterface/Icons/Achievement_zone_bloodmystisle_01:35:35|t|r Dawn of Sands of Time (T4)", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9002);
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|TInterface/Icons/Achievement_zone_stonetalon_01:35:35|t|r Ashes of T. Fates (T5)", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9003);
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|TInterface/Icons/Achievement_zone_zuldrak_09:35:35|t|r Blood Forged (T6)", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9004);
-				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|TInterface/Icons/Achievement_zone_grizzlyhills_05:35:35|t|r Legacy of Vengeance (T1)", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9005);
-				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|TInterface/Icons/Achievement_zone_zuldrak_12:35:35|t|r Smoldering Warlords (T2)", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9006);
 				
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "<- [Back]", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 11);
 				pPlayer->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pCreature->GetGUID());
@@ -346,12 +346,12 @@ public:
 					pPlayer->CLOSE_GOSSIP_MENU();
 					break;
 			   
-           case GOSSIP_ACTION_INFO_DEF +9002: 
+			case GOSSIP_ACTION_INFO_DEF +9002: 
 					pPlayer->SummonCreature(60027,pPlayer->GetPositionX() ,pPlayer->GetPositionY()+2, pPlayer->GetPositionZ(), 0,TEMPSUMMON_TIMED_DESPAWN,20000);
 					pPlayer->CLOSE_GOSSIP_MENU();
 					break;
 
-           case GOSSIP_ACTION_INFO_DEF +9003:
+			case GOSSIP_ACTION_INFO_DEF +9003:
 					pPlayer->SummonCreature(60028,pPlayer->GetPositionX() ,pPlayer->GetPositionY()+2, pPlayer->GetPositionZ(), 0,TEMPSUMMON_TIMED_DESPAWN,20000);
 					pPlayer->CLOSE_GOSSIP_MENU();
 					break;
