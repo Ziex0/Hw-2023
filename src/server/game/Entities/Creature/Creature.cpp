@@ -234,7 +234,7 @@ void Creature::DisappearAndDie()
 
 void Creature::SearchFormation()
 {
-    if (isSummon())
+    if (IsSummon())
         return;
 
     uint32 lowguid = GetDBTableGUIDLow();
@@ -863,7 +863,7 @@ bool Creature::Create(uint32 guidlow, Map* map, uint32 phaseMask, uint32 Entry, 
 
     uint32 displayID = GetNativeDisplayId();
     CreatureModelInfo const* minfo = sObjectMgr->GetCreatureModelRandomGender(&displayID);
-    if (minfo && !isTotem())                               // Cancel load if no model defined or if totem
+    if (minfo && !IsTotem())                               // Cancel load if no model defined or if totem
     {
         SetDisplayId(displayID);
         SetNativeDisplayId(displayID);
@@ -887,7 +887,7 @@ bool Creature::Create(uint32 guidlow, Map* map, uint32 phaseMask, uint32 Entry, 
 
 void Creature::InitializeReactState()
 {
-    if (isTotem() || isTrigger() || GetCreatureType() == CREATURE_TYPE_CRITTER || isSpiritService())
+    if (IsTotem() || isTrigger() || GetCreatureType() == CREATURE_TYPE_CRITTER || isSpiritService())
         SetReactState(REACT_PASSIVE);
     else
         SetReactState(REACT_AGGRESSIVE);
@@ -2118,7 +2118,7 @@ bool Creature::_IsTargetAcceptable(const Unit* target) const
 
 void Creature::SaveRespawnTime()
 {
-    if (isSummon() || !m_DBTableGuid || (m_creatureData && !m_creatureData->dbData))
+    if (IsSummon() || !m_DBTableGuid || (m_creatureData && !m_creatureData->dbData))
         return;
 
     GetMap()->SaveCreatureRespawnTime(m_DBTableGuid, m_respawnTime);

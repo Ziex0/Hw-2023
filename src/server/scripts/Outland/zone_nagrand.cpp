@@ -254,7 +254,7 @@ public:
             if (summoned->GetEntry() == NPC_MURK_BRUTE)
                 summoned->AI()->Talk(SAY_MAG_NO_ESCAPE);
 
-            if (summoned->isTotem())
+            if (summoned->IsTotem())
                 return;
 
             summoned->SetWalk(false);
@@ -599,7 +599,7 @@ public:
                 Talk(SAY_KUR_NO_ESCAPE);
 
             // This function is for when we summoned enemies to fight - so that does NOT mean we should make our totem count in this!
-            if (summoned->isTotem())
+            if (summoned->IsTotem())
                 return;
 
             summoned->SetWalk(false);

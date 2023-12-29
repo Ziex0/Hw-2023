@@ -2674,7 +2674,7 @@ float Unit::GetUnitDodgeChance() const
 		return GetFloatValue(PLAYER_DODGE_PERCENTAGE);
 	else
 	{
-		if (ToCreature()->isTotem())
+		if (ToCreature()->IsTotem())
 			return 0.0f;
 		else
 		{
@@ -2749,7 +2749,7 @@ float Unit::GetUnitBlockChance() const
 	}
 	else
 	{
-		if (ToCreature()->isTotem())
+		if (ToCreature()->IsTotem())
 			return 0.0f;
 		else
 		{
@@ -3450,7 +3450,7 @@ void Unit::_UnapplyAura(AuraApplicationMap::iterator &i, AuraRemoveMode removeMo
 	ASSERT(!aurApp->GetEffectMask());
 
 	// Remove totem at next update if totem loses its aura
-	if (aurApp->GetRemoveMode() == AURA_REMOVE_BY_EXPIRE && GetTypeId() == TYPEID_UNIT && ToCreature()->isTotem() && ToTotem()->GetSummonerGUID() == aura->GetCasterGUID())
+	if (aurApp->GetRemoveMode() == AURA_REMOVE_BY_EXPIRE && GetTypeId() == TYPEID_UNIT && ToCreature()->IsTotem() && ToTotem()->GetSummonerGUID() == aura->GetCasterGUID())
 	{
 		if (ToTotem()->GetSpell() == aura->GetId() && ToTotem()->GetTotemType() == TOTEM_PASSIVE)
 			ToTotem()->setDeathState(JUST_DIED);
@@ -9458,7 +9458,7 @@ void Unit::SetMinion(Minion *minion, bool apply)
 			if (GetPetGUID() == minion->GetGUID())
 				SetPetGUID(0);
 		}
-		else if (minion->isTotem())
+		else if (minion->IsTotem())
 		{
 			// All summoned by totem minions must disappear when it is removed.
 			if (SpellInfo const* spInfo = sSpellMgr->GetSpellInfo(minion->ToTotem()->GetSpell()))
@@ -9528,7 +9528,7 @@ void Unit::GetAllMinionsByEntry(std::list<Creature*>& Minions, uint32 entry)
 		Unit* unit = *itr;
 		++itr;
 		if (unit->GetEntry() == entry && unit->GetTypeId() == TYPEID_UNIT
-			&& unit->ToCreature()->isSummon()) // minion, actually
+			&& unit->ToCreature()->IsSummon()) // minion, actually
 			Minions.push_back(unit->ToCreature());
 	}
 }
@@ -9540,7 +9540,7 @@ void Unit::RemoveAllMinionsByEntry(uint32 entry)
 		Unit* unit = *itr;
 		++itr;
 		if (unit->GetEntry() == entry && unit->GetTypeId() == TYPEID_UNIT
-			&& unit->ToCreature()->isSummon()) // minion, actually
+			&& unit->ToCreature()->IsSummon()) // minion, actually
 			unit->ToTempSummon()->UnSummon();
 		// i think this is safe because i have never heard that a despawned minion will trigger a same minion
 	}
@@ -9635,7 +9635,7 @@ int32 Unit::DealHeal(Unit* victim, uint32 addhealth)
 
 	Unit* unit = this;
 
-	if (GetTypeId() == TYPEID_UNIT && ToCreature()->isTotem())
+	if (GetTypeId() == TYPEID_UNIT && ToCreature()->IsTotem())
 		unit = GetOwner();
 
 	if (Player* player = unit->ToPlayer())
@@ -9722,7 +9722,7 @@ void Unit::RemoveAllControlled()
 		m_Controlled.erase(m_Controlled.begin());
 		if (target->GetCharmerGUID() == GetGUID())
 			target->RemoveCharmAuras();
-		else if (target->GetOwnerGUID() == GetGUID() && target->isSummon())
+		else if (target->GetOwnerGUID() == GetGUID() && target->IsSummon())
 			target->ToTempSummon()->UnSummon();
 		else
 			sLog->outError(LOG_FILTER_UNITS, "Unit %u is trying to release unit %u which is neither charmed nor owned by it", GetEntry(), target->GetEntry());
@@ -9847,7 +9847,7 @@ void Unit::UnsummonAllTotems()
 			continue;
 
 		if (Creature* OldTotem = GetMap()->GetCreature(m_SummonSlot[i]))
-			if (OldTotem->isSummon())
+			if (OldTotem->IsSummon())
 				OldTotem->ToTempSummon()->UnSummon();
 	}
 }
@@ -9914,7 +9914,7 @@ uint32 Unit::SpellDamageBonusDone(Unit* victim, SpellInfo const* spellProto, uin
 		return pdamage;
 
 	// For totems get damage bonus from owner
-	if (GetTypeId() == TYPEID_UNIT && ToCreature()->isTotem())
+	if (GetTypeId() == TYPEID_UNIT && ToCreature()->IsTotem())
 		if (Unit* owner = GetOwner())
 			return owner->SpellDamageBonusDone(victim, spellProto, pdamage, damagetype);
 
@@ -10475,7 +10475,7 @@ bool Unit::isSpellCrit(Unit* victim, SpellInfo const* spellProto, SpellSchoolMas
 {
 	//! Mobs can't crit with spells. Player Totems can
 	//! Fire Elemental (from totem) can too - but this part is a hack and needs more research
-	if (IS_CREATURE_GUID(GetGUID()) && !(isTotem() && IS_PLAYER_GUID(GetOwnerGUID())) && GetEntry() != 15438)
+	if (IS_CREATURE_GUID(GetGUID()) && !(IsTotem() && IS_PLAYER_GUID(GetOwnerGUID())) && GetEntry() != 15438)
 		return false;
 
 	// not critting spell
@@ -10740,7 +10740,7 @@ uint32 Unit::SpellCriticalHealingBonus(SpellInfo const* spellProto, uint32 damag
 uint32 Unit::SpellHealingBonusDone(Unit* victim, SpellInfo const* spellProto, uint32 healamount, DamageEffectType damagetype, uint32 stack) const
 {
 	// For totems get healing bonus from owner (statue isn't totem in fact)
-	if (GetTypeId() == TYPEID_UNIT && isTotem())
+	if (GetTypeId() == TYPEID_UNIT && IsTotem())
 		if (Unit* owner = GetOwner())
 			return owner->SpellHealingBonusDone(victim, spellProto, healamount, damagetype, stack);
 
@@ -12512,7 +12512,7 @@ bool Unit::CanHaveThreatList() const
 		return false;
 
 	// totems can not have threat list
-	if (ToCreature()->isTotem())
+	if (ToCreature()->IsTotem())
 		return false;
 
 	// vehicles can not have threat list
@@ -12672,7 +12672,7 @@ Unit* Creature::SelectVictim()
 	{
 		// We have player pet probably
 		target = getAttackerForHelper();
-		if (!target && isSummon())
+		if (!target && IsSummon())
 		{
 			if (Unit* owner = ToTempSummon()->GetOwner())
 			{
@@ -14415,7 +14415,7 @@ Player* Unit::GetSpellModOwner() const
 {
 	if (GetTypeId() == TYPEID_PLAYER)
 		return (Player*)this;
-	if (ToCreature()->IsPet() || ToCreature()->isTotem())
+	if (ToCreature()->IsPet() || ToCreature()->IsTotem())
 	{
 		Unit* owner = GetOwner();
 		if (owner && owner->GetTypeId() == TYPEID_PLAYER)
@@ -14673,7 +14673,7 @@ Unit* Unit::SelectNearbyTarget(Unit* exclude, float dist) const
 	// remove not LoS targets
 	for (std::list<Unit*>::iterator tIter = targets.begin(); tIter != targets.end();)
 	{
-		if (!IsWithinLOSInMap(*tIter) || (*tIter)->isTotem() || (*tIter)->isSpiritService() || (*tIter)->GetCreatureType() == CREATURE_TYPE_CRITTER)
+		if (!IsWithinLOSInMap(*tIter) || (*tIter)->IsTotem() || (*tIter)->isSpiritService() || (*tIter)->GetCreatureType() == CREATURE_TYPE_CRITTER)
 			targets.erase(tIter++);
 		else
 			++tIter;
@@ -15287,7 +15287,7 @@ void Unit::Kill(Unit* victim, bool durabilityLoss)
 	}
 
 	// Do KILL and KILLED procs. KILL proc is called only for the unit who landed the killing blow (and its owner - for pets and totems) regardless of who tapped the victim
-	if (IsPet() || isTotem())
+	if (IsPet() || IsTotem())
 		if (Unit* owner = GetOwner())
 			owner->ProcDamageAndSpell(victim, PROC_FLAG_KILL, PROC_FLAG_NONE, PROC_EX_NONE, 0);
 

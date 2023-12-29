@@ -1,4 +1,4 @@
-## THIS IS NOT BLIZZLIKE 50% INSIDE MODIFIED.
+## THIS IS NOT BLIZZLIKE 60% INSIDE MODIFIED.
 ONLY WORK IN PRIVATE SERVER
 
 WILL BE GOT PUBLIC AT WWW.HEAVEN-WOW.COM
@@ -55,9 +55,9 @@ TrinityCore Requirements
 Platform: Linux, Windows or Mac
 Processor with SSE2 support
 ACE ≥ 5.8.3
-MySQL ≥ 5.1.0
+MySQL ≥ 8.1.0
 CMake ≥ 3.8.0
-OpenSSL ≥ 0.9.8o
+OpenSSL ≥ 1.0.0
 GCC ≥ 4.3 (Linux only)
 MS Visual Studio ≥ 12 (Windows only)
 

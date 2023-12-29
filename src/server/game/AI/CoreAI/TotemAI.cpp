@@ -29,7 +29,7 @@
 
 int TotemAI::Permissible(Creature const* creature)
 {
-    if (creature->isTotem())
+    if (creature->IsTotem())
         return PERMIT_BASE_PROACTIVE;
 
     return PERMIT_BASE_NO;
@@ -37,7 +37,7 @@ int TotemAI::Permissible(Creature const* creature)
 
 TotemAI::TotemAI(Creature* c) : CreatureAI(c), i_victimGuid(0)
 {
-    ASSERT(c->isTotem());
+    ASSERT(c->IsTotem());
 }
 
 void TotemAI::MoveInLineOfSight(Unit* /*who*/)

@@ -819,7 +819,7 @@ namespace Trinity
                 if (u->GetCreatureType() == CREATURE_TYPE_NON_COMBAT_PET)
                     return false;
 
-                if (u->GetTypeId() == TYPEID_UNIT && ((Creature*)u)->isTotem())
+                if (u->GetTypeId() == TYPEID_UNIT && ((Creature*)u)->IsTotem())
                     return false;
 
                 if (!u->isTargetableForAttack(false))
@@ -965,7 +965,7 @@ namespace Trinity
             bool operator()(Unit* u)
             {
                 // Check contains checks for: live, non-selectable, non-attackable flags, flight check and GM check, ignore totems
-                if (u->GetTypeId() == TYPEID_UNIT && ((Creature*)u)->isTotem())
+                if (u->GetTypeId() == TYPEID_UNIT && ((Creature*)u)->IsTotem())
                     return false;
 
                 if (i_funit->_IsValidAttackTarget(u, _spellInfo, i_obj->GetTypeId() == TYPEID_DYNAMICOBJECT ? i_obj : NULL) && i_obj->IsWithinDistInMap(u, i_range))

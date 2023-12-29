@@ -179,7 +179,7 @@ bool DICreatureCalcStats(Creature* creature)
     if (!DDEnable || !creature->IsAlive())
         return false;
 
-    if (creature->isTotem() || creature->isTrigger() || creature->GetCreatureType() == CREATURE_TYPE_CRITTER || creature->isSpiritService())
+    if (creature->IsTotem() || creature->isTrigger() || creature->GetCreatureType() == CREATURE_TYPE_CRITTER || creature->isSpiritService())
         return false;
 
     uint8 level = 1;
@@ -430,7 +430,7 @@ class Mod_DynamicInstance_AllCreatureScript : public AllCreatureScript
         if (!spellProto->MaxLevel)
             return;
             
-        if (creature->isTotem() || creature->isTrigger() || creature->GetCreatureType() == CREATURE_TYPE_CRITTER || creature->isSpiritService())
+        if (creature->IsTotem() || creature->isTrigger() || creature->GetCreatureType() == CREATURE_TYPE_CRITTER || creature->isSpiritService())
             return;
             
         uint8 level = creature->GetCreatureTemplate()->maxlevel;

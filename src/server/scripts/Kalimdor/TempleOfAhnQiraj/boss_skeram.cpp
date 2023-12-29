@@ -72,7 +72,7 @@ class boss_skeram : public CreatureScript
             void EnterEvadeMode()
             {
                 ScriptedAI::EnterEvadeMode();
-                if (me->isSummon())
+                if (me->IsSummon())
                     ((TempSummon*)me)->UnSummon();
             }
 
@@ -115,7 +115,7 @@ class boss_skeram : public CreatureScript
 
             void JustDied(Unit* /*killer*/)
             {
-                if (!me->isSummon())
+                if (!me->IsSummon())
                     Talk(SAY_DEATH);
                 else
                     me->RemoveCorpse();
@@ -168,7 +168,7 @@ class boss_skeram : public CreatureScript
                     }
                 }
 
-                if (!me->isSummon() && me->GetHealthPct() < _hpct)
+                if (!me->IsSummon() && me->GetHealthPct() < _hpct)
                 {
                     DoCast(me, SPELL_SUMMON_IMAGES);
                     Talk(SAY_SPLIT);

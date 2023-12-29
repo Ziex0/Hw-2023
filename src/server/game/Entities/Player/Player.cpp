@@ -22185,7 +22185,7 @@ void Player::VehicleSpellInitialize()
     WorldPacket data(SMSG_PET_SPELLS, 8 + 2 + 4 + 4 + 4 * 10 + 1 + 1 + cooldownCount * (4 + 2 + 4 + 4));
     data << uint64(vehicle->GetGUID());                     // Guid
     data << uint16(0);                                      // Pet Family (0 for all vehicles)
-    data << uint32(vehicle->isSummon() ? vehicle->ToTempSummon()->GetTimer() : 0); // Duration
+    data << uint32(vehicle->IsSummon() ? vehicle->ToTempSummon()->GetTimer() : 0); // Duration
     // The following three segments are read by the client as one uint32
     data << uint8(vehicle->GetReactState());                // React State
     data << uint8(0);                                       // Command State
@@ -25223,7 +25223,7 @@ bool Player::isHonorOrXPTarget(Unit* victim)
 
     if (victim->GetTypeId() == TYPEID_UNIT)
     {
-        if (victim->ToCreature()->isTotem() ||
+        if (victim->ToCreature()->IsTotem() ||
             victim->ToCreature()->IsPet() ||
             victim->ToCreature()->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_NO_XP_AT_KILL)
                 return false;

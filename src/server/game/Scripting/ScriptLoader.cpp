@@ -1406,6 +1406,8 @@ void AddBattlegroundScripts()
 	void AddSc_ScriptDawn_sand();
 	void AddSc_ScriptAshes_Fates();
 	void AddSc_Scriptblood_forg();
+	void AddSc_Scriptsmol_warlor();
+	void AddSc_Scriptleg_venge();
 
 #endif
 
@@ -1515,6 +1517,8 @@ void AddCustomScripts()
 	AddSc_ScriptDawn_sand();
 	AddSc_ScriptAshes_Fates();
 	AddSc_Scriptblood_forg();
+	AddSc_Scriptsmol_warlor();
+	AddSc_Scriptleg_venge();
 	
 #endif
 }
