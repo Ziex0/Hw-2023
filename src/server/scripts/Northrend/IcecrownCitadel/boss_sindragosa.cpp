@@ -1633,6 +1633,4 @@ void AddSC_boss_sindragosa()
 	new npc_sindragosa_trash();
 	new spell_frostwarden_handler_order_whelp();
 	new spell_frostwarden_handler_focus_fire();
-
-	new spell_sindragosa_frost_breath();
 }
