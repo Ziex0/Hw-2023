@@ -46,14 +46,14 @@ enum Texts
     SAY_DEAD = 5
 };
 
-class boss_two : public CreatureScript
+class boss_Vally : public CreatureScript
 {
 public:
-    boss_two() : CreatureScript("boss_two") { }
+    boss_Vally() : CreatureScript("boss_Vally") { }
 
     struct boss_twoAI : public ScriptedAI
     {
-        boss_twoAI(Creature* creature) : ScriptedAI(creature), Summons(me) { }
+        boss_VallyAI(Creature* creature) : ScriptedAI(creature), Summons(me) { }
 
         void Reset() override
         {
@@ -175,7 +175,7 @@ public:
     }
 };
 
-void AddSC_boss_two()
+void AddSC_boss_Vally()
 {
-    new boss_two();
+    new boss_Vally();
 }  

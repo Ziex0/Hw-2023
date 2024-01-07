@@ -1353,7 +1353,7 @@ void AddBattlegroundScripts()
 	void AddSC_npc_gurubashi_theme();
 	void AddSC_npc_morpher();
 	void AddSC_boss_maximus();
-	void AddSC_boss_two();
+	void AddSC_boss_Vally();
 	//void AddSC_NoFarming();
 
 	//Bots
@@ -1466,7 +1466,7 @@ void AddCustomScripts()
 	AddSC_npc_gurubashi_theme();
 	AddSC_npc_morpher();
 	AddSC_boss_maximus();
-	AddSC_boss_two();
+	AddSC_boss_Vally();
 	//AddSC_NoFarming();
 
 	//Bots
