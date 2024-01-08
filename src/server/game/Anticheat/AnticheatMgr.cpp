@@ -329,7 +329,7 @@ void AnticheatMgr::BuildReport(Player* player,uint8 reportType)
     {
         // display warning at the center of the screen, hacky way?
         std::string str = "";
-        str = "|cFFFFFC00[AC]|cFF00FFFF[|cFF60FF00" + std::string(player->GetName()) + "|cFF00FFFF] Possible cheater!";
+        str = "|cffff0000[AntiCheat]|cffffff00[|cFF60FF00" + std::string(player->GetName()) + "|cffffff00] Possible cheater!";
         WorldPacket data(SMSG_NOTIFICATION, (str.size()+1));
         data << str;
         sWorld->SendGlobalGMMessage(&data);

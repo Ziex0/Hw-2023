@@ -2702,7 +2702,7 @@ Anticheat.StricterDetectJumpHack = 0
 #       Default:    4 - (Default)
 #
 
-Anticheat.SpeedLimitTolerance = 4
+Anticheat.SpeedLimitTolerance = 2
 
 #     Automatic Moderation Features
 #
@@ -2716,7 +2716,7 @@ Anticheat.SpeedLimitTolerance = 4
 #
 
 Anticheat.KickPlayer = 1
-Anticheat.ReportsForKick = 75
+Anticheat.ReportsForKick = 70
 
 #     Anticheat.BanPlayer
 #     Anticheat.ReportsForBan
