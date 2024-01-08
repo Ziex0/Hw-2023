@@ -29,11 +29,12 @@ class AnticheatData;
 enum ReportTypes
 {
     SPEED_HACK_REPORT = 0,
-    FLY_HACK_REPORT,
-    WALK_WATER_HACK_REPORT,
-    JUMP_HACK_REPORT,
-    TELEPORT_PLANE_HACK_REPORT,
-    CLIMB_HACK_REPORT,
+    FLY_HACK_REPORT = 1,
+    WALK_WATER_HACK_REPORT = 2,
+    JUMP_HACK_REPORT = 3,
+    TELEPORT_PLANE_HACK_REPORT = 4,
+    CLIMB_HACK_REPORT = 5,
+    TELEPORT_HACK_REPORT = 6,
 
    // MAX_REPORT_TYPES
 };
@@ -45,7 +46,8 @@ enum DetectionTypes
     WALK_WATER_HACK_DETECTION       = 4,
     JUMP_HACK_DETECTION             = 8,
     TELEPORT_PLANE_HACK_DETECTION   = 16,
-    CLIMB_HACK_DETECTION            = 32
+    CLIMB_HACK_DETECTION            = 32,
+	TELEPORT_HACK_DETECTION			= 64
 };
 
 // GUIDLow is the key.
@@ -64,27 +66,25 @@ class AnticheatMgr
         void DeletePlayerData(Player* player);
         void CreatePlayerData(Player* player);
         void SavePlayerData(Player* player);
-
         void StartScripts();
-
         void HandlePlayerLogin(Player* player);
         void HandlePlayerLogout(Player* player);
-
         uint32 GetTotalReports(uint32 lowGUID);
         float GetAverage(uint32 lowGUID);
         uint32 GetTypeReports(uint32 lowGUID, uint8 type);
-
         void AnticheatGlobalCommand(ChatHandler* handler);
         void AnticheatDeleteCommand(uint32 guid);
-
         void ResetDailyReportStates();
+
     private:
-        void SpeedHackDetection(Player* player, MovementInfo movementInfo);
+		void SpeedHackDetection(Player* player, MovementInfo movementInfo);
         void FlyHackDetection(Player* player, MovementInfo movementInfo);
         void WalkOnWaterHackDetection(Player* player, MovementInfo movementInfo);
         void JumpHackDetection(Player* player, MovementInfo movementInfo,uint32 opcode);
-        void TeleportPlaneHackDetection(Player* player, MovementInfo);
-        void ClimbHackDetection(Player* player,MovementInfo movementInfo,uint32 opcode);
+        void TeleportPlaneHackDetection(Player* player, MovementInfo movementInfo, uint32 opcode);
+        void ClimbHackDetection(Player* player, MovementInfo movementInfo, uint32 opcode);
+        void IgnoreControlHackDetection(Player* player, MovementInfo movementInfo, uint32 opcode);
+        void TeleportHackDetection(Player* player, MovementInfo movementInfo);
 
         void BuildReport(Player* player,uint8 reportType);
 

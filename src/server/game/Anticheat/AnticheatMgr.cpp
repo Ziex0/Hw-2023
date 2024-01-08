@@ -79,7 +79,7 @@ void AnticheatMgr::FlyHackDetection(Player* player, MovementInfo /*movementInfo*
     BuildReport(player, FLY_HACK_REPORT);
 }
 
-void AnticheatMgr::TeleportPlaneHackDetection(Player* player, MovementInfo movementInfo)
+void AnticheatMgr::TeleportPlaneHackDetection(Player* player, MovementInfo movementInfo, uint32 opcode)
 {
     if ((sWorld->getIntConfig(CONFIG_ANTICHEAT_DETECTIONS_ENABLED) & TELEPORT_PLANE_HACK_DETECTION) == 0)
         return;
@@ -126,11 +126,11 @@ void AnticheatMgr::StartHackDetection(Player* player, MovementInfo movementInfo,
         return;
     }
 
-    SpeedHackDetection(player,movementInfo);
+	SpeedHackDetection(player,movementInfo);
     FlyHackDetection(player,movementInfo);
     WalkOnWaterHackDetection(player,movementInfo);
     JumpHackDetection(player,movementInfo,opcode);
-    TeleportPlaneHackDetection(player, movementInfo);
+    TeleportPlaneHackDetection(player, movementInfo, opcode);
     ClimbHackDetection(player,movementInfo,opcode);
 
     m_Players[key].SetLastMovementInfo(movementInfo);

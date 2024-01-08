@@ -32,8 +32,8 @@ public:
             { "player",         SEC_GAMEMASTER,     true,  &HandleAntiCheatPlayerCommand,         "", NULL },
             { "delete",         SEC_ADMINISTRATOR,  true,  &HandleAntiCheatDeleteCommand,         "", NULL },
             { "handle",         SEC_ADMINISTRATOR,  true,  &HandleAntiCheatHandleCommand,         "", NULL },
-            { "jail",           SEC_GAMEMASTER,     true,  &HandleAnticheatJailCommand,         "", NULL },
-            { "warn",           SEC_GAMEMASTER,     true,  &HandleAnticheatWarnCommand,         "", NULL },
+            { "jail",           SEC_GAMEMASTER,     true,  &HandleAnticheatJailCommand,			  "", NULL },
+            { "warn",           SEC_GAMEMASTER,     true,  &HandleAnticheatWarnCommand,           "", NULL },
             { NULL,             0,                     false, NULL,                                           "", NULL }
         };
 
@@ -197,7 +197,7 @@ public:
             return true;
         }
 
-        float average = sAnticheatMgr->GetAverage(guid);
+		float average = sAnticheatMgr->GetAverage(guid);
         uint32 total_reports = sAnticheatMgr->GetTotalReports(guid);
         uint32 speed_reports = sAnticheatMgr->GetTypeReports(guid,0);
         uint32 fly_reports = sAnticheatMgr->GetTypeReports(guid,1);
@@ -205,12 +205,16 @@ public:
         uint32 waterwalk_reports = sAnticheatMgr->GetTypeReports(guid,2);
         uint32 teleportplane_reports = sAnticheatMgr->GetTypeReports(guid,4);
         uint32 climb_reports = sAnticheatMgr->GetTypeReports(guid,5);
+        uint32 teleport_reports = sAnticheatMgr->GetTypeReports(guid, 6);
+
+		uint32 latency = 0;
+        latency = player->GetSession()->GetLatency();
 
         handler->PSendSysMessage("Information about player %s",player->GetName().c_str());
-        handler->PSendSysMessage("Average: %f || Total Reports: %u ",average,total_reports);
-        handler->PSendSysMessage("Speed Reports: %u || Fly Reports: %u || Jump Reports: %u ",speed_reports,fly_reports,jump_reports);
-        handler->PSendSysMessage("Walk On Water Reports: %u  || Teleport To Plane Reports: %u",waterwalk_reports,teleportplane_reports);
-        handler->PSendSysMessage("Climb Reports: %u", climb_reports);
+        handler->PSendSysMessage("|cffff0000Average: |cffffff00%f |cffff0000Total Reports: |cffffff00%u ", average, total_reports);
+        handler->PSendSysMessage("|cffff0000Speed Reports: |cffffff00%u |cffff0000Fly Reports: |cffffff00%u |cffff0000Jump Reports: |cffffff00%u ", speed_reports, fly_reports, jump_reports);
+        handler->PSendSysMessage("|cffff0000Walk On Water Reports:|cffffff00 %u |cffff0000Teleport To Plane Reports: |cffffff00%u", waterwalk_reports, teleportplane_reports);
+		handler->PSendSysMessage("|cffff0000Teleport Reports: |cffffff00%u |cffff0000Climb Reports: |cffffff00%u", teleport_reports, climb_reports);
 
         return true;
     }

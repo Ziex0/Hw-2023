@@ -51,7 +51,7 @@ class boss_Vally : public CreatureScript
 public:
     boss_Vally() : CreatureScript("boss_Vally") { }
 
-    struct boss_twoAI : public ScriptedAI
+    struct boss_VallyAI : public ScriptedAI
     {
         boss_VallyAI(Creature* creature) : ScriptedAI(creature), Summons(me) { }
 
@@ -171,7 +171,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_twoAI(creature);
+        return new boss_VallyAI(creature);
     }
 };
 

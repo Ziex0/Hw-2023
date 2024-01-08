@@ -919,8 +919,8 @@ void World::LoadConfigSettings(bool reload)
         m_timers[WUPDATE_CLEANDB].Reset();
     }
     m_int_configs[CONFIG_LOGDB_CLEARTIME] = ConfigMgr::GetIntDefault("LogDB.Opt.ClearTime", 1209600); // 14 days default
-    sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Will clear `logs` table of entries older than %i seconds every %u minutes.",
-        m_int_configs[CONFIG_LOGDB_CLEARTIME], m_int_configs[CONFIG_LOGDB_CLEARINTERVAL]);
+		sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Will clear `logs` table of entries older than %i seconds every %u minutes.",
+		m_int_configs[CONFIG_LOGDB_CLEARTIME], m_int_configs[CONFIG_LOGDB_CLEARINTERVAL]);
 
     m_int_configs[CONFIG_SKILL_CHANCE_ORANGE] = ConfigMgr::GetIntDefault("SkillChance.Orange", 100);
     m_int_configs[CONFIG_SKILL_CHANCE_YELLOW] = ConfigMgr::GetIntDefault("SkillChance.Yellow", 75);
@@ -1249,11 +1249,27 @@ void World::LoadConfigSettings(bool reload)
 	m_bool_configs[CONFIG_GMISLAND_PLAYERS_NOACCESS_ENABLE] = ConfigMgr::GetBoolDefault("GMIsland.PlayersNoAccess.Enable", true);
 	m_bool_configs[CONFIG_GMISLAND_BAN_ENABLE] = ConfigMgr::GetBoolDefault("GMIsland.Ban.Enable", false);
 
-
+	//Anticheat
     m_bool_configs[CONFIG_ANTICHEAT_ENABLE] = ConfigMgr::GetBoolDefault("Anticheat.Enable", true);
     m_int_configs[CONFIG_ANTICHEAT_REPORTS_INGAME_NOTIFICATION] = ConfigMgr::GetIntDefault("Anticheat.ReportsForIngameWarnings", 70);
-    m_int_configs[CONFIG_ANTICHEAT_DETECTIONS_ENABLED] = ConfigMgr::GetIntDefault("Anticheat.DetectionsEnabled",31);
     m_int_configs[CONFIG_ANTICHEAT_MAX_REPORTS_FOR_DAILY_REPORT] = ConfigMgr::GetIntDefault("Anticheat.MaxReportsForDailyReport",70);
+	m_bool_configs[CONFIG_ANTICHEAT_AUTOKICK_ENABLE] = ConfigMgr::GetBoolDefault("Anticheat.KickPlayer", false);
+    m_bool_configs[CONFIG_ANTICHEAT_ANNOUNCEKICK_ENABLE] = ConfigMgr::GetBoolDefault("Anticheat.AnnounceKick", false);
+    m_bool_configs[CONFIG_ANTICHEAT_AUTOBAN_ENABLE] = ConfigMgr::GetBoolDefault("Anticheat.BanPlayer", false);
+    m_bool_configs[CONFIG_ANTICHEAT_ANNOUNCEBAN_ENABLE] = ConfigMgr::GetBoolDefault("Anticheat.AnnounceBan", false);
+    m_bool_configs[CONFIG_ANTICHEAT_AUTOJAIL_ENABLE] = ConfigMgr::GetBoolDefault("Anticheat.JailPlayer", false);
+    m_bool_configs[CONFIG_ANTICHEAT_ANNOUNCEJAIL_ENABLE] = ConfigMgr::GetBoolDefault("Anticheat.AnnounceJail", false);
+    m_int_configs[CONFIG_ANTICHEAT_REPORT_IN_CHAT_MIN] = ConfigMgr::GetIntDefault("Anticheat.ReportinChat.Min", 70);
+    m_int_configs[CONFIG_ANTICHEAT_REPORT_IN_CHAT_MAX] = ConfigMgr::GetIntDefault("Anticheat.ReportinChat.Max", 80);
+	m_bool_configs[CONFIG_ANTICHEAT_FLYHACK_ENABLE] = ConfigMgr::GetBoolDefault("Anticheat.DetectFlyHack", false);
+	m_bool_configs[CONFIG_ANTICHEAT_TELEPANEHACK_ENABLE] = ConfigMgr::GetBoolDefault("Anticheat.DetectTelePlaneHack", false);
+	m_int_configs[CONFIG_ANTICHEAT_DETECTIONS_ENABLED] = ConfigMgr::GetIntDefault("Anticheat.DetectionsEnabled",31);
+
+    m_int_configs[CONFIG_ANTICHEAT_SPEED_LIMIT_TOLERANCE] = ConfigMgr::GetIntDefault("Anticheat.SpeedLimitTolerance", 4);
+    m_int_configs[CONFIG_ANTICHEAT_MAX_REPORTS_FOR_BANS] = ConfigMgr::GetIntDefault("Anticheat.ReportsForBan", 70);
+    m_int_configs[CONFIG_ANTICHEAT_MAX_REPORTS_FOR_KICKS] = ConfigMgr::GetIntDefault("Anticheat.ReportsForKick", 70);
+    m_int_configs[CONFIG_ANTICHEAT_MAX_REPORTS_FOR_JAILS] = ConfigMgr::GetIntDefault("Anticheat.ReportsForJail", 70);
+    m_int_configs[CONFIG_ANTICHEAT_ALERT_FREQUENCY] = ConfigMgr::GetIntDefault("Anticheat.AlertFrequency", 5);
 
     // trinity_nya
     m_bool_configs[CONFIG_ACCOUNT_ACHIEVEMENTS] = ConfigMgr::GetBoolDefault("Account.Achievements", false);
