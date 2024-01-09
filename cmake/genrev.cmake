@@ -18,9 +18,9 @@ if(NOT BUILDDIR)
 endif()
 
 if(NO_GIT)
-  set(rev_date "2023 Dev' Updt")
-  set(rev_hash "HW_Core")
-  set(rev_branch "335a")
+	set(rev_date "2024 01-01-01")
+	set(rev_hash "j4n2024zi3")
+	set(rev_branch "335a")
 else()
   if(GIT_EXEC)
     # Create a revision-string that we can use
@@ -56,10 +56,10 @@ else()
   if(NOT rev_info)
     # No valid ways available to find/set the revision/hash, so let's force some defaults
     message(STATUS "
-    Could not find a proper repository signature (hash) - you may need to pull tags with git fetch -t
-    Continuing anyway - note that the versionstring will be set to \"launched 2024 00:00:00 (HW updt)"\")
-    set(rev_date "2024 Updt 00:00:00 +0000")
-	set(rev_hash "HW_Core")
+    # Could not find a proper repository signature (hash) - you may need to pull tags with git fetch -t
+    Continuing anyway - note that the versionstring will be set to \"2024 01-01-01 (Re-Life)"\")
+    set(rev_date "2024 01-01-01")
+	set(rev_hash "j4n2024zi3")
 	set(rev_branch "335a")
   else()
     # Extract information required to build a proper versionstring
