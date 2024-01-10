@@ -23,6 +23,7 @@
 #include "SpellScript.h"
 #include "SpellAuraEffects.h"
 #include "Player.h"
+#include "InstanceScript.h"
 
 #define BASE_CAMP    200
 #define GROUNDS      201

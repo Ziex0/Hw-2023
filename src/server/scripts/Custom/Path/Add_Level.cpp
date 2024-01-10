@@ -1,10 +1,11 @@
 #include "ScriptPCH.h"
+#include "Language.h"
      
-    enum
+enum
     {
-    item_id = 320277,
-    max_lvl = 255,
-     };
+		item_id = 55559,
+		max_lvl = 255,
+    };
      
     class Level_item : public ItemScript
 {
@@ -18,10 +19,10 @@ public:
             player->GetSession()->SendNotification("You already have level 255.");
             return false;
         }
-        player->GiveLevel(255);
-        player->DestroyItemCount(item->GetEntry(),1,true,false);
-        player->GetSession()->SendNotification("Your level was set to 255.");
-        return true;
+			player->GiveLevel(255);
+			player->DestroyItemCount(item->GetEntry(),1,true,false);
+			player->GetSession()->SendNotification("Your level was set to 255.");
+			return true;
     }
 };
  

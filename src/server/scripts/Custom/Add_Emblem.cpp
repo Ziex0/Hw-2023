@@ -21,10 +21,15 @@ public:
         }
         else
         {			
-            player->ADD_GOSSIP_ITEM( 4, "|cffADD8E6|TInterface\\icons\\Achievement_Dungeon_Icecrown_Frostmourne:24|tExcahnge 25000 Honor to 250 Arena"      					, GOSSIP_SENDER_MAIN, 3); //Change the ID below
-            player->ADD_GOSSIP_ITEM( 4, "|cffADD8E6|TInterface\\icons\\Achievement_Dungeon_Icecrown_Frostmourne:24|tExcahnge 250 Arena to 20000 Honor"       					, GOSSIP_SENDER_MAIN, 4); //Change the ID below
-            player->ADD_GOSSIP_ITEM( 4, "|cffADD8E6|TInterface\\icons\\Achievement_Dungeon_Icecrown_Frostmourne:24|tExcahnge 500 Golden Coin to 40 Love Event Token" 			, GOSSIP_SENDER_MAIN, 5); //Change the stats below
-            player->ADD_GOSSIP_ITEM( 4, "|cffADD8E6|TInterface\\icons\\Achievement_Dungeon_Icecrown_Frostmourne:24|tExcahnge 20 Love Event Token to 100 Firdaus PvP Credit"   	, GOSSIP_SENDER_MAIN, 6); //Change the stats below
+            player->ADD_GOSSIP_ITEM( 4, "|cff003233|TInterface\\icons\\Achievement_bg_winwsg:24|t25000 Honor to 250 Arena"      									, GOSSIP_SENDER_MAIN, 3); //Change the ID below
+            player->ADD_GOSSIP_ITEM( 4, "|cff003233|TInterface\\icons\\Achievement_bg_winwsg:24|t250 Arena to 20000 Honor"       									, GOSSIP_SENDER_MAIN, 4); //Change the ID below
+            //player->ADD_GOSSIP_ITEM( 4, "|cffADD8E6|TInterface\\icons\\Achievement_Dungeon_Icecrown_Frostmourne:24|tExcahnge 500 Golden Coin to 40 Love Event Token" 			, GOSSIP_SENDER_MAIN, 5); //Change the stats below
+            //player->ADD_GOSSIP_ITEM( 4, "|cff003233|TInterface\\icons\\Inv_valentinescard01:24|tExchange 20 Love Event Token to 30 Firdaus PvP Credit"   	, GOSSIP_SENDER_MAIN, 6); //Change the stats below
+			player->ADD_GOSSIP_ITEM( 4, "|cff003233|TInterface\\icons\\Inv_misc_coin_17:24|t 1 Mirdoran the Fallen to 50 Firdaus PvP Credit"   						, GOSSIP_SENDER_MAIN, 7); //Change the stats below
+			player->ADD_GOSSIP_ITEM( 4, "|cff003233|TInterface\\icons\\Inv_misc_coin_17:24|t 1 Demon Lord of Terror to 50 Firdaus PvP Credit"   					, GOSSIP_SENDER_MAIN, 8); //Change the stats below
+			player->ADD_GOSSIP_ITEM( 4, "|cff003233|TInterface\\icons\\Inv_misc_coin_17:24|t 1 Shadow Crusher Gold to 50 Firdaus PvP Credit"   						, GOSSIP_SENDER_MAIN, 9); //Change the stats below
+			player->ADD_GOSSIP_ITEM( 4, "|cff003233|TInterface\\icons\\Inv_misc_coin_17:24|t 1 The Beast to 50 Firdaus PvP Credit"   								, GOSSIP_SENDER_MAIN, 10); //Change the stats below
+			player->ADD_GOSSIP_ITEM( 4, "|cff003233|TInterface\\icons\\Inv_misc_coin_17:24|t 1 Etiar The Victorious to 50 Firdaus PvP Credit"   					, GOSSIP_SENDER_MAIN, 11); //Change the stats below
 			player->PlayerTalkClass->SendGossipMenu(907, _creature->GetGUID());
         }
 
@@ -89,7 +94,82 @@ public:
                 {
                     player->CLOSE_GOSSIP_MENU();
                     player->DestroyItemCount(49927, 20, true, false);
-                    player->AddItem(38186, 100);
+                    player->AddItem(38186, 30);
+                    _creature->MonsterWhisper("You exchanged successfully!", player->GetGUID());
+                }
+                else
+                {
+                    player->CLOSE_GOSSIP_MENU();
+                    _creature->MonsterWhisper("I'm sorry, but you don't have enough arena points to make this exchange!.", player->GetGUID());
+                    return false;
+                }
+                break;
+				case 7: // Mirdoran the Fallen
+                if (player->HasItemCount( 43641, 1, false ))
+                {
+                    player->CLOSE_GOSSIP_MENU();
+                    player->DestroyItemCount(43641, 1, true, false);
+                    player->AddItem(38186, 50);
+                    _creature->MonsterWhisper("You exchanged successfully!", player->GetGUID());
+                }
+                else
+                {
+                    player->CLOSE_GOSSIP_MENU();
+                    _creature->MonsterWhisper("I'm sorry, but you don't have enough arena points to make this exchange!.", player->GetGUID());
+                    return false;
+                }
+                break;
+				case 8: // Demon Lord of Terror
+                if (player->HasItemCount( 43640, 1, false ))
+                {
+                    player->CLOSE_GOSSIP_MENU();
+                    player->DestroyItemCount(43640, 1, true, false);
+                    player->AddItem(38186, 50);
+                    _creature->MonsterWhisper("You exchanged successfully!", player->GetGUID());
+                }
+                else
+                {
+                    player->CLOSE_GOSSIP_MENU();
+                    _creature->MonsterWhisper("I'm sorry, but you don't have enough arena points to make this exchange!.", player->GetGUID());
+                    return false;
+                }
+                break;
+				case 9: //Shadow Crusher Gold
+                if (player->HasItemCount( 43639, 1, false ))
+                {
+                    player->CLOSE_GOSSIP_MENU();
+                    player->DestroyItemCount(43639, 1, true, false);
+                    player->AddItem(38186, 50);
+                    _creature->MonsterWhisper("You exchanged successfully!", player->GetGUID());
+                }
+                else
+                {
+                    player->CLOSE_GOSSIP_MENU();
+                    _creature->MonsterWhisper("I'm sorry, but you don't have enough arena points to make this exchange!.", player->GetGUID());
+                    return false;
+                }
+                break;
+				case 10: //The Beast
+                if (player->HasItemCount( 43638, 1, false ))
+                {
+                    player->CLOSE_GOSSIP_MENU();
+                    player->DestroyItemCount(43638, 1, true, false);
+                    player->AddItem(38186, 50);
+                    _creature->MonsterWhisper("You exchanged successfully!", player->GetGUID());
+                }
+                else
+                {
+                    player->CLOSE_GOSSIP_MENU();
+                    _creature->MonsterWhisper("I'm sorry, but you don't have enough arena points to make this exchange!.", player->GetGUID());
+                    return false;
+                }
+                break;
+				case 11: //Etiar The Victorious
+                if (player->HasItemCount( 43637, 1, false ))
+                {
+                    player->CLOSE_GOSSIP_MENU();
+                    player->DestroyItemCount(43637, 1, true, false);
+                    player->AddItem(38186, 50);
                     _creature->MonsterWhisper("You exchanged successfully!", player->GetGUID());
                 }
                 else

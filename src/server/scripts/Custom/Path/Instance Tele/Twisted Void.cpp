@@ -9,17 +9,17 @@
 #include "ScriptPCH.h"
 #include "Language.h"
 
-class blood_forg : public CreatureScript
+class twis_void : public CreatureScript
 {
 public:
-	blood_forg()
-		: CreatureScript("blood_forg") 
+	twis_void()
+		: CreatureScript("twis_void") 
 	{
 	}
 	
-	struct blood_forgAI : public ScriptedAI
+	struct twis_voidAI : public ScriptedAI
 	{
-		blood_forgAI(Creature *c) : ScriptedAI(c){}
+		twis_voidAI(Creature *c) : ScriptedAI(c){}
 		
 		void Reset()
 		{
@@ -41,7 +41,7 @@ public:
 
 	CreatureAI* GetAI(Creature* pCreature) const
     {
-		return new blood_forgAI(pCreature);
+		return new twis_voidAI(pCreature);
     }
 
 	void CreatureWhisperBasedOnBool(const char *text, Creature *pCreature, Player *pPlayer, bool value)
@@ -52,11 +52,11 @@ public:
 
 	void MainMenu(Player *pPlayer, Creature *pCreature)
 	{
-		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|TInterface/ICONS/Thrown_1H_Harpoon_D_01Blue:35|t Olympian Heavens ", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|TInterface/ICONS/Thrown_1H_Harpoon_D_01Blue:35|t Celestial Empire ", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|TInterface/ICONS/Thrown_1H_Harpoon_D_01Blue:35|t Shade of Eranikus ", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|TInterface/ICONS/Thrown_1H_Harpoon_D_01Blue:35|t Baron Rivendare ", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
-
+		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|TInterface/ICONS/Thrown_1H_Harpoon_D_01Blue:35|t Leviathan ", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|TInterface/ICONS/Thrown_1H_Harpoon_D_01Blue:35|t Kologarn ", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|TInterface/ICONS/Thrown_1H_Harpoon_D_01Blue:35|t Freya ", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|TInterface/ICONS/Thrown_1H_Harpoon_D_01Blue:35|t General Vezax ", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
+		
 
 		pPlayer->SEND_GOSSIP_MENU(907, pCreature->GetGUID());
 	}
@@ -74,24 +74,24 @@ public:
 
 		switch (uiAction)
 		{
-			case GOSSIP_ACTION_INFO_DEF + 1: //LK
+			case GOSSIP_ACTION_INFO_DEF + 1: //Levi
 				pPlayer->CLOSE_GOSSIP_MENU();
-				pPlayer->TeleportTo(209, 1506.0001f, 823.4819f, 12.8685f, 0.2613f);
+				pPlayer->TeleportTo(603, -866.0093f, -147.9786f, 459.6321f, 0.0090f);
 
 				break;
-			case GOSSIP_ACTION_INFO_DEF + 2: //Sartharion
+			case GOSSIP_ACTION_INFO_DEF + 2: //Kologarn
 				pPlayer->CLOSE_GOSSIP_MENU();
-				pPlayer->TeleportTo(209, 1884.2661f, 995.1323f, 9.6818f, 2.1429f);
+				pPlayer->TeleportTo(603, 1498.0699f, -24.3113f, 422.0029f, 6.2691f);
 
 				break;
-			case GOSSIP_ACTION_INFO_DEF + 3: //anomalus
+			case GOSSIP_ACTION_INFO_DEF + 3: //Freya
 				pPlayer->CLOSE_GOSSIP_MENU();
-				pPlayer->TeleportTo(109, -659.78821f, 51.2727f, -89.9459f, 4.7023f);
+				pPlayer->TeleportTo(603, 2108.3039f, -24.7539f, 421.8127f, 0.0098f);
 
 				break;
-			case GOSSIP_ACTION_INFO_DEF + 4: // ionar
+			case GOSSIP_ACTION_INFO_DEF + 4: // General Vezax
 				pPlayer->CLOSE_GOSSIP_MENU();
-				pPlayer->TeleportTo(329, 4032.8151f, -3371.3435f, 115.6502f, 1.6281f);
+				pPlayer->TeleportTo(603, 1821.9119f, 203.9488f, 359.2489f, 4.9476f);
 
 				break;
 			/*case GOSSIP_ACTION_INFO_DEF + 3:
@@ -130,7 +130,7 @@ public:
 	}
 };
 
-void AddSc_Scriptblood_forg()
+void AddSc_Scripttwis_void()
 {
-	new blood_forg();
+	new twis_void();
 }

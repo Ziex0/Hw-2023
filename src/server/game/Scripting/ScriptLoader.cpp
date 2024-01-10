@@ -1344,7 +1344,7 @@ void AddBattlegroundScripts()
 	void AddSC_Duel_Reset();
 	//void AddSC_premium_rate(); Disable for Double Script
 	void AddSC_Docommands();
-	void AddSC_Level_item();
+	//void AddSC_Level_item();
 	void AddSC_REFORGER_NPC();
 	void AddSC_gm_active();
 	void AddSC_Online_Time_VP();
@@ -1355,6 +1355,8 @@ void AddBattlegroundScripts()
 	void AddSC_boss_maximus();
 	void AddSC_boss_Vally();
 	//void AddSC_NoFarming();
+	void AddSC_npc_ex_emblem();
+	void AddSC_level_255();
 
 	//Bots
 	void AddSC_death_knight_bot();
@@ -1381,8 +1383,8 @@ void AddBattlegroundScripts()
 	// Custom
 	void AddSC_System_kill();
 	//void AddSC_vipmall_security();
-	void AddSC_ExchangeDPNPC();
-	//void AddSC_npc_exchanger();
+	void AddSC_hangeDPNPC();
+	void AddSC_npc_exchanger();
 	void AddSC_npc_legion_master();
 	void AddSC_BountyHunter();
 	//void AddSC_on_login();
@@ -1408,6 +1410,7 @@ void AddBattlegroundScripts()
 	void AddSc_Scriptblood_forg();
 	void AddSc_Scriptsmol_warlor();
 	void AddSc_Scriptleg_venge();
+	void AddSc_Scripttwis_void();
 
 #endif
 
@@ -1457,7 +1460,7 @@ void AddCustomScripts()
 	AddSC_Duel_Reset();
 	//AddSC_premium_rate(); //Same as Monthly script
 	AddSC_Docommands();
-	AddSC_Level_item();
+	//AddSC_Level_item();
 	AddSC_REFORGER_NPC();
 	AddSC_gm_active();
 	AddSC_Online_Time_VP();
@@ -1468,6 +1471,8 @@ void AddCustomScripts()
 	AddSC_boss_maximus();
 	AddSC_boss_Vally();
 	//AddSC_NoFarming();
+	AddSC_npc_ex_emblem();
+	AddSC_level_255();
 
 	//Bots
     AddSC_death_knight_bot();
@@ -1519,6 +1524,7 @@ void AddCustomScripts()
 	AddSc_Scriptblood_forg();
 	AddSc_Scriptsmol_warlor();
 	AddSc_Scriptleg_venge();
+	AddSc_Scripttwis_void();
 	
 #endif
 }

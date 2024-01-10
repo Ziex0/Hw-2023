@@ -77,18 +77,18 @@ public:
 
 	void MainMenu(Player *pPlayer, Creature *pCreature)
 	{
-		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/ICONS/Achievement_Zone_Netherstorm_01:35:35|t|r|cff0000ff Teleport Menu ->", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 11);
-		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/ICONS/INV_MISC_GEM_AMETHYST_03:35:35|t|r|cff0000ff Professions ->", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 196);
-		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/ICONS/ACHIEVEMENT_WIN_WINTERGRASP:35:35|t|r|cff0000ff Learn Spells ->", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 460);
-		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface\\icons\\Spell_Deathknight_ClassIcon:35:35|t|r|cffC41F3B Advance my weapon skills to max.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9);
-		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface\\icons\\Spell_Holy_SearingLightPriest:35:35|t|r|cffF58CBA Give me maximum riding skill.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 186);
-		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/ICONS/Ability_DualWieldSpecialization:35:35|t|r|cffff0000 Player Tools ->", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 450);
-		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/icons/achievement_zone_ashenvale_01:35:35|t|r|cff0000ff Buff Me UP", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2500);
+		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/ICONS/Achievement_Zone_Netherstorm_01:35:35|t|r|cff040414 Teleport Menu ->", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 11);
+		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/ICONS/INV_MISC_GEM_AMETHYST_03:35:35|t|r|cff040414 Professions ->", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 196);
+		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/ICONS/ACHIEVEMENT_WIN_WINTERGRASP:35:35|t|r|cff040414 Learn Spells ->", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 460);
+		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface\\icons\\Spell_Deathknight_ClassIcon:35:35|t|r|cff040414 Advance my weapon skills to max.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9);
+		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface\\icons\\Spell_Holy_SearingLightPriest:35:35|t|r|cff040414 Give me maximum riding skill.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 186);
+		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/ICONS/Ability_DualWieldSpecialization:35:35|t|r|cff040414 Player Tools ->", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 450);
+		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/icons/achievement_zone_ashenvale_01:35:35|t|r|cff040414 Buff Me UP", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2500);
 		//pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/ICONS/Achievement_Zone_Blackrock_01:35:35|t|rcffff0000 Free Mounts ->", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 177);
-		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/ICONS/Achievement_Zone_Azshara_01:35:35|t|r|cffff0000 The Heaven Shop", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1110); 
+		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/ICONS/Achievement_Zone_Azshara_01:35:35|t|r|cff040414 The Heaven Shop", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1110); 
 		//pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/ICONS/Achievement_Zone_Azshara_01:35:35|t|r|cffff0000 VIP Area", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999); 
-		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface\\icons\\Achievement_Dungeon_Icecrown_Frostmourne:35:35|t|r|cff0000ff Heaven Tier's Farming", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9000); 
-		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface\\icons\\Achievement_Boss_Valanar:35:35|t|r|cff0000ff High Level Tiers Questing", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1111);
+		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface\\icons\\Achievement_boss_thorim:35:35|t|r|cff040414 Heaven Tier's Farming", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9000); 
+		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface\\icons\\Achievement_boss_lordmarrowgar:35:35|t|r|cff040414 High Level Tiers Questing", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1111);
 		
 		pPlayer->SEND_GOSSIP_MENU(907, pCreature->GetGUID());
 	}
@@ -336,6 +336,7 @@ public:
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|TInterface/Icons/Achievement_zone_bloodmystisle_01:35:35|t|r Dawn of Sands of Time (T4)", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9002);
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|TInterface/Icons/Achievement_zone_stonetalon_01:35:35|t|r Ashes of T. Fates (T5)", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9003);
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|TInterface/Icons/Achievement_zone_zuldrak_09:35:35|t|r Blood Forged (T6)", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9004);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|TInterface/Icons/Achievement_dungeon_ulduarraid_irondwarf_01:35:35|t|r Twisted Void (T7)", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9007);
 				
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "<- [Back]", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 11);
 				pPlayer->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pCreature->GetGUID());
@@ -371,12 +372,12 @@ public:
 					pPlayer->CLOSE_GOSSIP_MENU();
 					break;
 			   
-            /*case GOSSIP_ACTION_INFO_DEF +5:
-					pPlayer->SummonCreature(190012,pPlayer->GetPositionX() ,pPlayer->GetPositionY()+2, pPlayer->GetPositionZ(), 0,TEMPSUMMON_TIMED_DESPAWN,30000);
+            case GOSSIP_ACTION_INFO_DEF +9007:
+					pPlayer->SummonCreature(60032,pPlayer->GetPositionX() ,pPlayer->GetPositionY()+2, pPlayer->GetPositionZ(), 0,TEMPSUMMON_TIMED_DESPAWN,20000);
 					pPlayer->CLOSE_GOSSIP_MENU();
 					break;
 					
-			case GOSSIP_ACTION_INFO_DEF +6:              
+			/*case GOSSIP_ACTION_INFO_DEF +6:              
 					pPlayer->SummonCreature(190107,pPlayer->GetPositionX() ,pPlayer->GetPositionY()+2, pPlayer->GetPositionZ(), 0,TEMPSUMMON_TIMED_DESPAWN,30000);
 					pPlayer->CLOSE_GOSSIP_MENU();
 					break;
@@ -1663,6 +1664,7 @@ public:
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Supremacy of Jewelrys & Weapons ", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 617);
 				//pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Forgotten quarries (Raid T2)", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 614);
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Reverse Blackwing Lair PvE", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 615);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Middle earth of Battles Lv.255", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 618);
 				
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "<- [Back]", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 11);
 				pPlayer->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pCreature->GetGUID());
@@ -1709,6 +1711,12 @@ public:
 				case GOSSIP_ACTION_INFO_DEF + 617:
 				pPlayer->CLOSE_GOSSIP_MENU();
 				pPlayer->TeleportTo(0, -785.3831f, 1541.9107f, 21.7619f, 2.6789f);
+				break;
+
+				//Middle earth of Battles Lv.255
+				case GOSSIP_ACTION_INFO_DEF + 618:
+				pPlayer->CLOSE_GOSSIP_MENU();
+				pPlayer->TeleportTo(571, 1647.1600f, -4122.1000f, 275.9630f, 0.2373f);
 				break;
 
 				//event zones
@@ -2639,7 +2647,7 @@ public:
 
 			case GOSSIP_ACTION_INFO_DEF + 1111:
 				pPlayer->CLOSE_GOSSIP_MENU();
-				pPlayer->TeleportTo(571, 7061.0449f, 2615.4746f, 976.6530f, 0.1005f);
+				pPlayer->TeleportTo(571, 1296.5100f, -5109.1801f, 174.9918f, 2.0970f);
 				break;
 		}
 
