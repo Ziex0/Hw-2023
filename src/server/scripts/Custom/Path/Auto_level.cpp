@@ -39,6 +39,7 @@ public:
 						Player->DestroyItemCount(level_token, 1, true, false);
 						Player->GiveLevel(255);
 						Player->GetSession()->SendNotification("Your level was set to 255.");
+						Player->PlayerTalkClass->SendCloseGossip();
 					}
 					else
 				if (Player->getLevel() >= 255 && (Player->HasItemCount(level_token, 0)))

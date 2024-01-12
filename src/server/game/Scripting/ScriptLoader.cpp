@@ -1344,7 +1344,6 @@ void AddBattlegroundScripts()
 	void AddSC_Duel_Reset();
 	//void AddSC_premium_rate(); Disable for Double Script
 	void AddSC_Docommands();
-	//void AddSC_Level_item();
 	void AddSC_REFORGER_NPC();
 	void AddSC_gm_active();
 	void AddSC_Online_Time_VP();
@@ -1460,7 +1459,6 @@ void AddCustomScripts()
 	AddSC_Duel_Reset();
 	//AddSC_premium_rate(); //Same as Monthly script
 	AddSC_Docommands();
-	//AddSC_Level_item();
 	AddSC_REFORGER_NPC();
 	AddSC_gm_active();
 	AddSC_Online_Time_VP();
