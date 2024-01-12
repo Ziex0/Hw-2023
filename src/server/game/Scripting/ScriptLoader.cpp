@@ -1356,6 +1356,7 @@ void AddBattlegroundScripts()
 	//void AddSC_NoFarming();
 	void AddSC_npc_ex_emblem();
 	void AddSC_level_255();
+	void AddSc_cross_spell();
 
 	//Bots
 	void AddSC_death_knight_bot();
@@ -1471,6 +1472,7 @@ void AddCustomScripts()
 	//AddSC_NoFarming();
 	AddSC_npc_ex_emblem();
 	AddSC_level_255();
+	AddSc_cross_spell();
 
 	//Bots
     AddSC_death_knight_bot();

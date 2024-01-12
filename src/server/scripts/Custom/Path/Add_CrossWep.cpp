@@ -20,7 +20,7 @@ public:
 	
 	struct cross_spellAI : public ScriptedAI
 	{
-		cross_spell(Creature *c) : ScriptedAI(c) {}
+		cross_spellAI(Creature *c) : ScriptedAI(c) {}
 
 		void Reset()
 		{
@@ -42,7 +42,7 @@ public:
 
 	CreatureAI* GetAI(Creature* pCreature) const
     {
-		return new universal_teleporterAI(pCreature);
+		return new cross_spellAI(pCreature);
     }
 
 	void CreatureWhisperBasedOnBool(const char *text, Creature *pCreature, Player *pPlayer, bool value)
@@ -56,7 +56,7 @@ public:
 		return sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL);
 	}
 
-	void MainMenu(Player *pPlayer, Creature *pCreature)
+	void MainMenu(Player *pPlayer, Creature *pCreature) //main menu
 	{
 		
 		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_TRAINER, "|TInterface/ICONS/INV_Chest_Plate13:24|t Learn Cross Weapon Spells ->", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
@@ -90,7 +90,7 @@ public:
 
 		switch (uiAction)
 		{			
-			case GOSSIP_ACTION_INFO_DEF + 1:
+			case GOSSIP_ACTION_INFO_DEF + 1: //cross spells
 			pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|cff040414 Dual Sword", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 10);
 			pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|cff040414 Sword", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 11);
 			pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|cff040414 Dual Axe", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 12);
@@ -104,72 +104,54 @@ public:
 				break;
 				
 			case GOSSIP_ACTION_INFO_DEF + 10:
-				if (Player->HasItemCount(cross_token, 1))
+				if (pPlayer->HasItemCount(cross_token, 1))
 			pPlayer->CLOSE_GOSSIP_MENU();
-			pPlayer->learnSpell(2457, false);
+			pPlayer->learnSpell(2457, false); //change spell need lol
 			break;
 			
 			case GOSSIP_ACTION_INFO_DEF + 11:
-				if (Player->HasItemCount(cross_token, 1))
+				if (pPlayer->HasItemCount(cross_token, 1))
 			pPlayer->CLOSE_GOSSIP_MENU();
 			pPlayer->learnSpell(2457, false);
 			break;
 			
 			case GOSSIP_ACTION_INFO_DEF + 12:
-				if (Player->HasItemCount(cross_token, 1))
+				if (pPlayer->HasItemCount(cross_token, 1))
 			pPlayer->CLOSE_GOSSIP_MENU();
 			pPlayer->learnSpell(2457, false);
 			break;
 			
 			case GOSSIP_ACTION_INFO_DEF + 13:
-				if (Player->HasItemCount(cross_token, 1))
+				if (pPlayer->HasItemCount(cross_token, 1))
 			pPlayer->CLOSE_GOSSIP_MENU();
 			pPlayer->learnSpell(2457, false);
 			break;
 			
 			case GOSSIP_ACTION_INFO_DEF + 14:
-				if (Player->HasItemCount(cross_token, 1))
+				if (pPlayer->HasItemCount(cross_token, 1))
 			pPlayer->CLOSE_GOSSIP_MENU();
 			pPlayer->learnSpell(2457, false);
 			break;
 			
 			case GOSSIP_ACTION_INFO_DEF + 15:
-				if (Player->HasItemCount(cross_token, 1))
+				if (pPlayer->HasItemCount(cross_token, 1))
 			pPlayer->CLOSE_GOSSIP_MENU();
 			pPlayer->learnSpell(2457, false);
 			break;
 			
 			case GOSSIP_ACTION_INFO_DEF + 16:
-				if (Player->HasItemCount(cross_token, 1))
+				if (pPlayer->HasItemCount(cross_token, 1))
 			pPlayer->CLOSE_GOSSIP_MENU();
 			pPlayer->learnSpell(2457, false);
 			break;
 			
 			case GOSSIP_ACTION_INFO_DEF + 17:
-				if (Player->HasItemCount(cross_token, 1))
+				if (pPlayer->HasItemCount(cross_token, 1))
 			pPlayer->CLOSE_GOSSIP_MENU();
 			pPlayer->learnSpell(2457, false);
 			break;
 			
-			case GOSSIP_ACTION_INFO_DEF + 18:
-				if (Player->HasItemCount(cross_token, 1))
-			pPlayer->CLOSE_GOSSIP_MENU();
-			pPlayer->learnSpell(2457, false);
-			break;
-			
-			case GOSSIP_ACTION_INFO_DEF + 19:
-				if (Player->HasItemCount(cross_token, 1))
-			pPlayer->CLOSE_GOSSIP_MENU();
-			pPlayer->learnSpell(2457, false);
-			break;
-			
-			case GOSSIP_ACTION_INFO_DEF + 20:
-				if (Player->HasItemCount(cross_token, 1))
-			pPlayer->CLOSE_GOSSIP_MENU();
-			pPlayer->learnSpell(2457, false);
-			break;
-
-			case GOSSIP_ACTION_INFO_DEF + 2:
+			case GOSSIP_ACTION_INFO_DEF + 2: //custom spells
 			pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|cff040414 Dual Sword", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 20);
 			pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|cff040414 Sword", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 21);
 			pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|cff040414 Dual Axe", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 22);
@@ -183,25 +165,25 @@ public:
 				break;
 				
 			case GOSSIP_ACTION_INFO_DEF + 20:
-				if (Player->HasItemCount(spell_cust, 1))
+				if (pPlayer->HasItemCount(spell_cust, 1))
 			pPlayer->CLOSE_GOSSIP_MENU();
 			pPlayer->learnSpell(2457, false);
 			break;
 			
 			case GOSSIP_ACTION_INFO_DEF + 21:
-				if (Player->HasItemCount(spell_cust, 1))
+				if (pPlayer->HasItemCount(spell_cust, 1))
 			pPlayer->CLOSE_GOSSIP_MENU();
 			pPlayer->learnSpell(2457, false);
 			break;
 			
 			case GOSSIP_ACTION_INFO_DEF + 22:
-				if (Player->HasItemCount(spell_cust, 1))
+				if (pPlayer->HasItemCount(spell_cust, 1))
 			pPlayer->CLOSE_GOSSIP_MENU();
 			pPlayer->learnSpell(2457, false);
 			break;
 			
 			case GOSSIP_ACTION_INFO_DEF + 23:
-				if (Player->HasItemCount(spell_cust, 1))
+				if (pPlayer->HasItemCount(spell_cust, 1))
 			pPlayer->CLOSE_GOSSIP_MENU();
 			pPlayer->learnSpell(2457, false);
 			break;
