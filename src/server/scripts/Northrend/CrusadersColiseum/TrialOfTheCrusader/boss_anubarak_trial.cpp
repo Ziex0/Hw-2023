@@ -716,10 +716,10 @@ class npc_anubarak_spike : public CreatureScript
                                 DoCast(me, SPELL_SPIKE_SPEED1);
                                 DoCast(me, SPELL_SPIKE_TRAIL);
                                 _phase = PHASE_IMPALE_NORMAL;
-                                if (Unit* target2 = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+                                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
                                 {
-                                    StartChase(target2);
-                                    Talk(EMOTE_SPIKE, target2->GetGUID());
+                                    StartChase(target);
+                                    Talk(EMOTE_SPIKE, target->GetGUID());
                                 }
                                 _phaseSwitchTimer = 7*IN_MILLISECONDS;
                                 return;
