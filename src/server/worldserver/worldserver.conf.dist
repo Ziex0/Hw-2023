@@ -3432,16 +3432,22 @@ DynamicDifficulty.WorldLevel = 255
 ###################################################################################################
 #on/off dynamic rate
 DynamicRate.Enable = 1
+
 #default rate
 DynamicRate.Default = 1
+
 #min set rate
 DynamicRate.Min = 1
+
 #max set rate
 DynamicRate.Max = 20
+
 #can set for account
 DynamicRate.Account = 0
+
 #can set for character
 DynamicRate.Character = 0
+
 #cd for set dynamic rate
 DynamicRate.Cooldown = 100
 
@@ -3470,10 +3476,13 @@ FriendChat = 1
 ###################################################################################################
 #on/off honor rank
 HonorRank.Enable = 1
+
 #check on kill
 HonorRank.Check.Kill = 1
+
 #check on login
 HonorRank.Check.Login = 0
+
 #set new rank
 HonorRank.SetNew = 0
 
@@ -3483,12 +3492,16 @@ HonorRank.SetNew = 0
 ###################################################################################################
 #on/off announce kill boss
 BossHistory.Enable = 1
+
 #annonce or log only boss in instance
 BossHistory.InstanceOnly = 1
+
 #annonuce when the guild killed boss
 BossHistory.Announce = 1
+
 #on/off log kill boss
 BossHistory.Log = 0
+
 #textid for announce
 BossHistory.NormalTextId = 11006
 BossHistory.HeroicTextId = 11007
