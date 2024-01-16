@@ -461,21 +461,27 @@ void AddSC_boss_krystallus();
 void AddSC_boss_sjonnir();
 void AddSC_instance_halls_of_stone();
 void AddSC_halls_of_stone();
-void AddSC_boss_auriaya();               //Ulduar Ulduar
+
+//Ulduar Ulduar
+void AddSC_boss_auriaya();               
 void AddSC_boss_flame_leviathan();
 void AddSC_boss_ignis();
 void AddSC_boss_razorscale();
 void AddSC_boss_xt002();
 void AddSC_boss_kologarn();
 void AddSC_boss_assembly_of_iron();
-void AddSC_boss_general_vezax();
-void AddSC_go_ulduar_teleporter();
-void AddSC_boss_mimiron();
 void AddSC_boss_hodir();
 void AddSC_boss_freya();
-void AddSC_boss_algalon_the_observer();
+void AddSC_boss_thorim();
+void AddSC_boss_mimiron();
+void AddSC_boss_general_vezax();
+void AddSC_boss_yogg_saron();
+void AddSC_ulduar_teleporter();
 void AddSC_instance_ulduar();
-void AddSC_boss_keleseth();              //Utgarde Keep
+void AddSC_boss_algalon_the_observer();
+
+//Utgarde Keep
+void AddSC_boss_keleseth();              
 void AddSC_boss_skarvald_dalronn();
 void AddSC_boss_ingvar_the_plunderer();
 void AddSC_instance_utgarde_keep();
@@ -572,7 +578,7 @@ void AddSC_boss_supremus();
 void AddSC_boss_gurtogg_bloodboil();
 void AddSC_boss_mother_shahraz();
 void AddSC_boss_reliquary_of_souls();
-//void AddSC_boss_teron_gorefiend();
+void AddSC_boss_teron_gorefiend();
 void AddSC_boss_najentus();
 void AddSC_boss_illidari_council();
 void AddSC_instance_black_temple();
@@ -1063,7 +1069,7 @@ void AddOutlandScripts()
     AddSC_boss_gurtogg_bloodboil();
     AddSC_boss_mother_shahraz();
     AddSC_boss_reliquary_of_souls();
-    //AddSC_boss_teron_gorefiend();
+    AddSC_boss_teron_gorefiend();
     AddSC_boss_najentus();
     AddSC_boss_illidari_council();
     AddSC_instance_black_temple();
@@ -1204,21 +1210,27 @@ void AddNorthrendScripts()
     AddSC_boss_sjonnir();
     AddSC_instance_halls_of_stone();
     AddSC_halls_of_stone();
-    AddSC_boss_auriaya();               //Ulduar Ulduar
-    AddSC_boss_flame_leviathan();
-    AddSC_boss_ignis();
-    AddSC_boss_razorscale();
-    AddSC_boss_xt002();
-    AddSC_boss_general_vezax();
-    AddSC_boss_assembly_of_iron();
-    AddSC_boss_kologarn();
-    AddSC_go_ulduar_teleporter();
-    AddSC_boss_mimiron();
-    AddSC_boss_hodir();
-    AddSC_boss_freya();
-    AddSC_boss_algalon_the_observer();
-    AddSC_instance_ulduar();
-    AddSC_boss_keleseth();              //Utgarde Keep
+
+	 //Ulduar Ulduar
+    AddSC_boss_auriaya();               
+	AddSC_boss_flame_leviathan();
+	AddSC_boss_ignis();
+	AddSC_boss_razorscale();
+	AddSC_boss_xt002();
+	AddSC_boss_kologarn();
+	AddSC_boss_assembly_of_iron();
+	AddSC_boss_hodir();
+	AddSC_boss_freya();
+	AddSC_boss_thorim();
+	AddSC_boss_mimiron();
+	AddSC_boss_general_vezax();
+	AddSC_boss_yogg_saron();
+	AddSC_ulduar_teleporter();
+	AddSC_instance_ulduar();
+	AddSC_boss_algalon_the_observer();
+
+	//Utgarde Keep
+    AddSC_boss_keleseth();              
     AddSC_boss_skarvald_dalronn();
     AddSC_boss_ingvar_the_plunderer();
     AddSC_instance_utgarde_keep();
