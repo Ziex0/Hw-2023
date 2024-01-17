@@ -395,7 +395,7 @@ public:
 
 		void Reset()
 		{
-			summons.DoAction(ACTION_DESPAWN_ADDS);
+			//summons.DoAction(ACTION_DESPAWN_ADDS);
 			events.Reset();
 			summons.DespawnAll();
 
@@ -603,7 +603,7 @@ public:
 		{
 			if (param == ACTION_BRAIN_DAMAGED)
 			{
-				summons.DoAction(ACTION_REMOVE_STUN);
+				//summons.DoAction(ACTION_REMOVE_STUN);
 
 				EntryCheckPredicate pred2(NPC_YOGG_SARON);
 				summons.DoAction(ACTION_YOGG_SARON_START_P3, pred2);
@@ -652,9 +652,11 @@ public:
 			me->CastSpell(me, SPELL_SHATTERED_ILLUSION, true);
 		}
 
-		void DamageTaken(Unit* who, uint32& damage, DamageEffectType, SpellSchoolMask)
+		/*void DamageTaken(Unit* Player, uint32& damage, DamageEffectType, SpellSchoolMask)
+		//void DamageTaken(Unit* Player, uint32& damage, DamageEffectType)
+
 		{
-			if (who && who->GetEntry() == NPC_GUARDIAN_OF_YS && !_secondPhase)
+			if (Player->GetEntry() == NPC_GUARDIAN_OF_YS && !_secondPhase)
 			{
 				damage = 25000;
 
@@ -678,7 +680,7 @@ public:
 			}
 
 			damage = 0;
-		}
+		}*/
 
 		void UpdateAI(uint32 diff)
 		{
@@ -819,7 +821,7 @@ public:
 				{
 					me->RemoveAura(SPELL_SHATTERED_ILLUSION);
 					events.PopEvent();
-					summons.DoAction(ACTION_REMOVE_STUN);
+					//summons.DoAction(ACTION_REMOVE_STUN);
 					break;
 				}
 				case EVENT_SARA_P2_SPAWN_START_TENTACLES:
@@ -828,7 +830,7 @@ public:
 					me->SetOrientation(M_PI);
 					me->SetDisplayId(SARA_TRANSFORM_MODEL);
 
-					me->SendMonsterMove(me->GetPositionX(), me->GetPositionY(), 355, 2000, SPLINEFLAG_FLYING);
+					//me->SendMonsterMove(me->GetPositionX(), me->GetPositionY(), 355, 2000, SPLINEFLAG_FLYING);
 					me->SetPosition(me->GetPositionX(), me->GetPositionY(), 355, me->GetOrientation());
 
 					SpawnTentacle(NPC_CRUSHER_TENTACLE);
@@ -931,22 +933,6 @@ public:
 			}
 		}
 
-		void UpdateEscortAI(uint32 diff)
-		{
-			_checkTimer += diff;
-			if (_checkTimer >= 500 && !_isSummoning)
-			{
-				Unit* Player = Player->SelectNearbyTarget(NULL, 6.0f);
-				if (Player->GetTypeId() == TYPEID_PLAYER && !Player->HasAura(SPELL_SUMMON_GUARDIAN_OF_YS) && !Player->HasAura(SPELL_HODIR_FLASH_FREEZE))
-				{
-					_isSummoning = true;
-					//Talk(0, Player);
-					Player->CastSpell(Player, SPELL_SUMMON_GUARDIAN_OF_YS, true);
-				}
-
-				_checkTimer = 0;
-			}
-		}
 	};
 };
 
@@ -1372,13 +1358,13 @@ public:
 			return 0;
 		}
 
-		void DamageTaken(Unit* who, uint32& damage, DamageEffectType, SpellSchoolMask)
+		/*void DamageTaken(Unit* player, uint32& damage, DamageEffectType, SpellSchoolMask)
 		{
 			if (_tentacleCount < 7) // if all tentacles aren't killed
 			{
 				damage = 0;
-				if (who)
-					Unit::Kill(who, who);
+				if (player)
+					//Unit::Kill(player, player);
 				return;
 			}
 
@@ -1397,7 +1383,7 @@ public:
 							sara->AI()->DoAction(ACTION_BRAIN_DAMAGED);
 				}
 			}
-		}
+		}*/
 
 		void UpdateAI(uint32 diff)
 		{
@@ -1411,11 +1397,6 @@ class boss_yoggsaron_death_orb : public CreatureScript
 {
 public:
     boss_yoggsaron_death_orb() : CreatureScript("boss_yoggsaron_death_orb") { }
-
-    CreatureAI* GetAI(Creature* pCreature) const
-    {
-        return new boss_yoggsaron_death_orbAI (pCreature);
-    }
 
 	struct boss_yoggsaron_death_orbAI : public NullCreatureAI
 	{
@@ -1452,12 +1433,7 @@ class boss_yoggsaron_crusher_tentacle : public CreatureScript
 public:
     boss_yoggsaron_crusher_tentacle() : CreatureScript("boss_yoggsaron_crusher_tentacle") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
-    {
-        return new boss_yoggsaron_crusher_tentacleAI (pCreature);
-    }
-
-	struct boss_yoggsaron_crusher_tentacleAI : public ScriptedAI
+ 	struct boss_yoggsaron_crusher_tentacleAI : public ScriptedAI
 	{
 		boss_yoggsaron_crusher_tentacleAI(Creature* pCreature) : ScriptedAI(pCreature)
         {
@@ -1472,7 +1448,7 @@ public:
 			me->SetInCombatWithZone();
 		}
 
-		void DamageTaken(Unit* who, uint32&, DamageEffectType damagetype, SpellSchoolMask)
+		/*void DamageTaken(Unit* who, uint32&, DamageEffectType damagetype, SpellSchoolMask)
 		{
 			if (who && damagetype == DIRECT_DAMAGE)
 			{
@@ -1481,7 +1457,7 @@ public:
 				AttackStart(who);
 				me->InterruptNonMeleeSpells(false);
 			}
-		}
+		}*/
 
 		void DoAction(int32 param)
 		{
@@ -1720,22 +1696,11 @@ class boss_yoggsaron_influence_tentacle : public CreatureScript
 public:
     boss_yoggsaron_influence_tentacle() : CreatureScript("boss_yoggsaron_influence_tentacle") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
-    {
-        return new boss_yoggsaron_influence_tentacleAI (pCreature);
-    }
-
 	struct boss_yoggsaron_influence_tentacleAI : public NullCreatureAI
 	{
 		boss_yoggsaron_influence_tentacleAI(Creature* pCreature) : NullCreatureAI(pCreature)
 		{
 			me->CastSpell(me, SPELL_GRIM_REPRISAL, true);
-		}
-
-		void DamageTaken(Unit*, uint32&, DamageEffectType, SpellSchoolMask)
-		{
-			if (me->GetEntry() != NPC_INFLUENCE_TENTACLE)
-				me->UpdateEntry(NPC_INFLUENCE_TENTACLE, 0, false);
 		}
 
 		void JustDied(Unit*)
@@ -1751,12 +1716,7 @@ class boss_yoggsaron_immortal_guardian : public CreatureScript
 {
 public:
     boss_yoggsaron_immortal_guardian() : CreatureScript("boss_yoggsaron_immortal_guardian") { }
-
-    CreatureAI* GetAI(Creature* pCreature) const
-    {
-        return new boss_yoggsaron_immortal_guardianAI (pCreature);
-    }
-
+ 
 	struct boss_yoggsaron_immortal_guardianAI : public ScriptedAI
 	{
 		boss_yoggsaron_immortal_guardianAI(Creature* pCreature) : ScriptedAI(pCreature)
@@ -1778,12 +1738,6 @@ public:
 			_visualTimer = 1;
 			me->SetControlled(true, UNIT_STATE_ROOT);
 			me->SetInCombatWithZone();
-		}
-
-		void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
-		{
-			if (damage >= me->GetHealth())
-				damage = me->GetHealth()-1;
 		}
 
 		void SpellHit(Unit* caster, const SpellInfo* spellInfo)
@@ -2238,7 +2192,7 @@ public:
 					if (Player* player = ObjectAccessor::GetPlayer(*me, _guid))
 					{
 						me->PlayDirectSound(15760, player);
-						me->MonsterWhisper("Destroy them minion, your master commands it!", player, false);
+						//me->MonsterWhisper("Destroy them minion, your master commands it!", player, false);
 					}
 					break;
 				}
@@ -2432,7 +2386,7 @@ class spell_yogg_saron_titanic_storm : public SpellScriptLoader
 			{
 				PreventHitDefaultEffect(effIndex);
 				if (Unit* target = GetHitUnit())
-					Unit::Kill(GetCaster(), target);
+					target->CastSpell(target, roll_chance_i(50), true, NULL, NULL, target->GetGUID());
 			}
 
             void FilterTargets(std::list<WorldObject*>& targets)
@@ -2593,7 +2547,7 @@ class spell_yogg_saron_insane_periodic_trigger : public SpellScriptLoader
 
 				Unit* caster = GetCaster();
 				caster->PlayDirectSound(VOYS_INSANE1, target);
-				caster->MonsterWhisper("Your will is no longer you own...", target, false);
+				//caster->MonsterWhisper("Your will is no longer you own...", target, false);
 				caster->CastSpell(target, SPELL_INSANE1, true);
 				target->CastSpell(target, SPELL_INSANE2, true);
 			}
@@ -2620,32 +2574,6 @@ class spell_yogg_saron_insane_periodic_trigger : public SpellScriptLoader
         SpellScript* GetSpellScript() const
         {
             return new spell_yogg_saron_insane_periodic_trigger_SpellScript();
-        }
-};
-
-class spell_yogg_saron_insane : public SpellScriptLoader
-{
-    public:
-        spell_yogg_saron_insane() : SpellScriptLoader("spell_yogg_saron_insane") { }
-
-        class spell_yogg_saron_insane_AuraScript : public AuraScript
-        {
-            PrepareAuraScript(spell_yogg_saron_insane_AuraScript);
-
-            void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-            {
-                Unit::Kill(GetUnitOwner(), GetUnitOwner());
-            }
-
-            void Register()
-            {
-                 OnEffectRemove += AuraEffectRemoveFn(spell_yogg_saron_insane_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_AOE_CHARM, AURA_EFFECT_HANDLE_REAL);
-            }
-        };
-
-        AuraScript* GetAuraScript() const
-        {
-            return new spell_yogg_saron_insane_AuraScript();
         }
 };
 
@@ -2966,7 +2894,7 @@ void AddSC_boss_yoggsaron()
 	new spell_yogg_saron_protective_gaze();
 	new spell_yogg_saron_empowered();
 	new spell_yogg_saron_insane_periodic_trigger();
-	new spell_yogg_saron_insane();
+	//new spell_yogg_saron_insane();
 	new spell_yogg_saron_sanity_well();
 	new spell_yogg_saron_sanity_reduce();
 	new spell_yogg_saron_empowering_shadows();

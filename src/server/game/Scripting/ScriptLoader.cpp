@@ -475,7 +475,7 @@ void AddSC_boss_freya();
 void AddSC_boss_thorim();
 void AddSC_boss_mimiron();
 void AddSC_boss_general_vezax();
-void AddSC_boss_yogg_saron();
+void AddSC_boss_yoggsaron();
 void AddSC_ulduar_teleporter();
 void AddSC_instance_ulduar();
 void AddSC_boss_algalon_the_observer();
@@ -1224,7 +1224,7 @@ void AddNorthrendScripts()
 	AddSC_boss_thorim();
 	AddSC_boss_mimiron();
 	AddSC_boss_general_vezax();
-	AddSC_boss_yogg_saron();
+	AddSC_boss_yoggsaron();
 	AddSC_ulduar_teleporter();
 	AddSC_instance_ulduar();
 	AddSC_boss_algalon_the_observer();
@@ -1423,6 +1423,8 @@ void AddBattlegroundScripts()
 	void AddSc_Scriptsmol_warlor();
 	void AddSc_Scriptleg_venge();
 	void AddSc_Scripttwis_void();
+	
+	void AddSC_tier_instance();
 
 #endif
 
@@ -1538,5 +1540,6 @@ void AddCustomScripts()
 	AddSc_Scriptleg_venge();
 	AddSc_Scripttwis_void();
 	
+	AddSC_tier_instance();
 #endif
 }
