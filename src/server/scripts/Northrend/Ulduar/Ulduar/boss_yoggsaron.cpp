@@ -419,7 +419,7 @@ public:
 				m_pInstance->DoStopTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, CRITERIA_NOT_GETTING_OLDER);
 				m_pInstance->DoRemoveAurasDueToSpellOnPlayers(SPELL_SANITY);
 				m_pInstance->SetData(BOSS_YOGGSARON, NOT_STARTED);
-				if (GameObject* go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(BOSS_YOGGSARON)))
+				if (GameObject* go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(GO_YOGG_SARON_DOORS)))
 					go->SetGoState(GO_STATE_ACTIVE);
 			}
 		}
@@ -455,7 +455,7 @@ public:
 		void SaveKeepers()
 		{
 			for (uint8 i = 0; i < 4; ++i)
-				if (m_pInstance->GetData(BOSS_BRIGHTLEAF) & (1 << i))
+				if (m_pInstance->GetData(BOSS_STONEBARK) & (1 << i))
 					switch (i)
 					{
 						case NPC_FREYA:
@@ -532,7 +532,7 @@ public:
 				}
 			}
 
-			EntryCheckPredicate pred(NPC_YOGGSARON);
+			EntryCheckPredicate pred(NPC_BRAIN_OF_YOGG_SARON);
 			summons.DoAction(_currentIllusion, pred);
 
 			if (_isIllusionReversed)
@@ -624,7 +624,7 @@ public:
 			else if (param == ACTION_YOGG_SARON_DEATH)
 			{
 				summons.DespawnEntry(NPC_VOICE_OF_YOGG_SARON);
-				summons.DespawnEntry(NPC_YOGGSARON);
+				summons.DespawnEntry(NPC_BRAIN_OF_YOGG_SARON);
 				summons.DespawnEntry(NPC_MIMIRON);
 				summons.DespawnEntry(NPC_HODIR);
 				summons.DespawnEntry(NPC_FREYA);
@@ -652,9 +652,7 @@ public:
 			me->CastSpell(me, SPELL_SHATTERED_ILLUSION, true);
 		}
 
-		/*void DamageTaken(Unit* Player, uint32& damage, DamageEffectType, SpellSchoolMask)
-		//void DamageTaken(Unit* Player, uint32& damage, DamageEffectType)
-
+		/*void DamageTaken(Unit* who, uint32& damage, DamageEffectType, SpellSchoolMask)
 		{
 			if (Player->GetEntry() == NPC_GUARDIAN_OF_YS && !_secondPhase)
 			{
@@ -750,7 +748,7 @@ public:
 					me->SummonCreature(NPC_VOICE_OF_YOGG_SARON, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
 
 					if (m_pInstance)
-						if (GameObject* go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(BOSS_YOGGSARON)))
+						if (GameObject* go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(GO_YOGG_SARON_DOORS)))
 							go->SetGoState(GO_STATE_READY);
 
 					events.ScheduleEvent(EVENT_SARA_P1_SPELLS, 0, 1, EVENT_PHASE_ONE);
@@ -777,7 +775,7 @@ public:
 					events.RescheduleEvent(EVENT_SARA_P2_SPAWN_START_TENTACLES, 500, 0, EVENT_PHASE_TWO);
 					
 					// Spawn Brain!
-					me->SummonCreature(BOSS_YOGGSARON, 1981.3f, -25.43f, 265);
+					me->SummonCreature(NPC_BRAIN_OF_YOGG_SARON, 1981.3f, -25.43f, 265);
 					break;
 				}
 				case EVENT_SARA_P2_MALADY:
@@ -831,7 +829,7 @@ public:
 					me->SetDisplayId(SARA_TRANSFORM_MODEL);
 
 					//me->SendMonsterMove(me->GetPositionX(), me->GetPositionY(), 355, 2000, SPLINEFLAG_FLYING);
-					me->SetPosition(me->GetPositionX(), me->GetPositionY(), 355, me->GetOrientation());
+					//me->SetPosition(me->GetPositionX(), me->GetPositionY(), 355, me->GetOrientation());
 
 					SpawnTentacle(NPC_CRUSHER_TENTACLE);
 					SpawnTentacle(NPC_CONSTRICTOR_TENTACLE);

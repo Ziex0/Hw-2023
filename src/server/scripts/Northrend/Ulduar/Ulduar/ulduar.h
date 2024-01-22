@@ -74,7 +74,9 @@ enum UlduarNPCs
     NPC_THORIM                              = 32865,
     NPC_FREYA                               = 32906,
     NPC_VEZAX                               = 33271,
+	NPC_SARA								= 33134,
     NPC_YOGGSARON                           = 33288,
+	NPC_BRAIN_OF_YOGG_SARON					= 33890,
     NPC_ALGALON                             = 32871,
 
     // Mimiron
@@ -167,6 +169,9 @@ enum UlduarGameObjects
     GO_DOODAD_UL_ULDUAR_TRAPDOOR_03         = 194253,
     GO_GIFT_OF_THE_OBSERVER_10              = 194821,
     GO_GIFT_OF_THE_OBSERVER_25              = 194822,
+	
+	// Yogg-Saron
+	GO_YOGG_SARON_DOORS						= 194773,
 };
 
 enum LeviathanData
