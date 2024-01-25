@@ -46,12 +46,6 @@ enum eAuthCmd
     XFER_CANCEL                                  = 0x34
 };
 
-enum eStatus
-{
-    STATUS_CONNECTED                             = 0,
-    STATUS_AUTHED
-};
-
 // GCC have alternative #pragma pack(N) syntax and old gcc version not support pack(push, N), also any gcc version not support it at some paltform
 #if defined(__GNUC__)
 #pragma pack(1)
@@ -85,7 +79,7 @@ typedef struct AUTH_LOGON_PROOF_C
     uint8   M1[20];
     uint8   crc_hash[20];
     uint8   number_of_keys;
-    uint8   securityFlags;                                  // 0x00-0x04
+    uint8   securityFlags;             // 0x00-0x04
 } sAuthLogonProof_C;
 
 typedef struct AUTH_LOGON_PROOF_S
@@ -96,6 +90,7 @@ typedef struct AUTH_LOGON_PROOF_S
     uint32  unk1;
     uint32  unk2;
     uint16  unk3;
+
 } sAuthLogonProof_S;
 
 typedef struct AUTH_LOGON_PROOF_S_OLD
@@ -123,6 +118,17 @@ typedef struct XFER_INIT
     uint64 file_size;                                       // file size (bytes)
     uint8 md5[MD5_DIGEST_LENGTH];                           // MD5
 } XFER_INIT;
+
+enum class BufferSizes : uint32
+{
+    SRP_6_V = 0x20,
+    SRP_6_S = 0x20,
+};
+
+#define MAX_ACCEPTED_CHALLENGE_SIZE (sizeof(AUTH_LOGON_CHALLENGE_C) + 16)
+
+#define AUTH_LOGON_CHALLENGE_INITIAL_SIZE 4
+#define REALM_LIST_PACKET_SIZE 5
 
 typedef struct XFER_DATA
 {
@@ -180,14 +186,14 @@ private:
 
 const AuthHandler table[] =
 {
-    { AUTH_LOGON_CHALLENGE,     STATUS_CONNECTED, &AuthSocket::_HandleLogonChallenge    },
-    { AUTH_LOGON_PROOF,         STATUS_CONNECTED, &AuthSocket::_HandleLogonProof        },
-    { AUTH_RECONNECT_CHALLENGE, STATUS_CONNECTED, &AuthSocket::_HandleReconnectChallenge},
-    { AUTH_RECONNECT_PROOF,     STATUS_CONNECTED, &AuthSocket::_HandleReconnectProof    },
-    { REALM_LIST,               STATUS_AUTHED,    &AuthSocket::_HandleRealmList         },
-    { XFER_ACCEPT,              STATUS_CONNECTED, &AuthSocket::_HandleXferAccept        },
-    { XFER_RESUME,              STATUS_CONNECTED, &AuthSocket::_HandleXferResume        },
-    { XFER_CANCEL,              STATUS_CONNECTED, &AuthSocket::_HandleXferCancel        }
+    { AUTH_LOGON_CHALLENGE,     STATUS_CHALLENGE,			&AuthSocket::_HandleLogonChallenge    },
+    { AUTH_LOGON_PROOF,         STATUS_CONNECTED,			&AuthSocket::_HandleLogonProof        },
+    { AUTH_RECONNECT_CHALLENGE, STATUS_CHALLENGE,			&AuthSocket::_HandleReconnectChallenge},
+    { AUTH_RECONNECT_PROOF,     STATUS_RECONNECT_PROOF,		&AuthSocket::_HandleReconnectProof    },
+    { REALM_LIST,               STATUS_AUTHED,				&AuthSocket::_HandleRealmList         }
+    //{ XFER_ACCEPT,              STATUS_CONNECTED,			&AuthSocket::_HandleXferAccept        },
+    //{ XFER_RESUME,              STATUS_CONNECTED,			&AuthSocket::_HandleXferResume        },
+    //{ XFER_CANCEL,              STATUS_CONNECTED,			&AuthSocket::_HandleXferCancel        }
 };
 
 #define AUTH_TOTAL_COMMANDS 8
@@ -232,7 +238,7 @@ void AuthSocket::OnRead()
         // Circle through known commands and call the correct command handler
         for (i = 0; i < AUTH_TOTAL_COMMANDS; ++i)
         {
-            if ((uint8)table[i].cmd == _cmd && (table[i].status == STATUS_CONNECTED || (_authed && table[i].status == STATUS_AUTHED)))
+            if ((uint8)table[i].cmd == _cmd && (table[i].status == STATUS_CHALLENGE || (_authed && table[i].status == STATUS_AUTHED)))
             {
                 sLog->outDebug(LOG_FILTER_AUTHSERVER, "Got data for cmd %u recv length %u", (uint32)_cmd, (uint32)socket().recv_len());
 
@@ -307,9 +313,7 @@ bool AuthSocket::_HandleLogonChallenge()
 
     socket().recv((char *)&buf[0], 4);
 
-#if TRINITY_ENDIAN == TRINITY_BIGENDIAN
     EndianConvert(*((uint16*)(buf[0])));
-#endif
 
     uint16 remaining = ((sAuthLogonChallenge_C *)&buf[0])->size;
     sLog->outDebug(LOG_FILTER_AUTHSERVER, "[AuthChallenge] got header, body is %#04x bytes", remaining);
@@ -329,7 +333,6 @@ bool AuthSocket::_HandleLogonChallenge()
 
     // BigEndian code, nop in little endian case
     // size already converted
-#if TRINITY_ENDIAN == TRINITY_BIGENDIAN
     EndianConvert(*((uint32*)(&ch->gamename[0])));
     EndianConvert(ch->build);
     EndianConvert(*((uint32*)(&ch->platform[0])));
@@ -337,7 +340,6 @@ bool AuthSocket::_HandleLogonChallenge()
     EndianConvert(*((uint32*)(&ch->country[0])));
     EndianConvert(ch->timezone_bias);
     EndianConvert(ch->ip);
-#endif
 
     ByteBuffer pkt;
 
@@ -560,11 +562,8 @@ bool AuthSocket::_HandleLogonProof()
     A.SetBinary(lp.A, 32);
 
     // SRP safeguard: abort if A == 0
-    if (A.isZero())
-    {
-        socket().shutdown();
-        return true;
-    }
+    if ((A % N).isZero())
+        return false;
 
     SHA1Hash sha;
     sha.UpdateBigNumbers(&A, &B, NULL);
@@ -746,9 +745,7 @@ bool AuthSocket::_HandleReconnectChallenge()
 
     socket().recv((char *)&buf[0], 4);
 
-#if TRINITY_ENDIAN == TRINITY_BIGENDIAN
     EndianConvert(*((uint16*)(buf[0])));
-#endif
 
     uint16 remaining = ((sAuthLogonChallenge_C *)&buf[0])->size;
     sLog->outDebug(LOG_FILTER_AUTHSERVER, "[ReconnectChallenge] got header, body is %#04x bytes", remaining);
@@ -1007,7 +1004,7 @@ bool AuthSocket::_HandleRealmList()
 }
 
 // Resume patch transfer
-bool AuthSocket::_HandleXferResume()
+/*bool AuthSocket::_HandleXferResume()
 {
     sLog->outDebug(LOG_FILTER_AUTHSERVER, "Entering _HandleXferResume");
     // Check packet length and patch existence
@@ -1057,7 +1054,7 @@ bool AuthSocket::_HandleXferAccept()
 
     ACE_Based::Thread u(new PatcherRunnable(this));
     return true;
-}
+}*/
 
 PatcherRunnable::PatcherRunnable(class AuthSocket* as)
 {
@@ -1158,12 +1155,12 @@ void Patcher::LoadPatchMD5(char *szFileName)
 }
 
 // Get cached MD5 hash for a given patch file
-bool Patcher::GetHash(char * pat, uint8 mymd5[16])
+bool Patcher::GetHash(char * pat, uint8 mymd5[32])
 {
     for (Patches::iterator i = _patches.begin(); i != _patches.end(); ++i)
         if (!stricmp(pat, i->first.c_str()))
         {
-            memcpy(mymd5, i->second->md5, 16);
+            memcpy(mymd5, i->second->md5, 32);
             return true;
         }
 

@@ -34,8 +34,8 @@ AccountOpResult AccountMgr::CreateAccount(std::string username, std::string pass
     if (utf8length(username) > MAX_ACCOUNT_STR)
         return AOR_NAME_TOO_LONG;                           // username's too long
 
-    normalizeString(username);
-    normalizeString(password);
+    utf8length(username);
+    utf8length(password);
 
     if (GetId(username))
         return AOR_NAME_ALREDY_EXIST;                       // username does already exist
@@ -44,6 +44,7 @@ AccountOpResult AccountMgr::CreateAccount(std::string username, std::string pass
 
     stmt->setString(0, username);
     stmt->setString(1, CalculateShaPassHash(username, password));
+	stmt->setInt8(2, uint8(sWorld->getIntConfig(CONFIG_EXPANSION)));
 
     LoginDatabase.DirectExecute(stmt); // Enforce saving, otherwise AddGroup can fail
 

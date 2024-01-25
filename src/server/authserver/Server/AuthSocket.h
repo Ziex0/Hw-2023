@@ -27,6 +27,16 @@
 class ACE_INET_Addr;
 struct Realm;
 
+enum AuthStatus
+{
+	STATUS_CONNECTED = 0,
+    STATUS_CHALLENGE = 0,
+    STATUS_LOGON_PROOF,
+    STATUS_RECONNECT_PROOF,
+    STATUS_AUTHED,
+    STATUS_CLOSED
+};
+
 // Handle login commands
 class AuthSocket: public RealmSocket::Session
 {
@@ -49,9 +59,9 @@ public:
     bool _HandleRealmList();
 
     //data transfer handle for patch
-    bool _HandleXferResume();
-    bool _HandleXferCancel();
-    bool _HandleXferAccept();
+    //bool _HandleXferResume();
+   // bool _HandleXferCancel();
+   // bool _HandleXferAccept();
 
     void _SetVSFields(const std::string& rI);
 
