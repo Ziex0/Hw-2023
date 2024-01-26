@@ -19,7 +19,8 @@ public:
 		bool OnGossipHello(Player * Player, Creature * pCreature)
 		{
 						
-			Player->ADD_GOSSIP_ITEM(4, "|cff00ff00|TInterface\\icons\\Achievement_Boss_Valanar:24|t|r Up My Level ", GOSSIP_SENDER_MAIN, 0);
+			Player->ADD_GOSSIP_ITEM(4, "|cff00ff00|TInterface\\icons\\Achievement_Boss_Valanar:24|t|r I want to be level 255 ", GOSSIP_SENDER_MAIN, 0);
+			Player->ADD_GOSSIP_ITEM(4, "|cff00ff00|TInterface\\icons\\Achievement_Boss_Valanar:24|t|r I dont have 255 Token. ", GOSSIP_SENDER_MAIN, 1);
 			Player->PlayerTalkClass->SendGossipMenu(9425, pCreature->GetGUID());
 			return true;
 		}
@@ -56,6 +57,17 @@ public:
 					}
 				break;
 				
+				case 1:
+					
+				if (Player->HasItemCount(level_token, 2))
+					{
+						Player->DestroyItemCount(level_token, 2, true, false);
+						Player->GiveLevel(0);
+						Player->GetSession()->SendNotification("Sorry, you do not have the required Token.");
+						Player->PlayerTalkClass->SendCloseGossip();
+				    }
+				break;
+
 			}
 			return true;
 		}

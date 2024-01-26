@@ -1088,6 +1088,7 @@ public:
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "[Zones] ->", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 106);
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "[World Bosses] ->", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 310);
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "[Quest/Armor Zones] ->", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 610);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "[Hell's Legion Lv.255] ->", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 619);
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "[Event Zone] ->", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 810);
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "[Leveling zone] ->", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 8000);
 				//pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "[Farm Zone]", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 710);
@@ -1655,6 +1656,70 @@ public:
 				pPlayer->TeleportTo(571, 4298.77f, 1868.45f, 354.036f, 4.77382f);
 				break;
 				
+				//Hell's legion Lv.255
+				case GOSSIP_ACTION_INFO_DEF + 619:
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Band of Variance Exiled Jewels", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 640);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Waygate Basin Orbital Weapons", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 641);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Thor Modan Hills Extinct Jewels", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 642);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Terrace of the Makers Extinct Weapons", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 643);
+				//pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "The Inventor's Library", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 644);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Valkyrion The jeweler", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 646);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Hall Conquered Enigmatic Jewels", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 645);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Fallen Temple of Enigmatic Weapons", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 647);
+
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "<- [Back]", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 11);
+				pPlayer->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pCreature->GetGUID());
+
+				break;
+
+				//Band of Variance
+				case GOSSIP_ACTION_INFO_DEF + 640:
+				pPlayer->CLOSE_GOSSIP_MENU();
+				pPlayer->TeleportTo(571, 3876.1599f, 6984.4399f, 106.9290f, 6.2790f);
+				break;
+
+				//Waygate Basin
+				case GOSSIP_ACTION_INFO_DEF + 641:
+				pPlayer->CLOSE_GOSSIP_MENU();
+				pPlayer->TeleportTo(571, 4914.9125f, 5189.9370f, -92.2451f, 0.4303f);
+				break;
+
+				//Thor Modan Hills
+				case GOSSIP_ACTION_INFO_DEF + 642:
+				pPlayer->CLOSE_GOSSIP_MENU();
+				pPlayer->TeleportTo(571, 4659.0219f, -4378.7290f, 186.6241f, 5.5198f);
+				break;
+
+				//Terrace of the Makers
+				case GOSSIP_ACTION_INFO_DEF + 643:
+				pPlayer->CLOSE_GOSSIP_MENU();
+				pPlayer->TeleportTo(571, 7760.9150f, -2163.4450f, 1233.8795f, 1.4836f);
+				break;
+
+				//The Inventor's Library
+				case GOSSIP_ACTION_INFO_DEF + 644:
+				pPlayer->CLOSE_GOSSIP_MENU();
+				pPlayer->TeleportTo(571, 8211.4589f, -772.6856f, 963.2974f, 4.4799f);
+				break;
+
+				//Hall of the Conquered Kings
+				case GOSSIP_ACTION_INFO_DEF + 645:
+				pPlayer->CLOSE_GOSSIP_MENU();
+				pPlayer->TeleportTo(619, 377.7231f, -1081.1236f, 48.3137f, 0.6070f);
+				break;
+
+				//Valkyrion
+				case GOSSIP_ACTION_INFO_DEF + 646:
+				pPlayer->CLOSE_GOSSIP_MENU();
+				pPlayer->TeleportTo(571, 7161.6733f, -124.4768f, 773.1715f, 0.6885f);
+				break;
+
+				//Fallen Temple of Ahn'Kahet
+				case GOSSIP_ACTION_INFO_DEF + 647:
+				pPlayer->CLOSE_GOSSIP_MENU();
+				pPlayer->TeleportTo(619, 483.9133f, -799.3528f, -23.2977f, 2.5694f);
+				break;
+
 				//Armor zones
 				case GOSSIP_ACTION_INFO_DEF + 610:
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Underworld Drake's PvE", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 611);
@@ -1664,7 +1729,7 @@ public:
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Supremacy of Jewelrys & Weapons ", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 617);
 				//pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Forgotten quarries (Raid T2)", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 614);
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Reverse Blackwing Lair PvE", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 615);
-				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Middle earth of Battles Lv.255", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 618);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Middle earth of Battles", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 618);
 				
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "<- [Back]", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 11);
 				pPlayer->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pCreature->GetGUID());

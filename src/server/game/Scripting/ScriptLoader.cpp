@@ -1369,6 +1369,8 @@ void AddBattlegroundScripts()
 	void AddSC_npc_ex_emblem();
 	void AddSC_level_255();
 	void AddSc_cross_spell();
+	void AddSC_npc_recycle();
+	void AddSC_tier_exchange();
 
 	//Bots
 	void AddSC_death_knight_bot();
@@ -1487,6 +1489,8 @@ void AddCustomScripts()
 	AddSC_npc_ex_emblem();
 	AddSC_level_255();
 	AddSc_cross_spell();
+	AddSC_npc_recycle();
+	AddSC_tier_exchange();
 
 	//Bots
     AddSC_death_knight_bot();
