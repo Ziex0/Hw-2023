@@ -1,27 +1,9 @@
 /*
  * Copyright (C) 2023 UpdateCore <http://www.Heaven-Wow.Com>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
- *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation; either version 2 of the License, or (at your
- * option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
- * more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program. If not, see <http://www.gnu.org/licenses/>.
- */
-
-/* ScriptData
-SDName: Boss_Kaelthas
-SD%Complete: 60
-SDComment: SQL, weapon scripts, mind control, need correct spells(interruptible/uninterruptible), phoenix spawn location & animation, phoenix behaviour & spawn during gravity lapse
-SDCategory: Tempest Keep, The Eye
-EndScriptData */
+ /*
+REWRITTEN BY XINEF
+*/
 
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
@@ -46,6 +28,7 @@ enum eEnums
     SAY_GRAVITYLAPSE                    = 11,
     SAY_SUMMON_PHOENIX                  = 12,
     SAY_DEATH                           = 13,
+	SAY_PYROBLAST						= 14,
 
     //Thaladred the Darkener speech
     SAY_THALADRED_AGGRO                 = 0,
