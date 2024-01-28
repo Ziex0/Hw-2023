@@ -28,6 +28,7 @@ EndScriptData */
 #include "ScriptedGossip.h"
 #include "black_temple.h"
 #include "Player.h"
+#include "ScriptPCH.h"
 
 enum ShadeOfAkama
 {

@@ -32,6 +32,7 @@ EndContentData */
 #include "ScriptedGossip.h"
 #include "black_temple.h"
 #include "Player.h"
+#include "ScriptPCH.h"
 
 /*###
 # npc_spirit_of_olum
