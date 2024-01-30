@@ -1371,6 +1371,7 @@ void AddBattlegroundScripts()
 	void AddSc_cross_spell();
 	void AddSC_npc_recycle();
 	void AddSC_tier_exchange();
+	void AddSc_Scriptquest_freya();
 
 	//Bots
 	void AddSC_death_knight_bot();
@@ -1425,6 +1426,7 @@ void AddBattlegroundScripts()
 	void AddSc_Scriptsmol_warlor();
 	void AddSc_Scriptleg_venge();
 	void AddSc_Scripttwis_void();
+	void AddSc_Scriptcustom_porterz();
 	
 	void AddSC_tier_instance();
 
@@ -1491,6 +1493,7 @@ void AddCustomScripts()
 	AddSc_cross_spell();
 	AddSC_npc_recycle();
 	AddSC_tier_exchange();
+	AddSc_Scriptquest_freya();
 
 	//Bots
     AddSC_death_knight_bot();
@@ -1543,6 +1546,7 @@ void AddCustomScripts()
 	AddSc_Scriptsmol_warlor();
 	AddSc_Scriptleg_venge();
 	AddSc_Scripttwis_void();
+	AddSc_Scriptcustom_porterz();
 	
 	AddSC_tier_instance();
 #endif
