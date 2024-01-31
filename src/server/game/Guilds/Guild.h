@@ -437,6 +437,11 @@ private:
                 eventType == GUILD_BANK_LOG_WITHDRAW_MONEY ||
                 eventType == GUILD_BANK_LOG_REPAIR_MONEY;
         }
+		
+		bool IsMoneyEvent() const
+                {
+                    return IsMoneyEvent(m_eventType);
+                }
 
         BankEventLogEntry(uint32 guildId, uint32 guid, GuildBankEventLogTypes eventType, uint8 tabId, uint32 playerGuid, uint32 itemOrMoney, uint16 itemStackCount, uint8 destTabId) :
             LogEntry(guildId, guid), m_eventType(eventType), m_bankTabId(tabId), m_playerGuid(playerGuid),
