@@ -259,6 +259,16 @@ uint32 CreatePIDFile(const std::string& filename)
     FILE* pid_file = fopen (filename.c_str(), "w" );
     if (pid_file == NULL)
         return 0;
+	    uint32 pid = getpid();
+
+    fprintf(pid_file, "%u", pid);
+    fclose(pid_file);
+
+    return pid;
+}
+
+uint32 GetPID()
+{
 
 #ifdef _WIN32
     DWORD pid = GetCurrentProcessId();
@@ -266,10 +276,7 @@ uint32 CreatePIDFile(const std::string& filename)
     pid_t pid = getpid();
 #endif
 
-    fprintf(pid_file, "%u", pid );
-    fclose(pid_file);
-
-    return (uint32)pid;
+    return uint32(pid);
 }
 
 size_t utf8length(std::string& utf8str)
@@ -542,4 +549,40 @@ std::string ByteArrayToHexStr(uint8 const* bytes, uint32 arrayLen, bool reverse 
     }
 
     return ss.str();
+}
+
+void HexStrToByteArray(std::string const& str, uint8* out, bool reverse /*= false*/)
+{
+    // string must have even number of characters
+    if (str.length() & 1)
+        return;
+
+    int32 init = 0;
+    int32 end = int32(str.length());
+    int8 op = 1;
+
+    if (reverse)
+    {
+        init = int32(str.length() - 2);
+        end = -2;
+        op = -1;
+    }
+
+    uint32 j = 0;
+    for (int32 i = init; i != end; i += 2 * op)
+    {
+        char buffer[3] = { str[i], str[i + 1], '\0' };
+        out[j++] = uint8(strtoul(buffer, NULL, 16));
+    }
+}
+
+bool Utf8ToUpperOnlyLatin(std::string& utf8String)
+{
+    std::wstring wstr;
+    if (!Utf8toWStr(utf8String, wstr))
+        return false;
+
+    std::transform(wstr.begin(), wstr.end(), wstr.begin(), wcharToUpperOnlyLatin);
+
+    return WStrToUtf8(wstr, utf8String);
 }

@@ -2446,7 +2446,7 @@ class npc_gunship_portal : public CreatureScript
                 me->RemoveFromWorld();
             }
 
-            void UpdateAI( const uint32 diff)
+            virtual void UpdateAI( const uint32 diff)
             {
 
              events.Update(diff);
