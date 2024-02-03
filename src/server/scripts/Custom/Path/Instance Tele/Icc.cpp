@@ -76,7 +76,7 @@ public:
 		{
 			case GOSSIP_ACTION_INFO_DEF + 1: //LK
 				pPlayer->CLOSE_GOSSIP_MENU();
-				pPlayer->TeleportTo(631, 505.212006f, -2124.3500f, 840.9400f, 0.0000f);
+				pPlayer->TeleportTo(571,5631.6811f,2022.5500f,1544.6900f,5.1317f);
 
 				break;
 			case GOSSIP_ACTION_INFO_DEF + 2: //Sartharion

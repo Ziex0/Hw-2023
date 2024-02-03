@@ -524,6 +524,7 @@ void AddSC_halls_of_reflection();
 void AddSC_boss_falric();
 void AddSC_boss_marwyn();
 void AddSC_boss_lord_marrowgar();       // Icecrown Citadel
+void AddSC_boss_gunship_battle();
 void AddSC_boss_lady_deathwhisper();
 void AddSC_boss_deathbringer_saurfang();
 void AddSC_boss_festergut();
@@ -1273,6 +1274,7 @@ void AddNorthrendScripts()
     AddSC_boss_falric();
     AddSC_boss_marwyn();
     AddSC_boss_lord_marrowgar();        // Icecrown Citadel
+	AddSC_boss_gunship_battle();
     AddSC_boss_lady_deathwhisper();
     AddSC_boss_deathbringer_saurfang();
     AddSC_boss_festergut();
@@ -1398,7 +1400,7 @@ void AddBattlegroundScripts()
 	// Custom
 	void AddSC_System_kill();
 	//void AddSC_vipmall_security();
-	void AddSC_hangeDPNPC();
+	//void AddSC_ExchangeDPNPC();
 	void AddSC_npc_exchanger();
 	void AddSC_npc_legion_master();
 	void AddSC_BountyHunter();
@@ -1494,6 +1496,7 @@ void AddCustomScripts()
 	AddSC_npc_recycle();
 	AddSC_tier_exchange();
 	AddSc_Scriptquest_freya();
+	//AddSC_ExchangeDPNPC();
 
 	//Bots
     AddSC_death_knight_bot();
@@ -1520,7 +1523,7 @@ void AddCustomScripts()
 	AddSC_System_kill();
 	//AddSC_vipmall_security();
 	AddSC_ArenaGambler();
-	//AddSC_npc_exchanger();
+	AddSC_npc_exchanger();
 	AddSC_npc_legion_master();
 	AddSC_BountyHunter();
 	//AddSC_on_login();

@@ -52,7 +52,7 @@ public:
 
 	void MainMenu(Player *pPlayer, Creature *pCreature)
 	{
-		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|TInterface/ICONS/Achievement_zone_icecrown_12:30|t The Purgatory ", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|TInterface/ICONS/Achievement_zone_icecrown_12:30|t The Purgatory 1 - 70 ", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|TInterface/ICONS/Achievement_zone_icecrown_12:30|t Seeker of Ambition 70 - 85 ", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
 		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|TInterface/ICONS/Achievement_zone_icecrown_12:30|t Seeker of Diversity 85 - 100 ", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
 		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|TInterface/ICONS/Achievement_zone_icecrown_12:30|t Seeker of Hope 100 - 140 ", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);

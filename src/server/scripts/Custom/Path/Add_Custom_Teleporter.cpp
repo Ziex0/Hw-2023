@@ -77,18 +77,18 @@ public:
 
 	void MainMenu(Player *pPlayer, Creature *pCreature)
 	{
-		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/ICONS/Achievement_Zone_Netherstorm_01:35:35|t|r|cff040414 Teleport Menu ->", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 11);
-		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/ICONS/INV_MISC_GEM_AMETHYST_03:35:35|t|r|cff040414 Professions ->", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 196);
-		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/ICONS/ACHIEVEMENT_WIN_WINTERGRASP:35:35|t|r|cff040414 Learn Spells ->", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 460);
-		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface\\icons\\Spell_Deathknight_ClassIcon:35:35|t|r|cff040414 Advance my weapon skills to max.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9);
-		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface\\icons\\Spell_Holy_SearingLightPriest:35:35|t|r|cff040414 Give me maximum riding skill.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 186);
-		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/ICONS/Ability_DualWieldSpecialization:35:35|t|r|cff040414 Player Tools ->", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 450);
-		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/icons/achievement_zone_ashenvale_01:35:35|t|r|cff040414 Buff Me UP", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2500);
-		//pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/ICONS/Achievement_Zone_Blackrock_01:35:35|t|rcffff0000 Free Mounts ->", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 177);
-		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/ICONS/Achievement_Zone_Azshara_01:35:35|t|r|cff040414 The Heaven Shop", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1110); 
-		//pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/ICONS/Achievement_Zone_Azshara_01:35:35|t|r|cffff0000 VIP Area", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999); 
-		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface\\icons\\Achievement_boss_thorim:35:35|t|r|cff040414 Heaven Tier's Farming", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9000); 
-		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface\\icons\\Achievement_boss_lordmarrowgar:35:35|t|r|cff040414 High Level Tiers Questing", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1111);
+		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/ICONS/Achievement_bg_masterofallbgs:32:32|t|r|cff040414 Teleport Menu ->", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 11);
+		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/ICONS/INV_MISC_GEM_AMETHYST_03:32:32|t|r|cff040414 Professions ->", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 196);
+		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/ICONS/Achievement_reputation_argentcrusader:32:32|t|r|cff040414 Learn Spells ->", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 460);
+		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface\\icons\\Achievement_bg_trueavshutout:32:32|t|r|cff040414 Advance my weapon skills to max.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9);
+		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface\\icons\\Ability_mount_spectraltiger:32:32|t|r|cff040414 Give me maximum riding skill.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 186);
+		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/ICONS/Ability_DualWieldSpecialization:32:32|t|r|cff040414 Player Tools ->", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 450);
+		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/icons/Ability_priest_soulwarding:32:32|t|r|cff040414 Buff Me UP", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2500);
+		//pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/ICONS/Achievement_Zone_Blackrock_01:32:32|t|rcffff0000 Free Mounts ->", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 177);
+		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/ICONS/Achievement_dungeon_nexusraid_normal:32:32|t|r|cff040414 The Heaven Shop", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1110); 
+		//pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface/ICONS/Achievement_Zone_Azshara_01:32:32|t|r|cffff0000 VIP Area", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9999); 
+		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface\\icons\\Achievement_boss_thorim:32:32|t|r|cff040414 Heaven Tier's Farming", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9000); 
+		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "|TInterface\\icons\\Achievement_boss_lordmarrowgar:32:32|t|r|cff040414 High Level Tiers Questing", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1111);
 		
 		pPlayer->SEND_GOSSIP_MENU(907, pCreature->GetGUID());
 	}
@@ -336,8 +336,7 @@ public:
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|TInterface/Icons/Achievement_zone_bloodmystisle_01:35:35|t|r Dawn of Sands of Time (T4)", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9002);
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|TInterface/Icons/Achievement_zone_stonetalon_01:35:35|t|r Ashes of T. Fates (T5)", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9003);
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|TInterface/Icons/Achievement_zone_zuldrak_09:35:35|t|r Blood Forged (T6)", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9004);
-				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|TInterface/Icons/Achievement_dungeon_ulduarraid_irondwarf_01:35:35|t|r Twisted Void (T7)", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9007);
-				
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|TInterface/Icons/Achievement_dungeon_ulduarraid_irondwarf_01:35:35|t|r Twisted Void (T7)", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9007);	
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "<- [Back]", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 11);
 				pPlayer->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pCreature->GetGUID());
 				break;
@@ -377,8 +376,8 @@ public:
 					pPlayer->CLOSE_GOSSIP_MENU();
 					break;
 					
-			/*case GOSSIP_ACTION_INFO_DEF +6:              
-					pPlayer->SummonCreature(190107,pPlayer->GetPositionX() ,pPlayer->GetPositionY()+2, pPlayer->GetPositionZ(), 0,TEMPSUMMON_TIMED_DESPAWN,30000);
+			/*case GOSSIP_ACTION_INFO_DEF +8:              
+					pPlayer->SummonCreature(60033,pPlayer->GetPositionX() ,pPlayer->GetPositionY()+2, pPlayer->GetPositionZ(), 0,TEMPSUMMON_TIMED_DESPAWN,20000);
 					pPlayer->CLOSE_GOSSIP_MENU();
 					break;
 					
@@ -1088,7 +1087,7 @@ public:
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "[Zones] ->", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 106);
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "[World Bosses] ->", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 310);
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "[Quest/Armor Zones] ->", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 610);
-				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "[Hell's Legion Lv.255] ->", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 619);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "[|cffFF0000Hell's|r Legion Lv.255] ->", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 619);
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "[Event Zone] ->", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 810);
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "[Leveling zone] ->", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 8000);
 				//pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "[Farm Zone]", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 710);
@@ -1658,14 +1657,14 @@ public:
 				
 				//Hell's legion Lv.255
 				case GOSSIP_ACTION_INFO_DEF + 619:
-				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Band of Variance Exiled Jewels", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 640);
-				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Waygate Basin Orbital Weapons", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 641);
-				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Thor Modan Hills Extinct Jewels", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 642);
-				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Terrace of the Makers Extinct Weapons", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 643);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|cffFF0000Hell's|r Exiled Lv.1 Jewels", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 640);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|cffFF0000Hell's|r Orbital Lv.1 Weapons", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 641);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|cffFF0000Hell's|r Extinct Lv.2 Jewels", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 642);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|cffFF0000Hell's|r Extinct Lv.2 Weapons", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 643);
 				//pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "The Inventor's Library", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 644);
-				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Valkyrion The jeweler", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 646);
-				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Hall Conquered Enigmatic Jewels", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 645);
-				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Fallen Temple of Enigmatic Weapons", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 647);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|cffFF0000Hell's|r Enigmatic Lv.3 Jewels", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 645);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|cffFF0000Hell's|r Enigmatic Lv.3 Weapons", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 647);
+				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "Valkyrion (Gems's)", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 646);
 
 				pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "<- [Back]", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 11);
 				pPlayer->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pCreature->GetGUID());

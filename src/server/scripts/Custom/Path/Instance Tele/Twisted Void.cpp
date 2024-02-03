@@ -52,7 +52,7 @@ public:
 
 	void MainMenu(Player *pPlayer, Creature *pCreature)
 	{
-		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|TInterface/ICONS/Thrown_1H_Harpoon_D_01Blue:35|t Leviathan ", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|TInterface/ICONS/Thrown_1H_Harpoon_D_01Blue:35|t Steelbreaker ", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|TInterface/ICONS/Thrown_1H_Harpoon_D_01Blue:35|t Kologarn ", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
 		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|TInterface/ICONS/Thrown_1H_Harpoon_D_01Blue:35|t Freya ", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
 		pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, "|TInterface/ICONS/Thrown_1H_Harpoon_D_01Blue:35|t General Vezax ", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
@@ -76,7 +76,7 @@ public:
 		{
 			case GOSSIP_ACTION_INFO_DEF + 1: //Levi
 				pPlayer->CLOSE_GOSSIP_MENU();
-				pPlayer->TeleportTo(603, -866.0093f, -147.9786f, 459.6321f, 0.0090f);
+				pPlayer->TeleportTo(603, 1703.4593f, 134.5658f, 428.0989f, 4.7140f);
 
 				break;
 			case GOSSIP_ACTION_INFO_DEF + 2: //Kologarn
