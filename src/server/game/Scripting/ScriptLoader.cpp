@@ -1352,9 +1352,9 @@ void AddBattlegroundScripts()
 	
 	//custom folder
 	void AddSC_vipcommands();
-	//void AddSC_System_Censure();
+	void AddSC_System_Censure();
 	//void AddSC_itemonkill();
-	//void AddSC_GoldOnKill();
+	void AddSC_GoldOnKill();
 	void AddSC_Duel_Reset();
 	//void AddSC_premium_rate(); Disable for Double Script
 	void AddSC_Docommands();
@@ -1474,9 +1474,9 @@ void AddCustomScripts()
 	
 	//custom folder
 	AddSC_vipcommands();
-	//AddSC_System_Censure();
+	AddSC_System_Censure();
 	//AddSC_itemonkill();
-	//AddSC_GoldOnKill();
+	AddSC_GoldOnKill();
 	AddSC_Duel_Reset();
 	//AddSC_premium_rate(); //Same as Monthly script
 	AddSC_Docommands();
