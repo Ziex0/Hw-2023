@@ -138,6 +138,19 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
 
     recvData >> type;
     recvData >> lang;
+
+/* Chat Min PlayedTime Coded By IranCore.Ir */
+	Player* chatkonande = GetPlayer();
+	{
+	if ((chatkonande->GetTotalPlayedTime() <= sWorld->getIntConfig(CONFIG_INT_CHAT_PLAYED_TIME)) && chatkonande->GetSession()->GetSecurity() == SEC_PLAYER)
+    {
+        std::string adStr = secsToTimeString(sWorld->getIntConfig(CONFIG_INT_CHAT_PLAYED_TIME) - chatkonande->GetTotalPlayedTime());
+        SendNotification("You need %s seconds playing Time before you can use chat in server", adStr.c_str());
+        recvData.rfinish();
+        return;
+    }
+	}
+/*End Chat MIn Played Time */
 	
 	if (sWorld->getBoolConfig(BATTLEGROUND_CROSSFACTION_ENABLED) && lang != LANG_ADDON)
     {

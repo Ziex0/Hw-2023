@@ -1299,6 +1299,7 @@ void World::LoadConfigSettings(bool reload)
         m_int_configs[CONFIG_PACKET_SPOOF_BANMODE] = BAN_ACCOUNT;
 
     m_int_configs[CONFIG_PACKET_SPOOF_BANDURATION] = ConfigMgr::GetIntDefault("PacketSpoof.BanDuration", 86400);
+	m_int_configs[CONFIG_INT_CHAT_PLAYED_TIME]  = ConfigMgr::GetIntDefault("bastanchatbaplayertime", 60);
 	 
 	// Individual XP/loot rates
     m_int_configs[CONFIG_VIP_XP_RATE_LEVEL_1] = ConfigMgr::GetIntDefault("Rate.XP.Vip.Level.1", 1);
