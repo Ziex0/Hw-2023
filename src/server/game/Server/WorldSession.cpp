@@ -98,6 +98,8 @@ bool WorldSessionFilter::Process(WorldPacket* packet)
 /// WorldSession constructor
 WorldSession::WorldSession(uint32 id, WorldSocket* sock, AccountTypes sec, bool ispremium, uint8 expansion, uint8 viplevel, time_t mute_time, LocaleConstant locale, uint32 recruiter, bool isARecruiter):
   //WorldSession::WorldSession(uint32 id, std::shared_ptr<WorldSocket> sock, AccountTypes sec, uint8 expansion, uint8 viplevel, time_t mute_time, LocaleConstant locale, uint32 recruiter, bool isARecruiter):
+
+  /// WorldSession constructor
 	m_muteTime(mute_time),
     m_timeOutTime(0),
     _player(NULL),
@@ -107,7 +109,7 @@ WorldSession::WorldSession(uint32 id, WorldSocket* sock, AccountTypes sec, bool 
     _accountId(id),
     m_expansion(expansion),
 	m_viplevel(viplevel),
-    _warden(NULL),
+    //_warden(NULL),
     _logoutTime(0),
     m_inQueue(false),
     m_playerLoading(false),
@@ -124,6 +126,12 @@ WorldSession::WorldSession(uint32 id, WorldSocket* sock, AccountTypes sec, bool 
 	AntiDOS(this),
 	m_CurrentVendor(0)
 {
+	memset(m_Tutorials, 0, sizeof(m_Tutorials));
+	_warden = NULL;
+	//_offlineTime = 0;
+	//_kicked = false;
+	//_shouldSetOfflineInDB = true;
+
     if (sock)
     {
         m_Address = sock->GetRemoteAddress();
