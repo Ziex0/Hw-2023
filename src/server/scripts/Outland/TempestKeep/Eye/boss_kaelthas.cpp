@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2023 UpdateCore <http://www.Heaven-Wow.Com>
- * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
+ * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ 
  /*
 REWRITTEN BY XINEF
 */
