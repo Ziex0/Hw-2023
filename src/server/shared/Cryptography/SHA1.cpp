@@ -23,6 +23,7 @@
 SHA1Hash::SHA1Hash()
 {
     SHA1_Init(&mC);
+    memset(mDigest, 0, SHA_DIGEST_LENGTH * sizeof(uint8));
 }
 
 SHA1Hash::~SHA1Hash()
@@ -62,6 +63,6 @@ void SHA1Hash::Initialize()
 
 void SHA1Hash::Finalize(void)
 {
-    SHA1_Final(mDigest, &mC);
+     SHA1_Final(mDigest, &mC);
 }
 

@@ -344,9 +344,10 @@ bool Utf8toWStr(char const* utf8str, size_t csize, wchar_t* wstr, size_t& wsize)
 
         wsize = len;
         utf8::utf8to16(utf8str, utf8str+csize, wstr);
+		//wsize -= out.remaining(); // remaining unused space
         wstr[len] = L'\0';
     }
-    catch(std::exception)
+	catch(std::exception const&)
     {
         // Replace the converted string with an error message if there is enough space
         // Otherwise just return an empty string
@@ -360,7 +361,7 @@ bool Utf8toWStr(char const* utf8str, size_t csize, wchar_t* wstr, size_t& wsize)
         else if (wsize > 0)
         {
             wstr[0] = L'\0';
-        wsize = 0;
+            wsize = 0;
         }
         else
             wsize = 0;
