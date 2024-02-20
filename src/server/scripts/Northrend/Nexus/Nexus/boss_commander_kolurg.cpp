@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -26,11 +26,15 @@ Script Data End */
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 
-#define SPELL_BATTLE_SHOUT                                    31403
-#define SPELL_CHARGE                                          60067
-#define SPELL_FRIGHTENING_SHOUT                               19134
-#define SPELL_WHIRLWIND_1                                     38619
-#define SPELL_WHIRLWIND_2                                     38618
+enum Spells
+{
+    SPELL_BATTLE_SHOUT           = 31403,
+    SPELL_CHARGE                 = 60067,
+    SPELL_FRIGHTENING_SHOUT      = 19134,
+    SPELL_WHIRLWIND_1            = 38619,
+    SPELL_WHIRLWIND_2            = 38618
+
+};
 
 //not used
 //Yell
@@ -43,20 +47,21 @@ class boss_commander_kolurg : public CreatureScript
 public:
     boss_commander_kolurg() : CreatureScript("boss_commander_kolurg") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_commander_kolurgAI (creature);
+        return new boss_commander_kolurgAI(creature);
     }
 
     struct boss_commander_kolurgAI : public ScriptedAI
     {
-        boss_commander_kolurgAI(Creature* creature) : ScriptedAI(creature) {}
+        boss_commander_kolurgAI(Creature* creature) : ScriptedAI(creature) { }
 
-        void Reset() {}
-        void EnterCombat(Unit* /*who*/) {}
-        void AttackStart(Unit* /*who*/) {}
-        void MoveInLineOfSight(Unit* /*who*/) {}
-        void UpdateAI(uint32 /*diff*/)
+        void Reset() override { }
+        void EnterCombat(Unit* /*who*/) override { }
+        void AttackStart(Unit* /*who*/) override { }
+        void MoveInLineOfSight(Unit* /*who*/) override { }
+
+        void UpdateAI(uint32 /*diff*/) override
         {
             //Return since we have no target
             if (!UpdateVictim())
@@ -64,7 +69,7 @@ public:
 
             DoMeleeAttackIfReady();
         }
-        void JustDied(Unit* /*killer*/)  {}
+        void JustDied(Unit* /*killer*/)  override { }
     };
 
 };

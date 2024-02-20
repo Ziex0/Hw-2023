@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2013 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2010 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -97,11 +97,9 @@ class boss_jaraxxus : public CreatureScript
 
         struct boss_jaraxxusAI : public BossAI
         {
-            boss_jaraxxusAI(Creature* creature) : BossAI(creature, BOSS_JARAXXUS)
-            {
-            }
+            boss_jaraxxusAI(Creature* creature) : BossAI(creature, BOSS_JARAXXUS) { }
 
-            void Reset()
+            void Reset() override
             {
                 _Reset();
                 events.ScheduleEvent(EVENT_FEL_FIREBALL, 5*IN_MILLISECONDS);
@@ -113,43 +111,33 @@ class boss_jaraxxus : public CreatureScript
                 events.ScheduleEvent(EVENT_SUMMON_INFERNAL_ERUPTION, 80*IN_MILLISECONDS);
             }
 
-            void JustReachedHome()
+            void JustReachedHome() override
             {
                 _JustReachedHome();
-                if (instance)
-                    instance->SetBossState(BOSS_JARAXXUS, FAIL);
+                instance->SetBossState(BOSS_JARAXXUS, FAIL);
                 DoCast(me, SPELL_JARAXXUS_CHAINS);
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
             }
 
-            void KilledUnit(Unit* who)
+            void KilledUnit(Unit* who) override
             {
                 if (who->GetTypeId() == TYPEID_PLAYER)
-                {
                     Talk(SAY_KILL_PLAYER);
-                    if (instance)
-                        instance->SetData(DATA_TRIBUTE_TO_IMMORTALITY_ELIGIBLE, 0);
-                }
             }
 
-            void JustDied(Unit* /*killer*/)
+            void JustDied(Unit* /*killer*/) override
             {
                 _JustDied();
                 Talk(SAY_DEATH);
             }
 
-            void JustSummoned(Creature* summoned)
-            {
-                summons.Summon(summoned);
-            }
-
-            void EnterCombat(Unit* /*who*/)
+            void EnterCombat(Unit* /*who*/) override
             {
                 _EnterCombat();
                 Talk(SAY_AGGRO);
             }
 
-            void UpdateAI(uint32 diff)
+            void UpdateAI(uint32 diff) override
             {
                 if (!UpdateVictim())
                     return;
@@ -175,7 +163,7 @@ class boss_jaraxxus : public CreatureScript
                         case EVENT_INCINERATE_FLESH:
                             if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 0.0f, true, -SPELL_LORD_HITTIN))
                             {
-                                Talk(EMOTE_INCINERATE, target->GetGUID());
+                                Talk(EMOTE_INCINERATE, target);
                                 Talk(SAY_INCINERATE);
                                 DoCast(target, SPELL_INCINERATE_FLESH);
                             }
@@ -188,7 +176,7 @@ class boss_jaraxxus : public CreatureScript
                         case EVENT_LEGION_FLAME:
                             if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 0.0f, true, -SPELL_LORD_HITTIN))
                             {
-                                Talk(EMOTE_LEGION_FLAME, target->GetGUID());
+                                Talk(EMOTE_LEGION_FLAME, target);
                                 DoCast(target, SPELL_LEGION_FLAME);
                             }
                             events.ScheduleEvent(EVENT_LEGION_FLAME, 30*IN_MILLISECONDS);
@@ -212,9 +200,9 @@ class boss_jaraxxus : public CreatureScript
             }
         };
 
-        CreatureAI* GetAI(Creature* creature) const
+        CreatureAI* GetAI(Creature* creature) const override
         {
-            return new boss_jaraxxusAI(creature);
+            return GetInstanceAI<boss_jaraxxusAI>(creature);
         }
 };
 
@@ -231,26 +219,26 @@ class npc_legion_flame : public CreatureScript
                 _instance = creature->GetInstanceScript();
             }
 
-            void Reset()
+            void Reset() override
             {
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
                 me->SetInCombatWithZone();
                 DoCast(SPELL_LEGION_FLAME_EFFECT);
             }
 
-            void UpdateAI(uint32 /*diff*/)
+            void UpdateAI(uint32 /*diff*/) override
             {
                 UpdateVictim();
-                if (_instance && _instance->GetBossState(BOSS_JARAXXUS) != IN_PROGRESS)
+                if (_instance->GetBossState(BOSS_JARAXXUS) != IN_PROGRESS)
                     me->DespawnOrUnsummon();
             }
             private:
                 InstanceScript* _instance;
         };
 
-        CreatureAI* GetAI(Creature* creature) const
+        CreatureAI* GetAI(Creature* creature) const override
         {
-            return new npc_legion_flameAI(creature);
+            return GetInstanceAI<npc_legion_flameAI>(creature);
         }
 };
 
@@ -266,7 +254,7 @@ class npc_infernal_volcano : public CreatureScript
                 SetCombatMovement(false);
             }
 
-            void Reset()
+            void Reset() override
             {
                 me->SetReactState(REACT_PASSIVE);
 
@@ -278,31 +266,31 @@ class npc_infernal_volcano : public CreatureScript
                 _summons.DespawnAll();
             }
 
-            void IsSummonedBy(Unit* /*summoner*/)
+            void IsSummonedBy(Unit* /*summoner*/) override
             {
                 DoCast(SPELL_INFERNAL_ERUPTION_EFFECT);
             }
 
-            void JustSummoned(Creature* summoned)
+            void JustSummoned(Creature* summoned) override
             {
                 _summons.Summon(summoned);
                 // makes immediate corpse despawn of summoned Felflame Infernals
                 summoned->SetCorpseDelay(0);
             }
 
-            void JustDied(Unit* /*killer*/)
+            void JustDied(Unit* /*killer*/) override
             {
                 // used to despawn corpse immediately
                 me->DespawnOrUnsummon();
             }
 
-            void UpdateAI(uint32 /*diff*/) {}
+            void UpdateAI(uint32 /*diff*/) override { }
 
             private:
                 SummonList _summons;
         };
 
-        CreatureAI* GetAI(Creature* creature) const
+        CreatureAI* GetAI(Creature* creature) const override
         {
             return new npc_infernal_volcanoAI(creature);
         }
@@ -317,18 +305,24 @@ class npc_fel_infernal : public CreatureScript
         {
             npc_fel_infernalAI(Creature* creature) : ScriptedAI(creature)
             {
+                Initialize();
                 _instance = creature->GetInstanceScript();
             }
 
-            void Reset()
+            void Initialize()
             {
-                _felStreakTimer = 30*IN_MILLISECONDS;
+                _felStreakTimer = 30 * IN_MILLISECONDS;
+            }
+
+            void Reset() override
+            {
+                Initialize();
                 me->SetInCombatWithZone();
             }
 
-            void UpdateAI(uint32 diff)
+            void UpdateAI(uint32 diff) override
             {
-                if (_instance && _instance->GetBossState(BOSS_JARAXXUS) != IN_PROGRESS)
+                if (_instance->GetBossState(BOSS_JARAXXUS) != IN_PROGRESS)
                 {
                     me->DespawnOrUnsummon();
                     return;
@@ -353,9 +347,9 @@ class npc_fel_infernal : public CreatureScript
                 InstanceScript* _instance;
         };
 
-        CreatureAI* GetAI(Creature* creature) const
+        CreatureAI* GetAI(Creature* creature) const override
         {
-            return new npc_fel_infernalAI(creature);
+            return GetInstanceAI<npc_fel_infernalAI>(creature);
         }
 };
 
@@ -366,11 +360,9 @@ class npc_nether_portal : public CreatureScript
 
         struct npc_nether_portalAI : public ScriptedAI
         {
-            npc_nether_portalAI(Creature* creature) : ScriptedAI(creature), _summons(me)
-            {
-            }
+            npc_nether_portalAI(Creature* creature) : ScriptedAI(creature), _summons(me) { }
 
-            void Reset()
+            void Reset() override
             {
                 me->SetReactState(REACT_PASSIVE);
 
@@ -382,31 +374,31 @@ class npc_nether_portal : public CreatureScript
                 _summons.DespawnAll();
             }
 
-            void IsSummonedBy(Unit* /*summoner*/)
+            void IsSummonedBy(Unit* /*summoner*/) override
             {
                 DoCast(SPELL_NETHER_PORTAL_EFFECT);
             }
 
-            void JustSummoned(Creature* summoned)
+            void JustSummoned(Creature* summoned) override
             {
                 _summons.Summon(summoned);
                 // makes immediate corpse despawn of summoned Mistress of Pain
                 summoned->SetCorpseDelay(0);
             }
 
-            void JustDied(Unit* /*killer*/)
+            void JustDied(Unit* /*killer*/) override
             {
                 // used to despawn corpse immediately
                 me->DespawnOrUnsummon();
             }
 
-            void UpdateAI(uint32 /*diff*/) {}
+            void UpdateAI(uint32 /*diff*/) override { }
 
             private:
                 SummonList _summons;
         };
 
-        CreatureAI* GetAI(Creature* creature) const
+        CreatureAI* GetAI(Creature* creature) const override
         {
             return new npc_nether_portalAI(creature);
         }
@@ -422,11 +414,10 @@ class npc_mistress_of_pain : public CreatureScript
             npc_mistress_of_painAI(Creature* creature) : ScriptedAI(creature)
             {
                 _instance = creature->GetInstanceScript();
-                if (_instance)
-                    _instance->SetData(DATA_MISTRESS_OF_PAIN_COUNT, INCREASE);
+                _instance->SetData(DATA_MISTRESS_OF_PAIN_COUNT, INCREASE);
             }
 
-            void Reset()
+            void Reset() override
             {
                 _events.ScheduleEvent(EVENT_SHIVAN_SLASH, 30*IN_MILLISECONDS);
                 _events.ScheduleEvent(EVENT_SPINNING_STRIKE, 30*IN_MILLISECONDS);
@@ -435,15 +426,14 @@ class npc_mistress_of_pain : public CreatureScript
                 me->SetInCombatWithZone();
             }
 
-            void JustDied(Unit* /*killer*/)
+            void JustDied(Unit* /*killer*/) override
             {
-                if (_instance)
-                    _instance->SetData(DATA_MISTRESS_OF_PAIN_COUNT, DECREASE);
+                _instance->SetData(DATA_MISTRESS_OF_PAIN_COUNT, DECREASE);
             }
 
-            void UpdateAI(uint32 diff)
+            void UpdateAI(uint32 diff) override
             {
-                if (_instance && _instance->GetBossState(BOSS_JARAXXUS) != IN_PROGRESS)
+                if (_instance->GetBossState(BOSS_JARAXXUS) != IN_PROGRESS)
                 {
                     me->DespawnOrUnsummon();
                     return;
@@ -486,9 +476,9 @@ class npc_mistress_of_pain : public CreatureScript
                 EventMap _events;
         };
 
-        CreatureAI* GetAI(Creature* creature) const
+        CreatureAI* GetAI(Creature* creature) const override
         {
-            return new npc_mistress_of_painAI(creature);
+            return GetInstanceAI<npc_mistress_of_painAI>(creature);
         }
 };
 
@@ -501,7 +491,7 @@ class spell_mistress_kiss : public SpellScriptLoader
         {
             PrepareAuraScript(spell_mistress_kiss_AuraScript);
 
-            bool Load()
+            bool Load() override
             {
                 if (GetCaster())
                     if (sSpellMgr->GetSpellIdForDifficulty(SPELL_MISTRESS_KISS_DAMAGE_SILENCE, GetCaster()))
@@ -523,13 +513,13 @@ class spell_mistress_kiss : public SpellScriptLoader
                 }
             }
 
-            void Register()
+            void Register() override
             {
                 OnEffectPeriodic += AuraEffectPeriodicFn(spell_mistress_kiss_AuraScript::HandleDummyTick, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
             }
         };
 
-        AuraScript* GetAuraScript() const
+        AuraScript* GetAuraScript() const override
         {
             return new spell_mistress_kiss_AuraScript();
         }
@@ -553,11 +543,11 @@ class MistressKissTargetSelector
 class spell_mistress_kiss_area : public SpellScriptLoader
 {
     public:
-        spell_mistress_kiss_area() : SpellScriptLoader("spell_mistress_kiss_area") {}
+        spell_mistress_kiss_area() : SpellScriptLoader("spell_mistress_kiss_area") { }
 
         class spell_mistress_kiss_area_SpellScript : public SpellScript
         {
-            PrepareSpellScript(spell_mistress_kiss_area_SpellScript)
+            PrepareSpellScript(spell_mistress_kiss_area_SpellScript);
 
             void FilterTargets(std::list<WorldObject*>& targets)
             {
@@ -576,14 +566,14 @@ class spell_mistress_kiss_area : public SpellScriptLoader
                 GetCaster()->CastSpell(GetHitUnit(), uint32(GetEffectValue()), true);
             }
 
-            void Register()
+            void Register() override
             {
                 OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_mistress_kiss_area_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
                 OnEffectHitTarget += SpellEffectFn(spell_mistress_kiss_area_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
             }
         };
 
-        SpellScript* GetSpellScript() const
+        SpellScript* GetSpellScript() const override
         {
             return new spell_mistress_kiss_area_SpellScript();
         }

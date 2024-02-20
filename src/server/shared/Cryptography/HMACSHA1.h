@@ -1,6 +1,6 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
- 
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -34,6 +34,7 @@ class HmacHash
         HmacHash(uint32 len, uint8 *seed);
         ~HmacHash();
         void UpdateData(const std::string &str);
+        void UpdateData(const uint8* data, size_t len);
         void Finalize();
         uint8 *ComputeHash(BigNumber* bn);
         uint8 *GetDigest() { return (uint8*)m_digest; }

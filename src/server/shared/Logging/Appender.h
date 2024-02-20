@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -18,60 +18,10 @@
 #ifndef APPENDER_H
 #define APPENDER_H
 
-#include "Define.h"
-#include <time.h>
+#include <unordered_map>
 #include <string>
-#include <map>
-
-enum LogFilterType
-{
-    LOG_FILTER_GENERAL                           =  0,     // This one should only be used inside Log.cpp
-    LOG_FILTER_UNITS                             =  1,     // Anything related to units that doesn't fit in other categories. ie. creature formations
-    LOG_FILTER_PETS                              =  2,
-    LOG_FILTER_VEHICLES                          =  3,
-    LOG_FILTER_TSCR                              =  4,     // C++ AI, instance scripts, etc.
-    LOG_FILTER_DATABASE_AI                       =  5,     // SmartAI, EventAI, Creature* * AI
-    LOG_FILTER_MAPSCRIPTS                        =  6,
-    LOG_FILTER_NETWORKIO                         =  7,
-    LOG_FILTER_SPELLS_AURAS                      =  8,
-    LOG_FILTER_ACHIEVEMENTSYS                    =  9,
-    LOG_FILTER_CONDITIONSYS                      = 10,
-    LOG_FILTER_POOLSYS                           = 11,
-    LOG_FILTER_AUCTIONHOUSE                      = 12,
-    LOG_FILTER_BATTLEGROUND                      = 13,
-    LOG_FILTER_OUTDOORPVP                        = 14,
-    LOG_FILTER_CHATSYS                           = 15,
-    LOG_FILTER_LFG                               = 16,
-    LOG_FILTER_MAPS                              = 17,
-    LOG_FILTER_PLAYER                            = 18,     // Any player log that does not fit in other player filters
-    LOG_FILTER_PLAYER_LOADING                    = 19,     // Debug output from Player::_Load functions
-    LOG_FILTER_PLAYER_ITEMS                      = 20,
-    LOG_FILTER_PLAYER_SKILLS                     = 21,
-    LOG_FILTER_PLAYER_CHATLOG                    = 22,
-    LOG_FILTER_LOOT                              = 23,
-    LOG_FILTER_GUILD                             = 24,
-    LOG_FILTER_TRANSPORTS                        = 25,
-    LOG_FILTER_SQL                               = 26,
-    LOG_FILTER_GMCOMMAND                         = 27,
-    LOG_FILTER_REMOTECOMMAND                     = 28,
-    LOG_FILTER_WARDEN                            = 29,
-    LOG_FILTER_AUTHSERVER                        = 30,
-    LOG_FILTER_WORLDSERVER                       = 31,
-    LOG_FILTER_GAMEEVENTS                        = 32,
-    LOG_FILTER_CALENDAR                          = 33,
-    LOG_FILTER_CHARACTER                         = 34,
-    LOG_FILTER_ARENAS                            = 35,
-    LOG_FILTER_SQL_DRIVER                        = 36,
-    LOG_FILTER_SQL_DEV                           = 37,
-    LOG_FILTER_PLAYER_DUMP                       = 38,
-    LOG_FILTER_BATTLEFIELD                       = 39,
-    LOG_FILTER_SERVER_LOADING                    = 40,
-    LOG_FILTER_OPCODES                           = 41,
-    LOG_FILTER_SOAP                              = 42,
-    LOG_FILTER_CHEAT                             = 44
-};
-
-const uint8 MaxLogFilter = 45;
+#include <time.h>
+#include "Define.h"
 
 // Values assigned have their equivalent in enum ACE_Log_Priority
 enum LogLevel
@@ -107,7 +57,7 @@ enum AppenderFlags
 
 struct LogMessage
 {
-    LogMessage(LogLevel _level, LogFilterType _type, std::string _text)
+    LogMessage(LogLevel _level, std::string const& _type, std::string const& _text)
         : level(_level), type(_type), text(_text), mtime(time(NULL))
     { }
 
@@ -115,7 +65,7 @@ struct LogMessage
     std::string getTimeStr();
 
     LogLevel level;
-    LogFilterType type;
+    std::string type;
     std::string text;
     std::string prefix;
     std::string param1;
@@ -124,7 +74,7 @@ struct LogMessage
     ///@ Returns size of the log message content in bytes
     uint32 Size() const
     {
-        return prefix.size() + text.size();
+        return static_cast<uint32>(prefix.size() + text.size());
     }
 };
 
@@ -143,7 +93,6 @@ class Appender
         void setLogLevel(LogLevel);
         void write(LogMessage& message);
         static const char* getLogLevelString(LogLevel level);
-        static const char* getLogFilterTypeString(LogFilterType type);
 
     private:
         virtual void _write(LogMessage const& /*message*/) = 0;
@@ -155,6 +104,6 @@ class Appender
         AppenderFlags flags;
 };
 
-typedef std::map<uint8, Appender*> AppenderMap;
+typedef std::unordered_map<uint8, Appender*> AppenderMap;
 
 #endif

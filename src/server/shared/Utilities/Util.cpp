@@ -1,56 +1,82 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation; either version 2 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "Util.h"
 #include "Common.h"
+#include "CompilerDefs.h"
 #include "utf8.h"
 #include "SFMT.h"
 #include "Errors.h" // for ASSERT
-#include <ace/TSS_T.h>
-#include "CompilerDefs.h"
 #include <stdarg.h>
+#include <boost/thread/tss.hpp>
 
-#if TRINITY_COMPILER_GNU
+#if COMPILER == COMPILER_GNU
   #include <sys/socket.h>
   #include <netinet/in.h>
   #include <arpa/inet.h>
 #endif
 
-typedef ACE_TSS<SFMTRand> SFMTRandTSS;
-static SFMTRandTSS sfmtRand;
+static boost::thread_specific_ptr<SFMTRand> sfmtRand;
+
+static SFMTRand* GetRng()
+{
+    SFMTRand* rand = sfmtRand.get();
+
+    if (!rand)
+    {
+        rand = new SFMTRand();
+        sfmtRand.reset(rand);
+    }
+
+    return rand;
+}
 
 int32 irand(int32 min, int32 max)
 {
     ASSERT(max >= min);
-    return int32(sfmtRand->IRandom(min, max));
+    return int32(GetRng()->IRandom(min, max));
 }
 
 uint32 urand(uint32 min, uint32 max)
 {
     ASSERT(max >= min);
-    return sfmtRand->URandom(min, max);
+    return GetRng()->URandom(min, max);
 }
 
 float frand(float min, float max)
 {
     ASSERT(max >= min);
-    return float(sfmtRand->Random() * (max - min) + min);
+    return float(GetRng()->Random() * (max - min) + min);
 }
 
-int32 rand32()
+uint32 rand32()
 {
-    return int32(sfmtRand->BRandom());
+    return GetRng()->BRandom();
 }
 
-double rand_norm(void)
+double rand_norm()
 {
-    return sfmtRand->Random();
+    return GetRng()->Random();
 }
 
-double rand_chance(void)
+double rand_chance()
 {
-    return sfmtRand->Random() * 100.0;
+    return GetRng()->Random() * 100.0;
 }
 
 Tokenizer::Tokenizer(const std::string &src, const char sep, uint32 vectorReserve)
@@ -120,6 +146,7 @@ void stripLineInvisibleChars(std::string &str)
         str.clear();
 
 }
+
 #if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
 struct tm* localtime_r(const time_t* time, struct tm *result)
 {
@@ -240,37 +267,12 @@ bool IsIPAddress(char const* ipaddress)
     return inet_addr(ipaddress) != INADDR_NONE;
 }
 
-std::string GetAddressString(ACE_INET_Addr const& addr)
-{
-    char buf[ACE_MAX_FULLY_QUALIFIED_NAME_LEN + 16];
-    addr.addr_to_string(buf, ACE_MAX_FULLY_QUALIFIED_NAME_LEN + 16);
-    return buf;
-}
-
-bool IsIPAddrInNetwork(ACE_INET_Addr const& net, ACE_INET_Addr const& addr, ACE_INET_Addr const& subnetMask)
-{
-    uint32 mask = subnetMask.get_ip_address();
-    if ((net.get_ip_address() & mask) == (addr.get_ip_address() & mask))
-        return true;
-    return false;
-}
-
 /// create PID file
 uint32 CreatePIDFile(const std::string& filename)
 {
     FILE* pid_file = fopen (filename.c_str(), "w" );
     if (pid_file == NULL)
         return 0;
-	    uint32 pid = getpid();
-
-    fprintf(pid_file, "%u", pid);
-    fclose(pid_file);
-
-    return pid;
-}
-
-uint32 GetPID()
-{
 
 #ifdef _WIN32
     DWORD pid = GetCurrentProcessId();
@@ -278,7 +280,10 @@ uint32 GetPID()
     pid_t pid = getpid();
 #endif
 
-    return uint32(pid);
+    fprintf(pid_file, "%u", pid );
+    fclose(pid_file);
+
+    return (uint32)pid;
 }
 
 size_t utf8length(std::string& utf8str)
@@ -289,7 +294,7 @@ size_t utf8length(std::string& utf8str)
     }
     catch(std::exception)
     {
-        utf8str = "";
+        utf8str.clear();
         return 0;
     }
 }
@@ -311,7 +316,7 @@ void utf8truncate(std::string& utf8str, size_t len)
     }
     catch(std::exception)
     {
-        utf8str = "";
+        utf8str.clear();
     }
 }
 
@@ -330,28 +335,13 @@ bool Utf8toWStr(char const* utf8str, size_t csize, wchar_t* wstr, size_t& wsize)
 
         wsize = len;
         utf8::utf8to16(utf8str, utf8str+csize, wstr);
-		//wsize -= out.remaining(); // remaining unused space
         wstr[len] = L'\0';
     }
-	catch(std::exception const&)
+    catch(std::exception)
     {
-        // Replace the converted string with an error message if there is enough space
-        // Otherwise just return an empty string
-        wchar_t const* errorMessage = L"An error occurred converting string from UTF-8 to WStr";
-        size_t errorMessageLength = wcslen(errorMessage);
-        if (wsize >= errorMessageLength)
-        {
-            wcscpy(wstr, errorMessage);
-            wsize = wcslen(wstr);
-        }
-        else if (wsize > 0)
-        {
+        if (wsize > 0)
             wstr[0] = L'\0';
-            wsize = 0;
-        }
-        else
-            wsize = 0;
-
+        wsize = 0;
         return false;
     }
 
@@ -370,7 +360,7 @@ bool Utf8toWStr(const std::string& utf8str, std::wstring& wstr)
     }
     catch(std::exception)
     {
-        wstr = L"";
+        wstr.clear();
         return false;
     }
 
@@ -393,14 +383,14 @@ bool WStrToUtf8(wchar_t* wstr, size_t size, std::string& utf8str)
     }
     catch(std::exception)
     {
-        utf8str = "";
+        utf8str.clear();
         return false;
     }
 
     return true;
 }
 
-bool WStrToUtf8(std::wstring wstr, std::string& utf8str)
+bool WStrToUtf8(std::wstring const& wstr, std::string& utf8str)
 {
     try
     {
@@ -416,7 +406,7 @@ bool WStrToUtf8(std::wstring wstr, std::string& utf8str)
     }
     catch(std::exception)
     {
-        utf8str = "";
+        utf8str.clear();
         return false;
     }
 
@@ -425,7 +415,7 @@ bool WStrToUtf8(std::wstring wstr, std::string& utf8str)
 
 typedef wchar_t const* const* wstrlist;
 
-std::wstring GetMainPartOfName(std::wstring wname, uint32 declension)
+std::wstring GetMainPartOfName(std::wstring const& wname, uint32 declension)
 {
     // supported only Cyrillic cases
     if (wname.size() < 1 || !isCyrillicCharacter(wname[0]) || declension > 5)
@@ -502,7 +492,7 @@ bool consoleToUtf8(const std::string& conStr, std::string& utf8str)
 #endif
 }
 
-bool Utf8FitTo(const std::string& str, std::wstring search)
+bool Utf8FitTo(const std::string& str, std::wstring const& search)
 {
     std::wstring temp;
 
@@ -533,6 +523,9 @@ void vutf8printf(FILE* out, const char *str, va_list* ap)
     wchar_t wtemp_buf[32*1024];
 
     size_t temp_len = vsnprintf(temp_buf, 32*1024, str, *ap);
+    //vsnprintf returns -1 if the buffer is too small
+    if (temp_len == size_t(-1))
+        temp_len = 32*1024-1;
 
     size_t wtemp_len = 32*1024-1;
     Utf8toWStr(temp_buf, temp_len, wtemp_buf, wtemp_len);
@@ -568,38 +561,11 @@ std::string ByteArrayToHexStr(uint8 const* bytes, uint32 arrayLen, bool reverse 
     return ss.str();
 }
 
-void HexStrToByteArray(std::string const& str, uint8* out, bool reverse /*= false*/)
+uint32 EventMap::GetTimeUntilEvent(uint32 eventId) const
 {
-    // string must have even number of characters
-    if (str.length() & 1)
-        return;
+    for (EventStore::const_iterator itr = _eventMap.begin(); itr != _eventMap.end(); ++itr)
+        if (eventId == (itr->second & 0x0000FFFF))
+            return itr->first - _time;
 
-    int32 init = 0;
-    int32 end = int32(str.length());
-    int8 op = 1;
-
-    if (reverse)
-    {
-        init = int32(str.length() - 2);
-        end = -2;
-        op = -1;
-    }
-
-    uint32 j = 0;
-    for (int32 i = init; i != end; i += 2 * op)
-    {
-        char buffer[3] = { str[i], str[i + 1], '\0' };
-        out[j++] = uint8(strtoul(buffer, NULL, 16));
-    }
-}
-
-bool Utf8ToUpperOnlyLatin(std::string& utf8String)
-{
-    std::wstring wstr;
-    if (!Utf8toWStr(utf8String, wstr))
-        return false;
-
-    std::transform(wstr.begin(), wstr.end(), wstr.begin(), wcharToUpperOnlyLatin);
-
-    return WStrToUtf8(wstr, utf8String);
+    return std::numeric_limits<uint32>::max();
 }

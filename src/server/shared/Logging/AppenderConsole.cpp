@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -15,11 +15,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <sstream>
+
 #include "AppenderConsole.h"
 #include "Config.h"
 #include "Util.h"
 
-#include <sstream>
+#if PLATFORM == PLATFORM_WINDOWS
+  #include <Windows.h>
+#endif
 
 AppenderConsole::AppenderConsole(uint8 id, std::string const& name, LogLevel level, AppenderFlags flags):
 Appender(id, name, APPENDER_CONSOLE, level, flags), _colored(false)
@@ -59,7 +63,7 @@ void AppenderConsole::InitColors(std::string const& str)
 
 void AppenderConsole::SetColor(bool stdout_stream, ColorTypes color)
 {
-    #if PLATFORM == PLATFORM_WINDOWS
+#if PLATFORM == PLATFORM_WINDOWS
     static WORD WinColorFG[MaxColors] =
     {
         0,                                                  // BLACK
@@ -87,7 +91,7 @@ void AppenderConsole::SetColor(bool stdout_stream, ColorTypes color)
 
     HANDLE hConsole = GetStdHandle(stdout_stream ? STD_OUTPUT_HANDLE : STD_ERROR_HANDLE);
     SetConsoleTextAttribute(hConsole, WinColorFG[color]);
-    #else
+#else
     enum ANSITextAttr
     {
         TA_NORMAL                                = 0,
@@ -156,7 +160,7 @@ void AppenderConsole::ResetColor(bool stdout_stream)
 
 void AppenderConsole::_write(LogMessage const& message)
 {
-    bool stdout_stream = message.level == LOG_LEVEL_ERROR || message.level == LOG_LEVEL_FATAL;
+    bool stdout_stream = !(message.level == LOG_LEVEL_ERROR || message.level == LOG_LEVEL_FATAL);
 
     if (_colored)
     {

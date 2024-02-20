@@ -1,6 +1,6 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
- 
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -45,7 +45,7 @@ class npc_rivern_frostwind : public CreatureScript
 public:
     npc_rivern_frostwind() : CreatureScript("npc_rivern_frostwind") { }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
     {
         player->PlayerTalkClass->ClearMenus();
         if (action == GOSSIP_ACTION_TRADE)
@@ -54,12 +54,12 @@ public:
         return true;
     }
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    bool OnGossipHello(Player* player, Creature* creature) override
     {
-        if (creature->isQuestGiver())
+        if (creature->IsQuestGiver())
             player->PrepareQuestMenu(creature->GetGUID());
 
-        if (creature->isVendor() && player->GetReputationRank(589) == REP_EXALTED)
+        if (creature->IsVendor() && player->GetReputationRank(589) == REP_EXALTED)
             player->ADD_GOSSIP_ITEM(GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
 
         player->SEND_GOSSIP_MENU(player->GetGossipTextId(creature), creature->GetGUID());
@@ -154,14 +154,13 @@ struct DialogueEntry
 class DialogueHelper
 {
 public:
-    // The array MUST be terminated by {0,0,0}
+    // The array MUST be terminated by {0, 0, 0}
     DialogueHelper(DialogueEntry const* dialogueArray) :
       _dialogueArray(dialogueArray),
           _currentEntry(NULL),
-          _actionTimer(0),
-          _isFirstSide(true)
-      {}
-      // The array MUST be terminated by {0,0,0,0,0}
+          _actionTimer(0)
+      { }
+      // The array MUST be terminated by {0, 0, 0, 0, 0}
 
       /// Function to initialize the dialogue helper for instances. If not used with instances, GetSpeakerByEntry MUST be overwritten to obtain the speakers
       /// Set if take first entries or second entries
@@ -182,9 +181,7 @@ public:
           }
 
           if (!found)
-          {
               return;
-          }
 
           DoNextDialogueStep();
       }
@@ -202,7 +199,7 @@ public:
 
 protected:
     /// Will be called when a dialogue step was done
-    virtual void JustDidDialogueStep(int32 /*entry*/) {}
+    virtual void JustDidDialogueStep(int32 /*entry*/) { }
     /// Will be called to get a speaker, MUST be implemented if not used in instances
     virtual Creature* GetSpeakerByEntry(int32 /*entry*/) { return NULL; }
 
@@ -210,7 +207,7 @@ private:
     void DoNextDialogueStep()
     {
         // Last Dialogue Entry done?
-        if (_currentEntry && !_currentEntry->TextEntry)
+        if (!_currentEntry || !_currentEntry->TextEntry)
         {
             _actionTimer = 0;
             return;
@@ -239,7 +236,6 @@ private:
     DialogueEntry const* _currentEntry;
 
     uint32 _actionTimer;
-    bool _isFirstSide;
 };
 
 const DialogueEntry introDialogue[] =
@@ -296,7 +292,7 @@ class npc_ranshalla : public CreatureScript
 {
 public:
     npc_ranshalla() : CreatureScript("npc_ranshalla") { }
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
     {
         if (quest->GetQuestId() == QUEST_GUARDIANS_ALTAR)
         {
@@ -311,7 +307,7 @@ public:
 
         return false;
     }
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_ranshallaAI(creature);
     }
@@ -321,20 +317,25 @@ public:
         npc_ranshallaAI(Creature* creature) : npc_escortAI(creature),
             DialogueHelper(introDialogue)
         {
-            Reset();
+            Initialize();
+        }
+
+        void Initialize()
+        {
+            _delayTimer = 0;
         }
 
         uint32 _delayTimer;
 
-        uint64 _firstPriestessGUID;
-        uint64 _secondPriestessGUID;
-        uint64 _guardEluneGUID;
-        uint64 _voiceEluneGUID;
-        uint64 _altarGUID;
+        ObjectGuid _firstPriestessGUID;
+        ObjectGuid _secondPriestessGUID;
+        ObjectGuid _guardEluneGUID;
+        ObjectGuid _voiceEluneGUID;
+        ObjectGuid _altarGUID;
 
-        void Reset()
+        void Reset() override
         {
-            _delayTimer = 0;
+            Initialize();
         }
 
         // Called when the player activates the torch / altar
@@ -398,9 +399,9 @@ public:
             StartNextDialogueText(SAY_PRIESTESS_ALTAR_3);
         }
 
-        void WaypointReached(uint32 pointId)
+        void WaypointReached(uint32 pointId) override
         {
-            switch(pointId)
+            switch (pointId)
             {
                 case 3:
                     Talk(SAY_ENTER_OWL_THICKET);
@@ -439,7 +440,7 @@ public:
                     SetEscortPaused(true);
                     DoSummonPriestess();
                     Talk(SAY_RANSHALLA_ALTAR_2);
-                    events.ScheduleEvent(EVENT_RESUME,2000);
+                    events.ScheduleEvent(EVENT_RESUME, 2000);
                     break;
                 case 44:
                     // Stop the escort and turn towards the altar
@@ -528,7 +529,7 @@ public:
                     if (Player* player = GetPlayerForEscort())
                     {
                         me->SetFacingToObject(player);
-                        Talk(SAY_RANSHALLA_END_1, player->GetGUID());
+                        Talk(SAY_RANSHALLA_END_1, player);
                     }
                     break;
                 case SAY_RANSHALLA_END_2:
@@ -542,7 +543,7 @@ public:
                     if (Player* player = GetPlayerForEscort())
                     {
                         player->GroupEventHappens(QUEST_GUARDIANS_ALTAR, me);
-                        Talk(SAY_RANSHALLA_END_2, player->GetGUID());
+                        Talk(SAY_RANSHALLA_END_2, player);
                     }
                     me->DespawnOrUnsummon(4000);
                     break;
@@ -567,7 +568,7 @@ public:
 
         }
 
-        void UpdateEscortAI(const uint32 diff)
+        void UpdateEscortAI(const uint32 diff) override
         {
             DialogueUpdate(diff);
 
@@ -600,7 +601,7 @@ class go_elune_fire : public GameObjectScript
 {
 public:
     go_elune_fire() : GameObjectScript("go_elune_fire") { }
-    bool OnGossipHello(Player* /*player*/, GameObject* go)
+    bool OnGossipHello(Player* /*player*/, GameObject* go) override
     {
         // Check if we are using the torches or the altar
         bool isAltar = false;

@@ -1,6 +1,6 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
- 
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -79,12 +79,12 @@ class npc_disciple_of_naralex : public CreatureScript
 public:
     npc_disciple_of_naralex() : CreatureScript("npc_disciple_of_naralex") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_disciple_of_naralexAI(creature);
+        return GetInstanceAI<npc_disciple_of_naralexAI>(creature);
     }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
     {
         player->PlayerTalkClass->ClearMenus();
         InstanceScript* instance = creature->GetInstanceScript();
@@ -99,14 +99,14 @@ public:
             creature->setFaction(250);
             creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
 
-            CAST_AI(npc_escortAI, (creature->AI()))->Start(false, false, player->GetGUID());
-            CAST_AI(npc_escortAI, (creature->AI()))->SetDespawnAtFar(false);
-            CAST_AI(npc_escortAI, (creature->AI()))->SetDespawnAtEnd(false);
+            ENSURE_AI(npc_escortAI, (creature->AI()))->Start(false, false, player->GetGUID());
+            ENSURE_AI(npc_escortAI, (creature->AI()))->SetDespawnAtFar(false);
+            ENSURE_AI(npc_escortAI, (creature->AI()))->SetDespawnAtEnd(false);
         }
         return true;
     }
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    bool OnGossipHello(Player* player, Creature* creature) override
     {
         InstanceScript* instance = creature->GetInstanceScript();
 
@@ -150,11 +150,8 @@ public:
         uint32 eventProgress;
         InstanceScript* instance;
 
-        void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 waypointId) override
         {
-            if (!instance)
-                return;
-
             switch (waypointId)
             {
                 case 4:
@@ -182,39 +179,34 @@ public:
             }
         }
 
-        void Reset()
+        void Reset() override
         {
 
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
-            Talk(SAY_ATTACKED, who->GetGUID());
+            Talk(SAY_ATTACKED, who);
         }
 
-        void JustDied(Unit* /*slayer*/)
+        void JustDied(Unit* /*slayer*/) override
         {
-            if (instance)
-            {
-                instance->SetData(TYPE_NARALEX_EVENT, FAIL);
-                instance->SetData(TYPE_NARALEX_PART1, FAIL);
-                instance->SetData(TYPE_NARALEX_PART2, FAIL);
-                instance->SetData(TYPE_NARALEX_PART3, FAIL);
-            }
+            instance->SetData(TYPE_NARALEX_EVENT, FAIL);
+            instance->SetData(TYPE_NARALEX_PART1, FAIL);
+            instance->SetData(TYPE_NARALEX_PART2, FAIL);
+            instance->SetData(TYPE_NARALEX_PART3, FAIL);
         }
 
-        void JustSummoned(Creature* summoned)
+        void JustSummoned(Creature* summoned) override
         {
              summoned->AI()->AttackStart(me);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (currentEvent != TYPE_NARALEX_PART3)
                 npc_escortAI::UpdateAI(diff);
 
-            if (!instance)
-                return;
             if (eventTimer <= diff)
             {
                 eventTimer = 0;
@@ -267,7 +259,7 @@ public:
                                 ++eventProgress;
                                 eventTimer = 15000;
                                 //CAST_AI(npc_escort::npc_escortAI, me->AI())->SetCanDefend(false);
-                                if (Creature* naralex = instance->instance->GetCreature(instance->GetData64(DATA_NARALEX)))
+                                if (Creature* naralex = instance->instance->GetCreature(instance->GetGuidData(DATA_NARALEX)))
                                     DoCast(naralex, SPELL_NARALEXS_AWAKENING, true);
                                 Talk(EMOTE_AWAKENING_RITUAL);
                             }
@@ -276,7 +268,7 @@ public:
                             {
                                 ++eventProgress;
                                 eventTimer = 15000;
-                                if (Creature* naralex = instance->instance->GetCreature(instance->GetData64(DATA_NARALEX)))
+                                if (Creature* naralex = instance->instance->GetCreature(instance->GetGuidData(DATA_NARALEX)))
                                     naralex->AI()->Talk(EMOTE_TROUBLED_SLEEP);
                                 me->SummonCreature(NPC_DEVIATE_MOCCASIN, 135.943f, 199.701f, -103.529f, 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 15000);
                                 me->SummonCreature(NPC_DEVIATE_MOCCASIN, 151.08f,  221.13f,  -103.609f, 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 15000);
@@ -287,7 +279,7 @@ public:
                             {
                                 ++eventProgress;
                                 eventTimer = 30000;
-                                if (Creature* naralex = instance->instance->GetCreature(instance->GetData64(DATA_NARALEX)))
+                                if (Creature* naralex = instance->instance->GetCreature(instance->GetGuidData(DATA_NARALEX)))
                                     naralex->AI()->Talk(EMOTE_WRITHE_IN_AGONY);
                                 me->SummonCreature(NPC_NIGHTMARE_ECTOPLASM, 133.413f, 207.188f, -102.469f, 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 15000);
                                 me->SummonCreature(NPC_NIGHTMARE_ECTOPLASM, 142.857f, 218.645f, -102.905f, 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 15000);
@@ -301,7 +293,7 @@ public:
                             if (eventProgress == 5)
                             {
                                 ++eventProgress;
-                                if (Creature* naralex = instance->instance->GetCreature(instance->GetData64(DATA_NARALEX)))
+                                if (Creature* naralex = instance->instance->GetCreature(instance->GetGuidData(DATA_NARALEX)))
                                     naralex->AI()->Talk(EMOTE_HORRENDOUS_VISION);
                                 me->SummonCreature(NPC_MUTANUS_THE_DEVOURER, 150.872f, 262.905f, -103.503f, 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 300000);
                                 Talk(SAY_MUTANUS_THE_DEVOURER);
@@ -312,7 +304,7 @@ public:
                             {
                                 ++eventProgress;
                                 eventTimer = 3000;
-                                if (Creature* naralex = instance->instance->GetCreature(instance->GetData64(DATA_NARALEX)))
+                                if (Creature* naralex = instance->instance->GetCreature(instance->GetGuidData(DATA_NARALEX)))
                                 {
                                     if (me->HasAura(SPELL_NARALEXS_AWAKENING))
                                         me->RemoveAura(SPELL_NARALEXS_AWAKENING);
@@ -326,7 +318,7 @@ public:
                             {
                                 ++eventProgress;
                                 eventTimer = 6000;
-                                if (Creature* naralex = instance->instance->GetCreature(instance->GetData64(DATA_NARALEX)))
+                                if (Creature* naralex = instance->instance->GetCreature(instance->GetGuidData(DATA_NARALEX)))
                                     naralex->AI()->Talk(SAY_THANK_YOU);
                             }
                             else
@@ -334,7 +326,7 @@ public:
                             {
                                 ++eventProgress;
                                 eventTimer = 8000;
-                                if (Creature* naralex = instance->instance->GetCreature(instance->GetData64(DATA_NARALEX)))
+                                if (Creature* naralex = instance->instance->GetCreature(instance->GetGuidData(DATA_NARALEX)))
                                 {
                                     naralex->AI()->Talk(SAY_FAREWELL);
                                     naralex->AddAura(SPELL_FLIGHT_FORM, naralex);
@@ -348,7 +340,7 @@ public:
                             {
                                 ++eventProgress;
                                 eventTimer = 1500;
-                                if (Creature* naralex = instance->instance->GetCreature(instance->GetData64(DATA_NARALEX)))
+                                if (Creature* naralex = instance->instance->GetCreature(instance->GetGuidData(DATA_NARALEX)))
                                     naralex->GetMotionMaster()->MovePoint(25, naralex->GetPositionX(), naralex->GetPositionY(), naralex->GetPositionZ());
                             }
                             else
@@ -356,7 +348,7 @@ public:
                             {
                                 ++eventProgress;
                                 eventTimer = 2500;
-                                if (Creature* naralex = instance->instance->GetCreature(instance->GetData64(DATA_NARALEX)))
+                                if (Creature* naralex = instance->instance->GetCreature(instance->GetGuidData(DATA_NARALEX)))
                                 {
                                     naralex->GetMotionMaster()->MovePoint(0, 117.095512f, 247.107971f, -96.167870f);
                                     naralex->GetMotionMaster()->MovePoint(1, 90.388809f, 276.135406f, -83.389801f);
@@ -367,7 +359,7 @@ public:
                             else
                             if (eventProgress == 11)
                             {
-                                if (Creature* naralex = instance->instance->GetCreature(instance->GetData64(DATA_NARALEX)))
+                                if (Creature* naralex = instance->instance->GetCreature(instance->GetGuidData(DATA_NARALEX)))
                                     naralex->SetVisible(false);
                                 me->SetVisible(false);
                                 instance->SetData(TYPE_NARALEX_PART3, DONE);

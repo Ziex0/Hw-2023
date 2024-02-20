@@ -1,6 +1,6 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
- 
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -22,7 +22,7 @@
 #include "Utilities/ByteConverter.h"
 #include <cassert>
 
-enum
+enum DbcFieldFormat
 {
     FT_NA='x',                                              //not used or unknown, 4 byte size
     FT_NA_BYTE='X',                                         //not used or unknown, byte
@@ -77,7 +77,7 @@ class DBCFileLoader
                 }
 
             private:
-                Record(DBCFileLoader &file_, unsigned char *offset_): offset(offset_), file(file_) {}
+                Record(DBCFileLoader &file_, unsigned char *offset_): offset(offset_), file(file_) { }
                 unsigned char *offset;
                 DBCFileLoader &file;
 
@@ -106,5 +106,8 @@ class DBCFileLoader
         uint32 *fieldsOffset;
         unsigned char *data;
         unsigned char *stringTable;
+
+        DBCFileLoader(DBCFileLoader const& right) = delete;
+        DBCFileLoader& operator=(DBCFileLoader const& right) = delete;
 };
 #endif

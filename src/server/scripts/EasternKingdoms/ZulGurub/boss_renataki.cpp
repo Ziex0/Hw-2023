@@ -1,6 +1,6 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
- 
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -40,24 +40,18 @@ enum Misc
 
 class boss_renataki : public CreatureScript
 {
-    public: boss_renataki() : CreatureScript("boss_renataki") {}
+    public:
+        boss_renataki() : CreatureScript("boss_renataki") { }
 
         struct boss_renatakiAI : public BossAI
         {
-            boss_renatakiAI(Creature* creature) : BossAI(creature, DATA_EDGE_OF_MADNESS) {}
-
-            uint32 Invisible_Timer;
-            uint32 Ambush_Timer;
-            uint32 Visible_Timer;
-            uint32 Aggro_Timer;
-            uint32 ThousandBlades_Timer;
-
-            bool Invisible;
-            bool Ambushed;
-
-            void Reset()
+            boss_renatakiAI(Creature* creature) : BossAI(creature, DATA_EDGE_OF_MADNESS)
             {
-                _Reset();
+                Initialize();
+            }
+
+            void Initialize()
+            {
                 Invisible_Timer = urand(8000, 18000);
                 Ambush_Timer = 3000;
                 Visible_Timer = 4000;
@@ -68,17 +62,32 @@ class boss_renataki : public CreatureScript
                 Ambushed = false;
             }
 
-            void JustDied(Unit* /*killer*/)
+            uint32 Invisible_Timer;
+            uint32 Ambush_Timer;
+            uint32 Visible_Timer;
+            uint32 Aggro_Timer;
+            uint32 ThousandBlades_Timer;
+
+            bool Invisible;
+            bool Ambushed;
+
+            void Reset() override
+            {
+                _Reset();
+                Initialize();
+            }
+
+            void JustDied(Unit* /*killer*/) override
             {
                 _JustDied();
             }
 
-            void EnterCombat(Unit* /*who*/)
+            void EnterCombat(Unit* /*who*/) override
             {
                 _EnterCombat();
             }
 
-            void UpdateAI(uint32 diff)
+            void UpdateAI(uint32 diff) override
             {
                 if (!UpdateVictim())
                     return;
@@ -101,9 +110,7 @@ class boss_renataki : public CreatureScript
                 {
                     if (Ambush_Timer <= diff)
                     {
-                        Unit* target = NULL;
-                        target = SelectTarget(SELECT_TARGET_RANDOM, 0);
-                        if (target)
+                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true))
                         {
                             DoTeleportTo(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ());
                             DoCast(target, SPELL_AMBUSH);
@@ -135,21 +142,19 @@ class boss_renataki : public CreatureScript
                 {
                     if (Aggro_Timer <= diff)
                     {
-                        Unit* target = NULL;
-                        target = SelectTarget(SELECT_TARGET_RANDOM, 1);
-
-                        if (DoGetThreat(me->GetVictim()))
-                            DoModifyThreatPercent(me->GetVictim(), -50);
-
-                        if (target)
+                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true))
+                        {
+                            if (DoGetThreat(me->GetVictim()))
+                                DoModifyThreatPercent(me->GetVictim(), -50);
                             AttackStart(target);
+                        }
 
                         Aggro_Timer = urand(7000, 20000);
                     } else Aggro_Timer -= diff;
 
                     if (ThousandBlades_Timer <= diff)
                     {
-                        DoCast(me->GetVictim(), SPELL_THOUSANDBLADES);
+                        DoCastVictim(SPELL_THOUSANDBLADES);
                         ThousandBlades_Timer = urand(7000, 12000);
                     } else ThousandBlades_Timer -= diff;
                 }
@@ -158,7 +163,7 @@ class boss_renataki : public CreatureScript
             }
         };
 
-        CreatureAI* GetAI(Creature* creature) const
+        CreatureAI* GetAI(Creature* creature) const override
         {
             return new boss_renatakiAI(creature);
         }

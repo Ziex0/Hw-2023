@@ -1,6 +1,6 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
- 
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -18,6 +18,7 @@
 
 #include "SHA1.h"
 #include "BigNumber.h"
+#include <cstring>
 #include <stdarg.h>
 
 SHA1Hash::SHA1Hash()
@@ -50,7 +51,7 @@ void SHA1Hash::UpdateBigNumbers(BigNumber* bn0, ...)
     bn = bn0;
     while (bn)
     {
-        UpdateData(bn->AsByteArray(), bn->GetNumBytes());
+        UpdateData(bn->AsByteArray().get(), bn->GetNumBytes());
         bn = va_arg(v, BigNumber*);
     }
     va_end(v);
@@ -63,6 +64,6 @@ void SHA1Hash::Initialize()
 
 void SHA1Hash::Finalize(void)
 {
-     SHA1_Final(mDigest, &mC);
+    SHA1_Final(mDigest, &mC);
 }
 

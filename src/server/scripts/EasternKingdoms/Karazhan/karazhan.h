@@ -1,7 +1,27 @@
+/*
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation; either version 2 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #ifndef DEF_KARAZHAN_H
 #define DEF_KARAZHAN_H
 
-enum eEnums
+#define DataHeader "KZ"
+
+enum DataTypes
 {
     TYPE_ATTUMEN                    = 1,
     TYPE_MOROES                     = 2,
@@ -34,9 +54,7 @@ enum eEnums
     DATA_IMAGE_OF_MEDIVH            = 26,
     DATA_MASTERS_TERRACE_DOOR_1     = 27,
     DATA_MASTERS_TERRACE_DOOR_2     = 28,
-    DATA_GO_SIDE_ENTRANCE_DOOR      = 29,
-    DATA_NIGHTBANE                  = 30,
-    DATA_ECHO_OF_MEDIVH             = 31
+    DATA_GO_SIDE_ENTRANCE_DOOR      = 29
 };
 
 enum OperaEvents
@@ -46,22 +64,4 @@ enum OperaEvents
     EVENT_RAJ                       = 3
 };
 
-enum MiscCreatures
-{
-    NPC_HYAKISS_THE_LURKER          = 16179,
-    NPC_ROKAD_THE_RAVAGER           = 16181,
-    NPC_SHADIKITH_THE_GLIDER        = 16180,
-
-    // Trash
-    NPC_COLDMIST_WIDOW              = 16171,
-    NPC_COLDMIST_STALKER            = 16170,
-    NPC_SHADOWBAT                   = 16173,
-    NPC_VAMPIRIC_SHADOWBAT          = 16175,
-    NPC_GREATER_SHADOWBAT           = 16174,
-    NPC_PHASE_HOUND                 = 16178,
-    NPC_DREADBEAST                  = 16177,
-    NPC_SHADOWBEAST                 = 16176
-};
- 
-#define ERROR_INST_DATA(a)          sLog->outError(LOG_FILTER_TSCR," Instance Data for Karazhan not set properly. Encounter for Creature Entry %u may not work properly.", a->GetEntry());
 #endif

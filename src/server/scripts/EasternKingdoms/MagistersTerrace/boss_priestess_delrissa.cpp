@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
- 
+ * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -110,7 +110,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_priestess_delrissaAI(creature);
+        return GetInstanceAI<boss_priestess_delrissaAI>(creature);
     }
 
     struct boss_priestess_delrissaAI : public ScriptedAI
@@ -137,7 +137,7 @@ public:
         InstanceScript* instance;
 
         std::vector<uint32> LackeyEntryList;
-        uint64 m_auiLackeyGUID[MAX_ACTIVE_LACKEY];
+        ObjectGuid m_auiLackeyGUID[MAX_ACTIVE_LACKEY];
 
         uint8 PlayersKilled;
 
@@ -360,7 +360,7 @@ struct boss_priestess_lackey_commonAI : public ScriptedAI
     {
         Initialize();
         instance = creature->GetInstanceScript();
-        //AcquireGUIDs();
+        AcquireGUIDs();
     }
 
     void Initialize()
@@ -376,7 +376,7 @@ struct boss_priestess_lackey_commonAI : public ScriptedAI
 
     InstanceScript* instance;
 
-    uint64 m_auiLackeyGUIDs[MAX_ACTIVE_LACKEY];
+    ObjectGuid m_auiLackeyGUIDs[MAX_ACTIVE_LACKEY];
     uint32 ResetThreatTimer;
 
     bool UsedPotion;
@@ -386,7 +386,7 @@ struct boss_priestess_lackey_commonAI : public ScriptedAI
         Initialize();
 
         // in case she is not alive and Reset was for some reason called, respawn her (most likely party wipe after killing her)
-        if (Creature* pDelrissa = ObjectAccessor::GetCreature(*me, instance->GetData(DATA_DELRISSA)))
+        if (Creature* pDelrissa = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_DELRISSA)))
         {
             if (!pDelrissa->IsAlive())
                 pDelrissa->Respawn();
@@ -410,7 +410,7 @@ struct boss_priestess_lackey_commonAI : public ScriptedAI
             }
         }
 
-        if (Creature* pDelrissa = ObjectAccessor::GetCreature(*me, instance->GetData(DATA_DELRISSA)))
+        if (Creature* pDelrissa = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_DELRISSA)))
         {
             if (pDelrissa->IsAlive() && !pDelrissa->GetVictim())
             {
@@ -422,7 +422,7 @@ struct boss_priestess_lackey_commonAI : public ScriptedAI
 
     void JustDied(Unit* /*killer*/) override
     {
-        Creature* pDelrissa = ObjectAccessor::GetCreature(*me, instance->GetData(DATA_DELRISSA));
+        Creature* pDelrissa = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_DELRISSA));
         uint32 uiLackeyDeathCount = instance->GetData(DATA_DELRISSA_DEATH_COUNT);
 
         if (!pDelrissa)
@@ -451,18 +451,18 @@ struct boss_priestess_lackey_commonAI : public ScriptedAI
 
     void KilledUnit(Unit* victim) override
     {
-        if (Creature* Delrissa = ObjectAccessor::GetCreature(*me, instance->GetData(DATA_DELRISSA)))
+        if (Creature* Delrissa = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_DELRISSA)))
             Delrissa->AI()->KilledUnit(victim);
     }
 
-    /*void AcquireGUIDs()
+    void AcquireGUIDs()
     {
-        if (Creature* Delrissa = (ObjectAccessor::GetCreature(*me, instance->GetData(DATA_DELRISSA))))
+        if (Creature* Delrissa = (ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_DELRISSA))))
         {
             for (uint8 i = 0; i < MAX_ACTIVE_LACKEY; ++i)
-                m_auiLackeyGUIDs[i] = CAST_AI(boss_priestess_delrissa::boss_priestess_delrissaAI, Delrissa->AI())->m_auiLackeyGUID[i];
+                m_auiLackeyGUIDs[i] = ENSURE_AI(boss_priestess_delrissa::boss_priestess_delrissaAI, Delrissa->AI())->m_auiLackeyGUID[i];
         }
-    }*/
+    }
 
     void UpdateAI(uint32 diff) override
     {
@@ -497,7 +497,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_kagani_nightstrikeAI(creature);
+        return GetInstanceAI<boss_kagani_nightstrikeAI>(creature);
     }
 
     struct boss_kagani_nightstrikeAI : public boss_priestess_lackey_commonAI
@@ -590,7 +590,7 @@ public:
         }
     };
 };
-/*
+
 enum WarlockSpells
 {
     SPELL_IMMOLATE              = 44267,
@@ -609,7 +609,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_ellris_duskhallowAI(creature);
+        return GetInstanceAI<boss_ellris_duskhallowAI>(creature);
     }
 
     struct boss_ellris_duskhallowAI : public boss_priestess_lackey_commonAI
@@ -642,7 +642,7 @@ public:
             boss_priestess_lackey_commonAI::Reset();
         }
 
-        void EnterCombat(Unit* who) override
+        void EnterCombat(Unit* /*who*/) override
         {
             DoCast(me, SPELL_SUMMON_IMP);
         }
@@ -694,7 +694,7 @@ public:
         }
     };
 };
-*/
+
 enum KickDown
 {
     SPELL_KNOCKDOWN     = 11428,
@@ -708,7 +708,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_eramas_brightblazeAI(creature);
+        return GetInstanceAI<boss_eramas_brightblazeAI>(creature);
     }
 
     struct boss_eramas_brightblazeAI : public boss_priestess_lackey_commonAI
@@ -777,7 +777,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_yazzaiAI(creature);
+        return GetInstanceAI<boss_yazzaiAI>(creature);
     }
 
     struct boss_yazzaiAI : public boss_priestess_lackey_commonAI
@@ -915,7 +915,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_warlord_salarisAI(creature);
+        return GetInstanceAI<boss_warlord_salarisAI>(creature);
     }
 
     struct boss_warlord_salarisAI : public boss_priestess_lackey_commonAI
@@ -1043,7 +1043,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_garaxxasAI(creature);
+        return GetInstanceAI<boss_garaxxasAI>(creature);
     }
 
     struct boss_garaxxasAI : public boss_priestess_lackey_commonAI
@@ -1064,7 +1064,7 @@ public:
             Freezing_Trap_Timer = 15000;
         }
 
-        uint64 m_uiPetGUID;;
+        ObjectGuid m_uiPetGUID;
 
         uint32 Aimed_Shot_Timer;
         uint32 Shoot_Timer;
@@ -1159,7 +1159,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_apokoAI (creature);
+        return GetInstanceAI<boss_apokoAI>(creature);
     }
 
     struct boss_apokoAI : public boss_priestess_lackey_commonAI
@@ -1256,7 +1256,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_zelfanAI (creature);
+        return GetInstanceAI<boss_zelfanAI>(creature);
     }
 
     struct boss_zelfanAI : public boss_priestess_lackey_commonAI
@@ -1358,7 +1358,7 @@ void AddSC_boss_priestess_delrissa()
 {
     new boss_priestess_delrissa();
     new boss_kagani_nightstrike();
-    // new boss_ellris_duskhallow();
+    new boss_ellris_duskhallow();
     new boss_eramas_brightblaze();
     new boss_yazzai();
     new boss_warlord_salaris();

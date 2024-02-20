@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
- 
+ * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -96,7 +96,7 @@ public:
 
     CreatureAI* GetAI(Creature* c) const override
     {
-        return new boss_felblood_kaelthasAI(c);
+        return GetInstanceAI<boss_felblood_kaelthasAI>(c);
     }
 
     struct boss_felblood_kaelthasAI : public ScriptedAI
@@ -166,7 +166,7 @@ public:
             instance->SetBossState(DATA_KAELTHAS, DONE);
 
             // Enable the Translocation Orb Exit
-            if (GameObject* escapeOrb = ObjectAccessor::GetGameObject(*me, instance->GetData(DATA_ESCAPE_ORB)))
+            if (GameObject* escapeOrb = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(DATA_ESCAPE_ORB)))
                 escapeOrb->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
         }
 
@@ -253,7 +253,7 @@ public:
                     unit->CastSpell(unit, SPELL_GRAVITY_LAPSE_FLY, true, 0, 0, me->GetGUID());
                     // Use packet hack
                     WorldPacket data(SMSG_MOVE_SET_CAN_FLY, 12);
-                    data.append(unit->GetPackGUID());
+                    data << unit->GetPackGUID();
                     data << uint32(0);
                     unit->SendMessageToSet(&data, true);
                 }
@@ -273,7 +273,7 @@ public:
                     unit->RemoveAurasDueToSpell(SPELL_GRAVITY_LAPSE_DOT);
 
                     WorldPacket data(SMSG_MOVE_UNSET_CAN_FLY, 12);
-                    data.append(unit->GetPackGUID());
+                    data << unit->GetPackGUID();
                     data << uint32(0);
                     unit->SendMessageToSet(&data, true);
                 }
@@ -486,7 +486,7 @@ public:
 
     CreatureAI* GetAI(Creature* c) const override
     {
-        return new npc_felkael_phoenixAI (c);
+        return GetInstanceAI<npc_felkael_phoenixAI>(c);
     }
 
     struct npc_felkael_phoenixAI : public ScriptedAI
@@ -548,7 +548,7 @@ public:
                 me->ModifyAuraState(AURA_STATE_HEALTHLESS_35_PERCENT, false);
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                 me->ClearAllReactives();
-                me->SetTarget(0);
+                me->SetTarget(ObjectGuid::Empty);
                 me->GetMotionMaster()->Clear();
                 me->GetMotionMaster()->MoveIdle();
                 me->SetStandState(UNIT_STAND_STATE_DEAD);

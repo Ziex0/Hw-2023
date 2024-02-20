@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -22,27 +22,10 @@ namespace AuthHelper
 {
     static RealmBuildInfo const PostBcAcceptedClientBuilds[] =
     {
-		/*{20726, 6, 2, 3, ' '},
-		{20574, 6, 2, 2, 'a'},
-		{20490, 6, 2, 2, 'a'},
-		{18414, 5, 4, 8, ' '},        // Last version MoP
-        {18291, 5, 4, 8, ' '},
-        {18019, 5, 4, 7, ' '},
-        {17956, 5, 4, 7, ' '},
-        {17930, 5, 4, 7, ' '},
-        {17898, 5, 4, 7, ' '},
-        {17688, 5, 4, 2, 'a'},
-        {17658, 5, 4, 2, ' '},
-        {17538, 5, 4, 1, ' '},
-        {17399, 5, 4, 0, ' '},
-        {17128, 5, 3, 0, ' '},
-        {16769, 5, 2, 0, ' '},
-        {16357, 5, 1, 0, 'a'},
-        {16309, 5, 1, 0, ' '},
-        {16135, 5, 0, 5, 'b'},
         {15595, 4, 3, 4, ' '},
         {14545, 4, 2, 2, ' '},
-        {13623, 4, 0, 6, 'a'},*/
+        {13623, 4, 0, 6, 'a'},
+        {13930, 3, 3, 5, 'a'},                                  // 3.3.5a China Mainland build
         {12340, 3, 3, 5, 'a'},
         {11723, 3, 3, 3, 'a'},
         {11403, 3, 3, 2, ' '},
@@ -96,4 +79,4 @@ namespace AuthHelper
 
         return NULL;
     }
-};
+}

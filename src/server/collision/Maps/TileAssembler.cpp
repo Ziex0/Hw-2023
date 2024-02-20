@@ -1,6 +1,6 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
- 
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -98,7 +98,16 @@ namespace VMAP
 
             printf("Creating map tree for map %u...\n", map_iter->first);
             BIH pTree;
-            pTree.build(mapSpawns, BoundsTrait<ModelSpawn*>::getBounds);
+
+            try
+            {
+                pTree.build(mapSpawns, BoundsTrait<ModelSpawn*>::getBounds);
+            }
+            catch (std::exception& e)
+            {
+                printf("Exception ""%s"" when calling pTree.build", e.what());
+                return false;
+            }
 
             // ===> possibly move this code to StaticMapTree class
             std::map<uint32, uint32> modelNodeIdx;
@@ -152,23 +161,25 @@ namespace VMAP
                 uint32 x, y;
                 StaticMapTree::unpackTileID(tile->first, x, y);
                 tilefilename << std::setw(2) << x << '_' << std::setw(2) << y << ".vmtile";
-                FILE* tilefile = fopen(tilefilename.str().c_str(), "wb");
-                // file header
-                if (success && fwrite(VMAP_MAGIC, 1, 8, tilefile) != 8) success = false;
-                // write number of tile spawns
-                if (success && fwrite(&nSpawns, sizeof(uint32), 1, tilefile) != 1) success = false;
-                // write tile spawns
-                for (uint32 s=0; s<nSpawns; ++s)
+                if (FILE* tilefile = fopen(tilefilename.str().c_str(), "wb"))
                 {
-                    if (s)
-                        ++tile;
-                    const ModelSpawn &spawn2 = map_iter->second->UniqueEntries[tile->second];
-                    success = success && ModelSpawn::writeToFile(tilefile, spawn2);
-                    // MapTree nodes to update when loading tile:
-                    std::map<uint32, uint32>::iterator nIdx = modelNodeIdx.find(spawn2.ID);
-                    if (success && fwrite(&nIdx->second, sizeof(uint32), 1, tilefile) != 1) success = false;
+                    // file header
+                    if (success && fwrite(VMAP_MAGIC, 1, 8, tilefile) != 8) success = false;
+                    // write number of tile spawns
+                    if (success && fwrite(&nSpawns, sizeof(uint32), 1, tilefile) != 1) success = false;
+                    // write tile spawns
+                    for (uint32 s=0; s<nSpawns; ++s)
+                    {
+                        if (s)
+                            ++tile;
+                        const ModelSpawn &spawn2 = map_iter->second->UniqueEntries[tile->second];
+                        success = success && ModelSpawn::writeToFile(tilefile, spawn2);
+                        // MapTree nodes to update when loading tile:
+                        std::map<uint32, uint32>::iterator nIdx = modelNodeIdx.find(spawn2.ID);
+                        if (success && fwrite(&nIdx->second, sizeof(uint32), 1, tilefile) != 1) success = false;
+                    }
+                    fclose(tilefile);
                 }
-                fclose(tilefile);
             }
             // break; //test, extract only first map; TODO: remvoe this line
         }
@@ -225,7 +236,7 @@ namespace VMAP
             MapData::iterator map_iter = mapData.find(mapID);
             if (map_iter == mapData.end())
             {
-                printf("spawning Map %d\n", mapID);
+                printf("spawning Map %u\n", mapID);
                 mapData[mapID] = current = new MapSpawns();
             }
             else current = (*map_iter).second;
@@ -380,6 +391,18 @@ namespace VMAP
                 }
             }
 
+            if (bounds.isEmpty())
+            {
+                std::cout << "\nModel " << std::string(buff, name_length) << " has empty bounding box" << std::endl;
+                continue;
+            }
+
+            if (!bounds.isFinite())
+            {
+                std::cout << "\nModel " << std::string(buff, name_length) << " has invalid bounding box" << std::endl;
+                continue;
+            }
+
             fwrite(&displayId, sizeof(uint32), 1, model_list_copy);
             fwrite(&name_length, sizeof(uint32), 1, model_list_copy);
             fwrite(&buff, sizeof(char), name_length, model_list_copy);
@@ -497,7 +520,8 @@ namespace VMAP
             return false;
         }
 
-        char ident[8];
+        char ident[9];
+        ident[8] = '\0';
         int readOperation = 0;
 
         READ_OR_RETURN(&ident, 8);
@@ -516,7 +540,8 @@ namespace VMAP
         for (uint32 g = 0; g < groups && succeed; ++g)
             succeed = groupsArray[g].Read(rf);
 
-        fclose(rf);
+        if (succeed) /// rf will be freed inside Read if the function had any errors.
+            fclose(rf);
         return succeed;
     }
 

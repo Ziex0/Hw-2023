@@ -1,6 +1,6 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
- 
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -46,37 +46,28 @@ class instance_the_eye : public InstanceMapScript
 
         struct instance_the_eye_InstanceMapScript : public InstanceScript
         {
-            instance_the_eye_InstanceMapScript(Map* map) : InstanceScript(map) {}
-
-            uint64 ThaladredTheDarkener;
-            uint64 LordSanguinar;
-            uint64 GrandAstromancerCapernian;
-            uint64 MasterEngineerTelonicus;
-            uint64 Kaelthas;
-            uint64 Astromancer;
-            uint64 Alar;
-            uint8 KaelthasEventPhase;
-            uint8 AlarEventPhase;
-
-            uint32 m_auiEncounter[MAX_ENCOUNTER];
-
-            void Initialize()
+            instance_the_eye_InstanceMapScript(Map* map) : InstanceScript(map)
             {
+                SetHeaders(DataHeader);
                 memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
-
-                ThaladredTheDarkener = 0;
-                LordSanguinar = 0;
-                GrandAstromancerCapernian = 0;
-                MasterEngineerTelonicus = 0;
-                Kaelthas = 0;
-                Astromancer = 0;
-                Alar = 0;
 
                 KaelthasEventPhase = 0;
                 AlarEventPhase = 0;
             }
 
-            bool IsEncounterInProgress() const
+            ObjectGuid ThaladredTheDarkener;
+            ObjectGuid LordSanguinar;
+            ObjectGuid GrandAstromancerCapernian;
+            ObjectGuid MasterEngineerTelonicus;
+            ObjectGuid Kaelthas;
+            ObjectGuid Astromancer;
+            ObjectGuid Alar;
+            uint8 KaelthasEventPhase;
+            uint8 AlarEventPhase;
+
+            uint32 m_auiEncounter[MAX_ENCOUNTER];
+
+            bool IsEncounterInProgress() const override
             {
                 for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
                     if (m_auiEncounter[i] == IN_PROGRESS)
@@ -85,7 +76,7 @@ class instance_the_eye : public InstanceMapScript
                 return false;
             }
 
-            void OnCreatureCreate(Creature* creature)
+            void OnCreatureCreate(Creature* creature) override
             {
                 switch (creature->GetEntry())
                 {
@@ -113,7 +104,7 @@ class instance_the_eye : public InstanceMapScript
                 }
             }
 
-            uint64 GetData64(uint32 identifier) const
+            ObjectGuid GetGuidData(uint32 identifier) const override
             {
                 switch (identifier)
                 {
@@ -125,10 +116,10 @@ class instance_the_eye : public InstanceMapScript
                 case DATA_ASTROMANCER:                  return Astromancer;
                 case DATA_ALAR:                         return Alar;
                 }
-                return 0;
+                return ObjectGuid::Empty;
             }
 
-            void SetData(uint32 type, uint32 data)
+            void SetData(uint32 type, uint32 data) override
             {
                 switch (type)
                 {
@@ -151,7 +142,7 @@ class instance_the_eye : public InstanceMapScript
                     SaveToDB();
             }
 
-            uint32 GetData(uint32 type) const
+            uint32 GetData(uint32 type) const override
             {
                 switch (type)
                 {
@@ -163,7 +154,7 @@ class instance_the_eye : public InstanceMapScript
                 return 0;
             }
 
-            std::string GetSaveData()
+            std::string GetSaveData() override
             {
                 OUT_SAVE_INST_DATA;
 
@@ -174,7 +165,7 @@ class instance_the_eye : public InstanceMapScript
                 return stream.str();
             }
 
-            void Load(const char* in)
+            void Load(const char* in) override
             {
                 if (!in)
                 {
@@ -192,7 +183,7 @@ class instance_the_eye : public InstanceMapScript
             }
         };
 
-        InstanceScript* GetInstanceScript(InstanceMap* map) const
+        InstanceScript* GetInstanceScript(InstanceMap* map) const override
         {
             return new instance_the_eye_InstanceMapScript(map);
         }

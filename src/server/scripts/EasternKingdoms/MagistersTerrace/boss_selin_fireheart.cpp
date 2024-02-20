@@ -88,7 +88,7 @@ class boss_selin_fireheart : public CreatureScript
                 }
 
                 _Reset();
-                std::list<uint64> Crystals;
+                CrystalGUID.Clear();
                 _scheduledEvents = false;
             }
 
@@ -220,7 +220,7 @@ class boss_selin_fireheart : public CreatureScript
                             if (CrystalChosen && CrystalChosen->IsAlive())
                                 CrystalChosen->Kill(CrystalChosen);
 
-                            std::list<uint64> Crystals;
+                            CrystalGUID.Clear();
 
                             me->GetMotionMaster()->Clear();
                             me->GetMotionMaster()->MoveChase(me->GetVictim());
@@ -254,13 +254,13 @@ class boss_selin_fireheart : public CreatureScript
 
         private:
             std::list<Creature*> Crystals;
-            uint32 CrystalGUID;
+            ObjectGuid CrystalGUID;
             bool _scheduledEvents;
         };
 
         CreatureAI* GetAI(Creature* creature) const override
         {
-            return new boss_selin_fireheartAI(creature);
+            return GetInstanceAI<boss_selin_fireheartAI>(creature);
         };
 };
 
@@ -277,7 +277,7 @@ class npc_fel_crystal : public CreatureScript
             {
                 if (InstanceScript* instance = me->GetInstanceScript())
                 {
-                    Creature* Selin = ObjectAccessor::GetCreature(*me, instance->GetData(DATA_SELIN));
+                    Creature* Selin = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_SELIN));
                     if (Selin && Selin->IsAlive())
                         Selin->AI()->DoAction(ACTION_SWITCH_PHASE);
                 }
@@ -286,7 +286,7 @@ class npc_fel_crystal : public CreatureScript
 
         CreatureAI* GetAI(Creature* creature) const override
         {
-            return new npc_fel_crystalAI(creature);
+            return GetInstanceAI<npc_fel_crystalAI>(creature);
         };
 };
 

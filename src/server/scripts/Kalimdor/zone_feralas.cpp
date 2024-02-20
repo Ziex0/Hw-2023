@@ -1,6 +1,6 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
- 
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -19,7 +19,7 @@
 /* ScriptData
 SDName: Feralas
 SD%Complete: 100
-SDComment: Quest support: 3520, 2767, Special vendor Gregan Brewspewer
+SDComment: Quest support: 2767, Special vendor Gregan Brewspewer
 SDCategory: Feralas
 EndScriptData */
 
@@ -42,7 +42,7 @@ class npc_gregan_brewspewer : public CreatureScript
 public:
     npc_gregan_brewspewer() : CreatureScript("npc_gregan_brewspewer") { }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
     {
         player->PlayerTalkClass->ClearMenus();
         if (action == GOSSIP_ACTION_INFO_DEF+1)
@@ -55,12 +55,12 @@ public:
         return true;
     }
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    bool OnGossipHello(Player* player, Creature* creature) override
     {
-        if (creature->isQuestGiver())
+        if (creature->IsQuestGiver())
             player->PrepareQuestMenu(creature->GetGUID());
 
-        if (creature->isVendor() && player->GetQuestStatus(3909) == QUEST_STATUS_INCOMPLETE)
+        if (creature->IsVendor() && player->GetQuestStatus(3909) == QUEST_STATUS_INCOMPLETE)
             player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_HELLO, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
 
         player->SEND_GOSSIP_MENU(2433, creature->GetGUID());
@@ -97,7 +97,7 @@ class npc_oox22fe : public CreatureScript
 public:
     npc_oox22fe() : CreatureScript("npc_oox22fe") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest)
+    bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest) override
     {
         if (quest->GetQuestId() == QUEST_RESCUE_OOX22FE)
         {
@@ -118,7 +118,7 @@ public:
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_oox22feAI(creature);
     }
@@ -127,7 +127,7 @@ public:
     {
         npc_oox22feAI(Creature* creature) : npc_escortAI(creature) { }
 
-        void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 waypointId) override
         {
             switch (waypointId)
             {
@@ -162,44 +162,24 @@ public:
             }
         }
 
-        void Reset()
+        void Reset() override
         {
             if (!HasEscortState(STATE_ESCORT_ESCORTING))
                 me->SetStandState(UNIT_STAND_STATE_DEAD);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             //For an small probability the npc says something when he get aggro
             if (urand(0, 9) > 7)
                 Talk(SAY_OOX_AGGRO);
         }
 
-        void JustSummoned(Creature* summoned)
+        void JustSummoned(Creature* summoned) override
         {
             summoned->AI()->AttackStart(me);
         }
     };
-
-};
-
-/*######
-## npc_screecher_spirit
-######*/
-
-class npc_screecher_spirit : public CreatureScript
-{
-public:
-    npc_screecher_spirit() : CreatureScript("npc_screecher_spirit") { }
-
-    bool OnGossipHello(Player* player, Creature* creature)
-    {
-        player->SEND_GOSSIP_MENU(2039, creature->GetGUID());
-        player->TalkedToCreature(creature->GetEntry(), creature->GetGUID());
-        creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-
-        return true;
-    }
 
 };
 
@@ -227,13 +207,13 @@ class spell_gordunni_trap : public SpellScriptLoader
                     }
             }
 
-            void Register()
+            void Register() override
             {
                 OnCast += SpellCastFn(spell_gordunni_trap_SpellScript::HandleDummy);
             }
         };
 
-        SpellScript* GetSpellScript() const
+        SpellScript* GetSpellScript() const override
         {
             return new spell_gordunni_trap_SpellScript();
         }
@@ -247,6 +227,5 @@ void AddSC_feralas()
 {
     new npc_gregan_brewspewer();
     new npc_oox22fe();
-    new npc_screecher_spirit();
     new spell_gordunni_trap();
 }

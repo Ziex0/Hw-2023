@@ -1,6 +1,6 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
- 
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -85,33 +85,42 @@ enum NPCs
 
 class boss_venoxis : public CreatureScript
 {
-    public: boss_venoxis() : CreatureScript("boss_venoxis") {}
+    public:
+        boss_venoxis() : CreatureScript("boss_venoxis") { }
 
         struct boss_venoxisAI : public BossAI
         {
-            boss_venoxisAI(Creature* creature) : BossAI(creature, DATA_VENOXIS) {}
+            boss_venoxisAI(Creature* creature) : BossAI(creature, DATA_VENOXIS)
+            {
+                Initialize();
+            }
 
-            void Reset()
+            void Initialize()
+            {
+                _inMeleeRange = 0;
+                _transformed = false;
+                _frenzied = false;
+            }
+
+            void Reset() override
             {
                 _Reset();
                 // remove all spells and auras from previous attempts
                 me->RemoveAllAuras();
                 me->SetReactState(REACT_PASSIVE);
                 // set some internally used variables to their defaults
-                _inMeleeRange = 0;
-                _transformed = false;
-                _frenzied = false;
+                Initialize();
                 events.SetPhase(PHASE_ONE);
             }
 
-            void JustDied(Unit* /*killer*/)
+            void JustDied(Unit* /*killer*/) override
             {
                 _JustDied();
                 Talk(SAY_VENOXIS_DEATH);
                 me->RemoveAllAuras();
             }
 
-            void EnterCombat(Unit* /*who*/)
+            void EnterCombat(Unit* /*who*/) override
             {
                 _EnterCombat();
                 me->SetReactState(REACT_AGGRESSIVE);
@@ -130,7 +139,7 @@ class boss_venoxis : public CreatureScript
                 DoZoneInCombat();
             }
 
-            void DamageTaken(Unit* /*attacker*/, uint32& /*damage*/)
+            void DamageTaken(Unit* /*attacker*/, uint32& /*damage*/) override
             {
                 // check if venoxis is ready to transform
                 if (!_transformed && !HealthAbovePct(50))
@@ -147,7 +156,7 @@ class boss_venoxis : public CreatureScript
                 }
             }
 
-            void UpdateAI(uint32 diff)
+            void UpdateAI(uint32 diff) override
             {
                 if (!UpdateVictim())
                     return;
@@ -167,7 +176,6 @@ class boss_venoxis : public CreatureScript
                             DoCast(me, SPELL_THRASH, true);
                             events.ScheduleEvent(EVENT_THRASH, urand(10000, 20000));
                             break;
-
                         // troll form spells and Actions (first part)
                         case EVENT_DISPEL_MAGIC:
                             DoCast(me, SPELL_DISPEL_MAGIC);
@@ -190,7 +198,7 @@ class boss_venoxis : public CreatureScript
 
                             // trigger spellcast only if we have 3 or more targets to affect
                             if (_inMeleeRange >= 3)
-                                DoCast(me->GetVictim(), SPELL_HOLY_NOVA);
+                                DoCastVictim(SPELL_HOLY_NOVA);
 
                             events.ScheduleEvent(EVENT_HOLY_NOVA, urand(45000, 75000), 0, PHASE_ONE);
                             break;
@@ -262,7 +270,7 @@ class boss_venoxis : public CreatureScript
             bool _frenzied;
         };
 
-        CreatureAI* GetAI(Creature* creature) const
+        CreatureAI* GetAI(Creature* creature) const override
         {
             return new boss_venoxisAI(creature);
         }

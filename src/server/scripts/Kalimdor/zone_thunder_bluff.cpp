@@ -1,6 +1,6 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
- 
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -48,7 +48,7 @@ class npc_cairne_bloodhoof : public CreatureScript
 public:
     npc_cairne_bloodhoof() : CreatureScript("npc_cairne_bloodhoof") { }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
     {
         player->PlayerTalkClass->ClearMenus();
         if (action == GOSSIP_SENDER_INFO)
@@ -59,9 +59,9 @@ public:
         return true;
     }
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    bool OnGossipHello(Player* player, Creature* creature) override
     {
-        if (creature->isQuestGiver())
+        if (creature->IsQuestGiver())
             player->PrepareQuestMenu(creature->GetGUID());
 
         if (player->GetQuestStatus(925) == QUEST_STATUS_INCOMPLETE)
@@ -72,22 +72,19 @@ public:
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_cairne_bloodhoofAI (creature);
+        return new npc_cairne_bloodhoofAI(creature);
     }
 
     struct npc_cairne_bloodhoofAI : public ScriptedAI
     {
-        npc_cairne_bloodhoofAI(Creature* creature) : ScriptedAI(creature) {}
+        npc_cairne_bloodhoofAI(Creature* creature) : ScriptedAI(creature)
+        {
+            Initialize();
+        }
 
-        uint32 BerserkerChargeTimer;
-        uint32 CleaveTimer;
-        uint32 MortalStrikeTimer;
-        uint32 ThunderclapTimer;
-        uint32 UppercutTimer;
-
-        void Reset()
+        void Initialize()
         {
             BerserkerChargeTimer = 30000;
             CleaveTimer = 5000;
@@ -96,9 +93,20 @@ public:
             UppercutTimer = 10000;
         }
 
-        void EnterCombat(Unit* /*who*/) {}
+        uint32 BerserkerChargeTimer;
+        uint32 CleaveTimer;
+        uint32 MortalStrikeTimer;
+        uint32 ThunderclapTimer;
+        uint32 UppercutTimer;
 
-        void UpdateAI(uint32 diff)
+        void Reset() override
+        {
+            Initialize();
+        }
+
+        void EnterCombat(Unit* /*who*/) override { }
+
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -112,25 +120,25 @@ public:
 
             if (UppercutTimer <= diff)
             {
-                DoCast(me->GetVictim(), SPELL_UPPERCUT);
+                DoCastVictim(SPELL_UPPERCUT);
                 UppercutTimer = 20000;
             } else UppercutTimer -= diff;
 
             if (ThunderclapTimer <= diff)
             {
-                DoCast(me->GetVictim(), SPELL_THUNDERCLAP);
+                DoCastVictim(SPELL_THUNDERCLAP);
                 ThunderclapTimer = 15000;
             } else ThunderclapTimer -= diff;
 
             if (MortalStrikeTimer <= diff)
             {
-                DoCast(me->GetVictim(), SPELL_MORTAL_STRIKE);
+                DoCastVictim(SPELL_MORTAL_STRIKE);
                 MortalStrikeTimer = 15000;
             } else MortalStrikeTimer -= diff;
 
             if (CleaveTimer <= diff)
             {
-                DoCast(me->GetVictim(), SPELL_CLEAVE);
+                DoCastVictim(SPELL_CLEAVE);
                 CleaveTimer = 7000;
             } else CleaveTimer -= diff;
 

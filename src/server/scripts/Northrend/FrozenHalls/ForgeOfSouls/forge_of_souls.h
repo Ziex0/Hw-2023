@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -19,6 +19,7 @@
 #define DEF_FORGE_OF_SOULS_H
 
 #define FoSScriptName "instance_forge_of_souls"
+#define DataHeader    "FOS"
 
 enum Data
 {

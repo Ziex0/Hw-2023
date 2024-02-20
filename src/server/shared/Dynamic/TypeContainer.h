@@ -1,6 +1,6 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
- 
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -60,7 +60,7 @@ template<class OBJECT> struct ContainerArrayList
 };
 
 // termination condition
-template<> struct ContainerArrayList<TypeNull> {};
+template<> struct ContainerArrayList<TypeNull> { };
 // recursion
 template<class H, class T> struct ContainerArrayList<TypeList<H, T> >
 {
@@ -78,7 +78,7 @@ template<class OBJECT> struct ContainerList
 };
 
 /* TypeNull is underfined */
-template<> struct ContainerList<TypeNull> {};
+template<> struct ContainerList<TypeNull> { };
 template<class H, class T> struct ContainerList<TypeList<H, T> >
 {
     ContainerList<H> _elements;

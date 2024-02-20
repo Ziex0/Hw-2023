@@ -1,4 +1,4 @@
-# Copyright (C) 2008-2013 Trinity <http://www.trinitycore.org/>
+# Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
 #
 # This file is free software; as a special exception the author gives
 # unlimited permission to copy and/or distribute it, with or without
@@ -7,6 +7,7 @@
 # This program is distributed in the hope that it will be useful, but
 # WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
 # User has manually chosen to ignore the git-tests, so throw them a warning.
 # This is done EACH compile so they can be alerted about the consequences.
 
@@ -18,9 +19,9 @@ if(NOT BUILDDIR)
 endif()
 
 if(NO_GIT)
-	set(rev_date "2024 01-01-01")
-	set(rev_hash "j4n2024zi3")
-	set(rev_branch "335a")
+  set(rev_date "1970-01-01 00:00:00 +0000")
+  set(rev_hash "unknown")
+  set(rev_branch "Archived")
 else()
   if(GIT_EXEC)
     # Create a revision-string that we can use
@@ -40,7 +41,7 @@ else()
       OUTPUT_STRIP_TRAILING_WHITESPACE
       ERROR_QUIET
     )
-    
+
     # Also retrieve branch name
     execute_process(
       COMMAND "${GIT_EXEC}" rev-parse --abbrev-ref HEAD
@@ -56,11 +57,11 @@ else()
   if(NOT rev_info)
     # No valid ways available to find/set the revision/hash, so let's force some defaults
     message(STATUS "
-    # Could not find a proper repository signature (hash) - you may need to pull tags with git fetch -t
-    Continuing anyway - note that the versionstring will be set to \"2024 01-01-01 (Re-Life)"\")
-    set(rev_date "2024 01-01-01")
-	set(rev_hash "j4n2024zi3")
-	set(rev_branch "335a")
+    Could not find a proper repository signature (hash) - you may need to pull tags with git fetch -t
+    Continuing anyway - note that the versionstring will be set to \"unknown 1970-01-01 00:00:00 (Archived)\"")
+    set(rev_date "1970-01-01 00:00:00 +0000")
+    set(rev_hash "unknown")
+    set(rev_branch "Archived")
   else()
     # Extract information required to build a proper versionstring
     string(REGEX REPLACE init-|[0-9]+-g "" rev_hash ${rev_info})

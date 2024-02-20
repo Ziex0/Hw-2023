@@ -1,1959 +1,1382 @@
 /*
- * Copyright (C) 2008-2013 Trinity <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation; either version 2 of the License, or (at your
+ * option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- * Updated by: Toba and Baeumchen (maddin)
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "icecrown_citadel.h"
-#include "MapManager.h"
-#include "Transport.h"
-#include "Vehicle.h"
-#include "Group.h"
-#include "ObjectMgr.h"
-#include "Object.h"
+#include "CellImpl.h"
+#include "CreatureTextMgr.h"
+#include "GridNotifiersImpl.h"
+#include "GossipDef.h"
+#include "MoveSpline.h"
+#include "MoveSplineInit.h"
+#include "PassiveAI.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-#include "SpellAuras.h"
+#include "SpellAuraEffects.h"
 #include "SpellScript.h"
+#include "Transport.h"
+#include "TransportMgr.h"
+#include "Vehicle.h"
+#include "icecrown_citadel.h"
 
-enum eAchievements
+enum Texts
 {
-    IM_ON_A_BOAT_10    = 4536,
-    IM_ON_A_BOAT_25    = 4612
-};
+    // High Overlord Saurfang
+    SAY_SAURFANG_INTRO_1                = 0,
+    SAY_SAURFANG_INTRO_2                = 1,
+    SAY_SAURFANG_INTRO_3                = 2,
+    SAY_SAURFANG_INTRO_4                = 3,
+    SAY_SAURFANG_INTRO_5                = 4,
+    SAY_SAURFANG_INTRO_6                = 5,
+    SAY_SAURFANG_INTRO_A                = 6,
+    SAY_SAURFANG_BOARD                  = 7,
+    SAY_SAURFANG_ENTER_SKYBREAKER       = 8,
+    SAY_SAURFANG_AXETHROWERS            = 9,
+    SAY_SAURFANG_ROCKETEERS             = 10,
+    SAY_SAURFANG_MAGES                  = 11,
+    SAY_SAURFANG_VICTORY                = 12,
+    SAY_SAURFANG_WIPE                   = 13,
 
-enum Actions
-{
-    ACTION_INTRO_START             = 1,
-    ACTION_BATTLE_EVENT            = 2,
-    ACTION_MAGE_DIE                = 3,
-    ACTION_ROCK_DIE                = 4,
-    ACTION_AXES_RIFL_DIE           = 5,
-    ACTION_DONE                    = 6,
-    ACTION_FAIL                    = 7,
-};
+    // Muradin Bronzebeard
+    SAY_MURADIN_INTRO_1                 = 0,
+    SAY_MURADIN_INTRO_2                 = 1,
+    SAY_MURADIN_INTRO_3                 = 2,
+    SAY_MURADIN_INTRO_4                 = 3,
+    SAY_MURADIN_INTRO_5                 = 4,
+    SAY_MURADIN_INTRO_6                 = 5,
+    SAY_MURADIN_INTRO_7                 = 6,
+    SAY_MURADIN_INTRO_H                 = 7,
+    SAY_MURADIN_BOARD                   = 8,
+    SAY_MURADIN_ENTER_ORGRIMMS_HAMMER   = 9,
+    SAY_MURADIN_RIFLEMAN                = 10,
+    SAY_MURADIN_MORTAR                  = 11,
+    SAY_MURADIN_SORCERERS               = 12,
+    SAY_MURADIN_VICTORY                 = 13,
+    SAY_MURADIN_WIPE                    = 14,
 
-enum Spells
-{
-    SPELL_BURNING_PITCH_A             = 71335,
-    SPELL_BURNING_PITCH_H             = 71339,
-    SPELL_BURNING_PITCH_SIEGE_DMG_A   = 70383,
-    SPELL_BURNING_PITCH_SIEGE_DMG_H   = 70374,
-    SPELL_BURNING_PITCH_AOE_DAMAGE    = 69660,
+    SAY_ZAFOD_ROCKET_PACK_ACTIVE        = 0,
+    SAY_ZAFOD_ROCKET_PACK_DISABLED      = 1,
 
-    SPELL_WOUNDING_STRIKE_10_NM       = 69651,
-    SPELL_WOUNDING_STRIKE_10_HM       = 72570,
-    SPELL_WOUNDING_STRIKE_25_NM       = 72569,
-    SPELL_WOUNDING_STRIKE_25_HM       = 72571,
-
-    SPELL_TELEPORT_VISUAL             = 64446,
-    SPELL_BLADESTORM                  = 69652,
-    SPELL_BLADESTORM_TRIGGER          = 69653,
-
-    // Cannon
-    SPELL_HEAT_DRAIN                  = 69470,
-    SPELL_OVERHEAT                    = 69487, // Triggers spell #69488 every 0.25s. It should consume 10 Energy but does not.
-    SPELL_CANNON_BLAST                = 69399,
-    SPELL_INCINERATING_BLAST          = 69401,
-
-    // Auras
-    SPELL_ON_ORGRIMS_HAMMERS_DECK     = 70121,
-    SPELL_ON_SKYBREAKERS_DECK         = 70120,
-
-    // Achievement spell required target
-    SPELL_ACHIEVEMENT                 = 72959,
-
-    // Rampart of Skulls NPCs Spells
-    // Kor'kron Primalist
-    SPELL_WRATH                       = 69968,
-    SPELL_HEALING_TOUCH               = 69899,
-    SPELL_REGROWTH                    = 69882,
-    SPELL_REJUVENATION                = 69898,
-
-    SPELL_SUMMON_BATTLE_STANDART_A    = 69810,
-    SPELL_SUMMON_BATTLE_STANDART_H    = 69811,
-
-    // Kor'kron Defender
-    SPELL_DEVASTATE                   = 69902,
-    SPELL_THUNDERCLAP                 = 69965,
-    SPELL_SUNDER_ARMOR                = 57807,
-    SPELL_SPELL_REFLECT               = 69901,
-
-    // Skybreaker Vindicator
-    SPELL_AVENGERS_SHIELD             = 69927,
-    SPELL_CONCENTRATION               = 69930,
-    SPELL_HOLY_WRATH                  = 69934,
-
-    // Frostwyrm
-    SPELL_FROST_BREATH                = 70116,
-    SPELL_BLIZZARD                    = 70362,
-    SPELL_FROST_CLEAVE                = 70361,
-
-    // Muradin Bronzebeard / High Overlord Saurfang
-    SPELL_CLEAVE                      = 15284,
-    SPELL_RENDING_THROW               = 70309,
-    SPELL_TASTE_OF_BLOOD              = 69634,
-
-    // Kor'kron Battle-mage & Skybreaker Sorcerer
-    SPELL_BELOW_ZERO                  = 69705,
-    SPELL_SHADOW_CHANNELING           = 45104,
-
-    // Experience spells
-    SPELL_EXPERIENCED                 = 71188,
-    SPELL_VETERAN                     = 71193,
-    SPELL_ELITE                       = 71195,
-    SPELL_DESPERATE_RESOLVE_10_NM     = 69647,
-    SPELL_DESPERATE_RESOLVE_10_HM     = 72537,
-    SPELL_DESPERATE_RESOLVE_25_NM     = 72536,
-    SPELL_DESPERATE_RESOLVE_25_HM     = 72538,
-
-    // Kor'kron Axethrower & Skybreaker Rifleman
-    SPELL_HURL_AXE                    = 70161,
-    SPELL_SHOOT                       = 70162,
-
-    // Kor'kron Rocketeer & Skybreaker Mortar Soldier
-    SPELL_ROCKET_ARTILLERY_MARKER     = 71371,
-    SPELL_ROCKET_ARTILLERY_TRIGGERED  = 69679,
-    SPELL_ROCKET_ARTILLERY_HORDE      = 69678,
-    SPELL_ROCKET_ARTILLERY_ALLIANCE   = 70609,
-    SPELL_EXPLOSION                   = 69680,
-
-    // Ship Explsion
-    SPELL_SHIP_EXPLOSION              = 72137,
-
-    // Remove Rocket Packs
-    SPELL_REMOVE_ROCKET_PACK          = 70713,
-
-    // Achievements
-    SPELL_ACHIEVEMENT_CHECK           = 72959,
+    SAY_OVERHEAT                        = 0
 };
 
 enum Events
 {
-    EVENT_NULL,
-    EVENT_INTRO_ALLIANCE_1, // Muradin Bronzebeard yells: Fire up the engines! We got a meetin' with destiny, lads!
-    EVENT_INTRO_ALLIANCE_2, // Muradin Bronzebeard yells: Hold on to yer hats!
-    EVENT_INTRO_ALLIANCE_3, // Muradin Bronzebeard yells: What in the world is that? Grab me spyglass, crewman!
-    EVENT_INTRO_ALLIANCE_4, // Muradin Bronzebeard yells: By me own beard! HORDE SAILIN' IN FAST 'N HOT!
-    EVENT_INTRO_ALLIANCE_5, // Muradin Bronzebeard yells: EVASIVE ACTION! MAN THE GUNS!
-    EVENT_INTRO_ALLIANCE_6, // Muradin Bronzebeard yells: Cowardly dogs! Ye blindsided us!
-    EVENT_INTRO_ALLIANCE_7, // High Overlord Saurfang yells: This is not your battle, dwarf. Back down or we will be forced to destroy your ship.
-    EVENT_INTRO_ALLIANCE_8, // Muradin Bronzebeard yells: Not me battle? I dunnae who ye think ye are, mister, but I got a score to settle with Arthas and yer not gettin' in me way! FIRE ALL GUNS! FIRE! FIRE!
-
-    EVENT_INTRO_HORDE_1, // High Overlord Saurfang yells: Rise up, sons and daughters of the Horde! Today we battle a hated enemy of the Horde! LOK'TAR OGAR! Kor'kron, take us out!
-    EVENT_INTRO_HORDE_1_1, // Kor'kron, take us out!
-    EVENT_INTRO_HORDE_2, // High Overlord Saurfang yells: What is that?! Something approaching in the distance!
-    EVENT_INTRO_HORDE_3, // High Overlord Saurfang yells: ALLIANCE GUNSHIP! ALL HANDS ON DECK!
-    EVENT_INTRO_HORDE_4, // Muradin Bronzebeard yells: Move yer jalopy or we'll blow it out of the sky, orc! The Horde's got no business here!
-    EVENT_INTRO_HORDE_5, // High Overlord Saurfang yells: You will know our business soon! KOR'KRON, ANNIHILATE THEM!
-
-    EVENT_OUTRO_ALLIANCE_1,
-    EVENT_OUTRO_ALLIANCE_2,
-    EVENT_OUTRO_ALLIANCE_3,
-
-    EVENT_OUTRO_HORDE_1,
-    EVENT_OUTRO_HORDE_2,
-    EVENT_OUTRO_HORDE_3,
-    
-   //Fly
-    EVENT_START_FLY,
-
-   //Misc battle
-    EVENT_WALK_MOBS,
-    EVENT_SUMMON_PORTAL,
-    EVENT_FREEZE_CANNON,
-    EVENT_SHADOW_CHANNELING,
-    EVENT_UNSUMMON_PORTAL,
-    EVENT_BOARDING_GUNSHIP,
-    EVENT_BOARDING_TALK,
-    EVENT_BURNING_PITCH,
-    EVENT_WOUNDING_STRIKE,
-    EVENT_BLADE_STORM,
-    EVENT_DONE,
-    EVENT_FAIL,
-    EVENT_RESTART_EVENT,
-    EVENT_BOARDING_REAVERS_MARINE,
-    EVENT_WIPE_CHECK,
-
-   // Rampart of Skulls NPCs Events
-    EVENT_WRATH,
-    EVENT_HEAL,
-
-    EVENT_SUNDER_ARMOR,
-    EVENT_SPELL_REFLECT,
-    EVENT_THUNDERCLAP,
-    EVENT_DEVASTATE,
-
-    EVENT_FROST_BREATH,
-    EVENT_BLIZZARD,
-    EVENT_CLEAVE,
-
-    // Skybreaker Vindicator
-    EVENT_AVENGERS_SHILED,
-    EVENT_CONCENTRATION,
-    EVENT_HOLY_WRATH,
-
-    // First Squad Assisted
-    EVENT_FIRST_SQUAD_ASSISTED_1,
-    EVENT_FIRST_SQUAD_ASSISTED_2,
-
-    // Second Squad Assisted
-    EVENT_SECOND_SQUAD_ASSISTED_1,
-    EVENT_SECOND_SQUAD_ASSISTED_2,
-    EVENT_SECOND_SQUAD_ASSISTED_3,
-
-    // Shared experience events
-    EVENT_EXPERIENCED,
-    EVENT_VETERAN,
-    EVENT_ELITE,
-    EVENT_ATACK_START,
-
-    // Kor'kron Axethrower & Skybreaker Rifleman
-    EVENT_HURL_AXE,
-    EVENT_SHOOT,
-
-    // Kor'kron Rocketeer & Skybreaker Mortar Soldier
-    EVENT_ROCKET_ART,
-
-    // Muradin Bronzebeard & High Overlord Saurfang
-    EVENT_RENDING_THROW,
-    EVENT_TASTE_OF_BLOOD,
-
-    // Misc (used in various NPCs)
-    EVENT_SPAWN_MAGE,
-    EVENT_RESPAWN_AXES_RIFLEMEN,
-    EVENT_RESPAWN_ROCKETEER,
-};
-
-enum Texts
-{
-    // Kor'kron Primalist
-    SAY_FIRST_SQUAD_RESCUED_HORDE_0  = 0,
-
-    // Kor'kron Invoker
-    SAY_FIRST_SQUAD_RESCUED_HORDE_1  = 0,
-
-    // Kor'kron Defender
-    SAY_SECOND_SQUAD_RESCUED_HORDE_0 = 0,
-    SAY_SECOND_SQUAD_RESCUED_HORDE_1 = 1,
-    SAY_FROSTWYRM_SUMMON_0           = 2,
-    SAY_FROSTWYRM_SUMMON_1           = 3,
-
-    // Skybreaker Vindicator
-    SAY_FIRST_SQUAD_RESCUED_ALLIANCE_0  = 0,
-
-    // Skybreaker Sorcerer
-    SAY_FIRST_SQUAD_RESCUED_ALLIANCE_1  = 0,
-
-    // Skybreaker Protector
-    SAY_SECOND_SQUAD_RESCUED_ALLIANCE_0 = 0,
-    SAY_SECOND_SQUAD_RESCUED_ALLIANCE_1 = 1,
-    SAY_SECOND_SQUAD_RESCUED_ALLIANCE_2 = 2,
-
-    // Kor'kron Invoker & Skybreaker Sorcerer
-    SAY_SUMMON_BATTLE_STANDARD          = 1,
-
-    // Froswyrm
-    SAY_FROSTWYRM_LAND_H_0           = 0,
-    SAY_FROSTWYRM_LAND_A_1           = 1,
+    // High Overlord Saurfang
+    EVENT_INTRO_H_1                 = 1,
+    EVENT_INTRO_H_2                 = 2,
+    EVENT_INTRO_SUMMON_SKYBREAKER   = 3,
+    EVENT_INTRO_H_3                 = 4,
+    EVENT_INTRO_H_4                 = 5,
+    EVENT_INTRO_H_5                 = 6,
+    EVENT_INTRO_H_6                 = 7,
 
     // Muradin Bronzebeard
-    SAY_INTRO_ALLIANCE_0             = 0,
-    SAY_INTRO_ALLIANCE_1             = 1,
-    SAY_INTRO_ALLIANCE_2             = 2,
-    SAY_INTRO_ALLIANCE_3             = 3,
-    SAY_INTRO_ALLIANCE_4             = 4,
-    SAY_INTRO_ALLIANCE_5             = 5,
-    SAY_INTRO_ALLIANCE_7             = 6,
-    SAY_INTRO_HORDE_3                = 7,
-    SAY_BOARDING_SKYBREAKER_1        = 8,
-    SAY_BOARDING_ORGRIMS_HAMMER_0    = 9,
-    SAY_NEW_RIFLEMEN_SPAWNED         = 10,
-    SAY_NEW_MORTAR_TEAM_SPAWNED      = 11,
-    SAY_NEW_MAGE_SPAWNED             = 12,
-    SAY_ALLIANCE_VICTORY             = 13,
-    SAY_ALLIANCE_DEFEAT              = 14, // How will we handle that case ? Ie. the player loses
+    EVENT_INTRO_A_1                 = 1,
+    EVENT_INTRO_A_2                 = 2,
+    EVENT_INTRO_SUMMON_ORGRIMS_HAMMER = 3,
+    EVENT_INTRO_A_3                 = 4,
+    EVENT_INTRO_A_4                 = 5,
+    EVENT_INTRO_A_5                 = 6,
+    EVENT_INTRO_A_6                 = 7,
+    EVENT_INTRO_A_7                 = 8,
 
+    EVENT_KEEP_PLAYER_IN_COMBAT     = 9,
+    EVENT_SUMMON_MAGE               = 10,
+    EVENT_ADDS                      = 11,
+    EVENT_ADDS_BOARD_YELL           = 12,
+    EVENT_CHECK_RIFLEMAN            = 13,
+    EVENT_CHECK_MORTAR              = 14,
+    EVENT_CLEAVE                    = 15,
+
+    EVENT_BLADESTORM                = 16,
+    EVENT_WOUNDING_STRIKE           = 17
+};
+
+enum Spells
+{
+    // Applied on friendly transport NPCs
+    SPELL_FRIENDLY_BOSS_DAMAGE_MOD          = 70339,
+    SPELL_CHECK_FOR_PLAYERS                 = 70332,
+    SPELL_GUNSHIP_FALL_TELEPORT             = 67335,
+    SPELL_TELEPORT_PLAYERS_ON_RESET_A       = 70446,
+    SPELL_TELEPORT_PLAYERS_ON_RESET_H       = 71284,
+    SPELL_TELEPORT_PLAYERS_ON_VICTORY       = 72340,
+    SPELL_ACHIEVEMENT                       = 72959,
+    SPELL_AWARD_REPUTATION_BOSS_KILL        = 73843,
+
+    // Murading Bronzebeard
     // High Overlord Saurfang
-    SAY_INTRO_HORDE_0                = 0,
-    SAY_INTRO_HORDE_0_1              = 1,
-    SAY_INTRO_HORDE_1                = 2,
-    SAY_INTRO_HORDE_2                = 3,
-    SAY_INTRO_HORDE_4                = 4,
-    SAY_BOARDING_SKYBREAKER_0        = 5,
-    SAY_BOARDING_ORGRIMS_HAMMER_1    = 6,
-    SAY_NEW_AXETHROWER_SPAWNED       = 7,
-    SAY_NEW_ROCKETEERS_SPAWNED       = 8,
-    SAY_NEW_BATTLE_MAGE_SPAWNED      = 9,
-    SAY_HORDE_VICTORY                = 10,
-    SAY_HORDE_DEFEAT                 = 11,
+    SPELL_BATTLE_FURY                       = 69637,
+    SPELL_RENDING_THROW                     = 70309,
+    SPELL_CLEAVE                            = 15284,
+    SPELL_TASTE_OF_BLOOD                    = 69634,
 
-    SAY_HIGH_OVERLORD_SAURFANG_NOT_VISUAL = 0,
-    SAY_BOARDING_SKYBREAKER_SAURFANG      = 1,
-    SAY_MURADIN_BRONZEBEARD_NOT_VISUAL    = 0,
-    SAY_BOARDING_SKYBREAKER_MURADIN       = 1,
+    // Applied on enemy NPCs
+    SPELL_MELEE_TARGETING_ON_SKYBREAKER     = 70219,
+    SPELL_MELEE_TARGETING_ON_ORGRIMS_HAMMER = 70294,
+
+    // Gunship Hull
+    SPELL_EXPLOSION_WIPE                    = 72134,
+    SPELL_EXPLOSION_VICTORY                 = 72137,
+
+    // Hostile NPCs
+    SPELL_TELEPORT_TO_ENEMY_SHIP            = 70104,
+    SPELL_BATTLE_EXPERIENCE                 = 71201,
+    SPELL_EXPERIENCED                       = 71188,
+    SPELL_VETERAN                           = 71193,
+    SPELL_ELITE                             = 71195,
+    SPELL_ADDS_BERSERK                      = 72525,
+
+    // Skybreaker Sorcerer
+    // Kor'kron Battle-Mage
+    SPELL_SHADOW_CHANNELING                 = 43897,
+    SPELL_BELOW_ZERO                        = 69705,
+
+    // Skybreaker Rifleman
+    // Kor'kron Axethrower
+    SPELL_SHOOT                             = 70162,
+    SPELL_HURL_AXE                          = 70161,
+    SPELL_BURNING_PITCH_A                   = 70403,
+    SPELL_BURNING_PITCH_H                   = 70397,
+    SPELL_BURNING_PITCH                     = 69660,
+
+    // Skybreaker Mortar Soldier
+    // Kor'kron Rocketeer
+    SPELL_ROCKET_ARTILLERY_A                = 70609,
+    SPELL_ROCKET_ARTILLERY_H                = 69678,
+    SPELL_BURNING_PITCH_DAMAGE_A            = 70383,
+    SPELL_BURNING_PITCH_DAMAGE_H            = 70374,
+
+    // Skybreaker Marine
+    // Kor'kron Reaver
+    SPELL_DESPERATE_RESOLVE                 = 69647,
+
+    // Skybreaker Sergeant
+    // Kor'kron Sergeant
+    SPELL_BLADESTORM                        = 69652,
+    SPELL_WOUNDING_STRIKE                   = 69651,
+
+    //
+    SPELL_LOCK_PLAYERS_AND_TAP_CHEST        = 72347,
+    SPELL_ON_SKYBREAKER_DECK                = 70120,
+    SPELL_ON_ORGRIMS_HAMMER_DECK            = 70121,
+
+    // Rocket Pack
+    SPELL_ROCKET_PACK_DAMAGE                = 69193,
+    SPELL_ROCKET_BURST                      = 69192,
+    SPELL_ROCKET_PACK_USEABLE               = 70348,
+
+    // Alliance Gunship Cannon
+    // Horde Gunship Cannon
+    SPELL_OVERHEAT                          = 69487,
+    SPELL_EJECT_ALL_PASSENGERS_BELOW_ZERO   = 68576,
+    SPELL_EJECT_ALL_PASSENGERS_WIPE         = 50630
 };
 
-Position const FrostWyrmPosH   = {-435.429f, 2077.556f, 219.1148f, 4.767166f};
-Position const FrostWyrmPosA   = {-437.409f, 2349.026f, 219.1148f, 1.483120f};
-
-struct mortarMarksLoc
+enum MiscData
 {
-    uint32 durationBeforeRefreshing;
-    Position location;
+    ITEM_GOBLIN_ROCKET_PACK = 49278,
+
+    PHASE_COMBAT            = 0,
+    PHASE_INTRO             = 1,
+
+    MUSIC_ENCOUNTER         = 17289
 };
 
-
-//Function find player special for Gunship battle
-typedef std::list<Player*> TPlayerLists;
-
-TPlayerLists GetPlayersInTheMaps(Map *pMap)
+enum EncounterActions
 {
-    TPlayerLists players;
-    const Map::PlayerList &PlayerList = pMap->GetPlayers();
-    if (!PlayerList.isEmpty())
-        for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-            if (Player* player = i->getSource())
-                players.push_back(player);
-    return players;
-}
+    ACTION_SPAWN_MAGE       = 1,
+    ACTION_SPAWN_ALL_ADDS   = 2,
+    ACTION_CLEAR_SLOT       = 3,
+    ACTION_SET_SLOT         = 4,
+    ACTION_SHIP_VISITS      = 5
+};
 
-Player* SelectRandomPlayerFromLists(TPlayerLists &players)
+Position const SkybreakerAddsSpawnPos = { 15.91131f, 0.0f, 20.4628f, float(M_PI) };
+Position const OrgrimsHammerAddsSpawnPos = { 60.728395f, 0.0f, 38.93467f, float(M_PI) };
+
+// Horde encounter
+Position const SkybreakerTeleportPortal  = { 6.666975f, 0.013001f, 20.87888f, 0.0f };
+Position const OrgrimsHammerTeleportExit = { 7.461699f, 0.158853f, 35.72989f, 0.0f };
+
+// Alliance encounter
+Position const OrgrimsHammerTeleportPortal = { 47.550990f, -0.101778f, 37.61111f, 0.0f };
+Position const SkybreakerTeleportExit      = { -17.55738f, -0.090421f, 21.18366f, 0.0f };
+
+uint32 const MuradinExitPathSize = 10;
+G3D::Vector3 const MuradinExitPath[MuradinExitPathSize] =
 {
-    if (players.empty())
-        return NULL;
-    TPlayerLists::iterator it = players.begin();
-    std::advance(it, urand(0, players.size()-1));
-    return *it;
-}
+    { 8.130936f, -0.2699585f, 20.31728f },
+    { 6.380936f, -0.2699585f, 20.31728f },
+    { 3.507703f, 0.02986573f, 20.78463f },
+    { -2.767633f, 3.743143f, 20.37663f },
+    { -4.017633f, 4.493143f, 20.12663f },
+    { -7.242224f, 6.856013f, 20.03468f },
+    { -7.742224f, 8.606013f, 20.78468f },
+    { -7.992224f, 9.856013f, 21.28468f },
+    { -12.24222f, 23.10601f, 21.28468f },
+    { -14.88477f, 25.20844f, 21.59985f },
+};
 
-Player* SelectRandomPlayerInTheMaps(Map* pMap)
+uint32 const SaurfangExitPathSize = 13;
+G3D::Vector3 const SaurfangExitPath[SaurfangExitPathSize] =
 {
-    TPlayerLists players = GetPlayersInTheMaps(pMap);
-    return SelectRandomPlayerFromLists(players);
-}
+    { 30.43987f, 0.1475817f, 36.10674f },
+    { 21.36141f, -3.056458f, 35.42970f },
+    { 19.11141f, -3.806458f, 35.42970f },
+    { 19.01736f, -3.299440f, 35.39428f },
+    { 18.6747f, -5.862823f, 35.66611f },
+    { 18.6747f, -7.862823f, 35.66611f },
+    { 18.1747f, -17.36282f, 35.66611f },
+    { 18.1747f, -22.61282f, 35.66611f },
+    { 17.9247f, -24.36282f, 35.41611f },
+    { 17.9247f, -26.61282f, 35.66611f },
+    { 17.9247f, -27.86282f, 35.66611f },
+    { 17.9247f, -29.36282f, 35.66611f },
+    { 15.33203f, -30.42621f, 35.93796f }
+};
 
-//Function start motion of the ship
-void StartFlyShip(Transport* t)
+enum PassengerSlots
 {
-    t->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_IN_USE);
-    t->SetGoState(GO_STATE_ACTIVE);
-    t->SetUInt32Value(GAMEOBJECT_DYNAMIC, 0x10830010); // Seen in sniffs
-    t->SetFloatValue(GAMEOBJECT_PARENTROTATION + 3, 1.0f);
+    // Freezing the cannons
+    SLOT_FREEZE_MAGE    = 0,
 
-    Map* map = t->GetMap();
-    std::set<uint32> mapsUsed;
-    GameObjectTemplate const* goinfo = t->GetGOInfo();
+    // Channeling the portal, refilled with adds that board player's ship
+    SLOT_MAGE_1         = 1,
+    SLOT_MAGE_2         = 2,
 
-    t->GenerateWaypoints(goinfo->moTransport.taxiPathId, mapsUsed);
+    // Rifleman
+    SLOT_RIFLEMAN_1     = 3,
+    SLOT_RIFLEMAN_2     = 4,
+    SLOT_RIFLEMAN_3     = 5,
+    SLOT_RIFLEMAN_4     = 6,
 
-    for (Map::PlayerList::const_iterator itr = map->GetPlayers().begin(); itr != map->GetPlayers().end(); ++itr)
+    // Additional Rifleman on 25 man
+    SLOT_RIFLEMAN_5     = 7,
+    SLOT_RIFLEMAN_6     = 8,
+    SLOT_RIFLEMAN_7     = 9,
+    SLOT_RIFLEMAN_8     = 10,
+
+    // Mortar
+    SLOT_MORTAR_1       = 11,
+    SLOT_MORTAR_2       = 12,
+
+    // Additional spawns on 25 man
+    SLOT_MORTAR_3       = 13,
+    SLOT_MORTAR_4       = 14,
+
+    // Marines
+    SLOT_MARINE_1       = 15,
+    SLOT_MARINE_2       = 16,
+
+    // Additional spawns on 25 man
+    SLOT_MARINE_3       = 17,
+    SLOT_MARINE_4       = 18,
+
+    // Sergeants
+    SLOT_SERGEANT_1     = 19,
+
+    // Additional spawns on 25 man
+    SLOT_SERGEANT_2     = 20,
+
+    MAX_SLOTS
+};
+
+struct SlotInfo
+{
+    uint32 Entry;
+    Position TargetPosition;
+    uint32 Cooldown;
+};
+
+SlotInfo const SkybreakerSlotInfo[MAX_SLOTS] =
+{
+    { NPC_SKYBREAKER_SORCERER, { -9.479858f, 0.05663967f, 20.77026f, 4.729842f }, 0 },
+
+    { NPC_SKYBREAKER_SORCERER, { 6.385986f,  4.978760f, 20.55417f, 4.694936f }, 0 },
+    { NPC_SKYBREAKER_SORCERER, { 6.579102f, -4.674561f, 20.55060f, 1.553343f }, 0 },
+
+    { NPC_SKYBREAKER_RIFLEMAN, { -29.563900f, -17.95801f, 20.73837f, 4.747295f }, 30 },
+    { NPC_SKYBREAKER_RIFLEMAN, { -18.017210f, -18.82056f, 20.79150f, 4.747295f }, 30 },
+    { NPC_SKYBREAKER_RIFLEMAN, { -9.1193850f, -18.79102f, 20.58887f, 4.712389f }, 30 },
+    { NPC_SKYBREAKER_RIFLEMAN, { -0.3364258f, -18.87183f, 20.56824f, 4.712389f }, 30 },
+
+    { NPC_SKYBREAKER_RIFLEMAN, { -34.705810f, -17.67261f, 20.51523f, 4.729842f }, 30 },
+    { NPC_SKYBREAKER_RIFLEMAN, { -23.562010f, -18.28564f, 20.67859f, 4.729842f }, 30 },
+    { NPC_SKYBREAKER_RIFLEMAN, { -13.602780f, -18.74268f, 20.59622f, 4.712389f }, 30 },
+    { NPC_SKYBREAKER_RIFLEMAN, { -4.3350220f, -18.84619f, 20.58234f, 4.712389f }, 30 },
+
+    { NPC_SKYBREAKER_MORTAR_SOLDIER, { -31.70142f, 18.02783f, 20.77197f, 4.712389f }, 30 },
+    { NPC_SKYBREAKER_MORTAR_SOLDIER, { -9.368652f, 18.75806f, 20.65335f, 4.712389f }, 30 },
+
+    { NPC_SKYBREAKER_MORTAR_SOLDIER, { -20.40851f, 18.40381f, 20.50647f, 4.694936f }, 30 },
+    { NPC_SKYBREAKER_MORTAR_SOLDIER, { 0.1585693f, 18.11523f, 20.41949f, 4.729842f }, 30 },
+
+    { NPC_SKYBREAKER_MARINE, SkybreakerTeleportPortal, 0 },
+    { NPC_SKYBREAKER_MARINE, SkybreakerTeleportPortal, 0 },
+
+    { NPC_SKYBREAKER_MARINE, SkybreakerTeleportPortal, 0 },
+    { NPC_SKYBREAKER_MARINE, SkybreakerTeleportPortal, 0 },
+
+    { NPC_SKYBREAKER_SERGEANT, SkybreakerTeleportPortal, 0 },
+
+    { NPC_SKYBREAKER_SERGEANT, SkybreakerTeleportPortal, 0 }
+};
+
+SlotInfo const OrgrimsHammerSlotInfo[MAX_SLOTS] =
+{
+    { NPC_KOR_KRON_BATTLE_MAGE, { 13.58548f, 0.3867192f, 34.99243f, 1.53589f }, 0 },
+
+    { NPC_KOR_KRON_BATTLE_MAGE, { 47.29290f, -4.308941f, 37.55550f, 1.570796f }, 0 },
+    { NPC_KOR_KRON_BATTLE_MAGE, { 47.34621f,  4.032004f, 37.70952f, 4.817109f }, 0 },
+
+    { NPC_KOR_KRON_AXETHROWER, { -12.09280f, 27.65942f, 33.58557f, 1.53589f }, 30 },
+    { NPC_KOR_KRON_AXETHROWER, { -3.170555f, 28.30652f, 34.21082f, 1.53589f }, 30 },
+    { NPC_KOR_KRON_AXETHROWER, { 14.928040f, 26.18018f, 35.47803f, 1.53589f }, 30 },
+    { NPC_KOR_KRON_AXETHROWER, { 24.703310f, 25.36584f, 35.97845f, 1.53589f }, 30 },
+
+    { NPC_KOR_KRON_AXETHROWER, { -16.65302f, 27.59668f, 33.18726f, 1.53589f }, 30 },
+    { NPC_KOR_KRON_AXETHROWER, { -8.084572f, 28.21448f, 33.93805f, 1.53589f }, 30 },
+    { NPC_KOR_KRON_AXETHROWER, {  7.594765f, 27.41968f, 35.00775f, 1.53589f }, 30 },
+    { NPC_KOR_KRON_AXETHROWER, { 20.763390f, 25.58215f, 35.75287f, 1.53589f }, 30 },
+
+    { NPC_KOR_KRON_ROCKETEER, { -11.44849f, -25.71838f, 33.64343f, 1.518436f }, 30 },
+    { NPC_KOR_KRON_ROCKETEER, {  12.30336f, -25.69653f, 35.32373f, 1.518436f }, 30 },
+
+    { NPC_KOR_KRON_ROCKETEER, { -0.05931854f, -25.46399f, 34.50592f, 1.518436f }, 30 },
+    { NPC_KOR_KRON_ROCKETEER, { 27.62149000f, -23.48108f, 36.12708f, 1.518436f }, 30 },
+
+    { NPC_KOR_KRON_REAVER, OrgrimsHammerTeleportPortal, 0 },
+    { NPC_KOR_KRON_REAVER, OrgrimsHammerTeleportPortal, 0 },
+
+    { NPC_KOR_KRON_REAVER, OrgrimsHammerTeleportPortal, 0 },
+    { NPC_KOR_KRON_REAVER, OrgrimsHammerTeleportPortal, 0 },
+
+    { NPC_KOR_KRON_SERGEANT, OrgrimsHammerTeleportPortal, 0 },
+
+    { NPC_KOR_KRON_SERGEANT, OrgrimsHammerTeleportPortal, 0 }
+};
+
+class PassengerController
+{
+public:
+    PassengerController()
     {
-        if (Player* pPlayer = itr->getSource())
-        {
-            UpdateData transData;
-            t->BuildCreateUpdateBlockForPlayer(&transData, pPlayer);
-            WorldPacket packet;
-            transData.BuildPacket(&packet);
-            pPlayer->SendDirectMessage(&packet);
-        }
+        ResetSlots(HORDE);
     }
-}
 
-void UpdateTransportMotionInMap(Transport* t)
-{
-    Map* map = t->GetMap();
+    void SetTransport(Transport* transport) { _transport = transport; }
 
-    for (Map::PlayerList::const_iterator itr = map->GetPlayers().begin(); itr != map->GetPlayers().end(); ++itr)
+    void ResetSlots(uint32 team)
     {
-        if (Player* pPlayer = itr->getSource())
-        {
-            UpdateData transData;
-            t->BuildCreateUpdateBlockForPlayer(&transData, pPlayer);
-            WorldPacket packet;
-            transData.BuildPacket(&packet);
-            pPlayer->SendDirectMessage(&packet);
-        }
-    }
-}
+        _transport = NULL;
+        for (uint32 i = 0; i < MAX_SLOTS; ++i)
+            _controlledSlots[i].Clear();
 
-void RelocateTransport(Transport* t)
-{
-    Map* map = t->GetMap();
-    InstanceScript* instance = t->GetInstanceScript();
-
-    if (!t || !instance)
-        return;
-
-    // Transoprt movemend on server-side is ugly hack, so we do sincronize positions
-    switch (t->GetEntry())
-    {
-        case GO_THE_SKYBREAKER_ALLIANCE_ICC:
-            if (instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != DONE)
-                t->Relocate(-377.184021f, 2073.548584f, 445.753387f);
-            else if (instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) == DONE)
-                t->Relocate(-583.942627f, 2212.364990f, 534.673889f);
-            break;
-        case GO_ORGRIM_S_HAMMER_ALLIANCE_ICC:
-            if (instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != DONE)
-                t->Relocate(-384.878479f, 1989.831665f, 431.549438f);
-            break;
-        case GO_ORGRIM_S_HAMMER_HORDE_ICC:
-            if (instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != DONE)
-                t->Relocate(-438.142365f, 2395.725830f, 436.781647f);
-            else if (instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) == DONE)
-                t->Relocate(-583.942627f, 2212.364990f, 534.673889f);
-            break;
-        case GO_THE_SKYBREAKER_HORDE_ICC:
-            if (instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != DONE)
-                t->Relocate(-435.854156f, 2475.328125f, 449.364105f);
-            break;
+        memset(_respawnCooldowns, 0, sizeof(time_t)* MAX_SLOTS);
+        _spawnPoint = team == HORDE ? &OrgrimsHammerAddsSpawnPos : &SkybreakerAddsSpawnPos;
+        _slotInfo = team == HORDE ? OrgrimsHammerSlotInfo : SkybreakerSlotInfo;
     }
 
-    t->Update(0);
-    t->UpdatePassengerPositions(); 
-}
-
-
-//Function stop motion of the ship
-void StopFlyShip(Transport* t)
-{
-    Map* map = t->GetMap();
-    t->m_WayPoints.clear();
-    RelocateTransport(t);
-    t->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_IN_USE);
-    t->SetGoState(GO_STATE_READY);
-
-    for (Map::PlayerList::const_iterator itr = map->GetPlayers().begin(); itr != map->GetPlayers().end(); ++itr)
+    bool SummonCreatures(PassengerSlots first, PassengerSlots last)
     {
-        if (Player* pPlayer = itr->getSource())
-        {
-            UpdateData transData;
-            t->BuildCreateUpdateBlockForPlayer(&transData, pPlayer);
-            WorldPacket packet;
-            transData.BuildPacket(&packet);
-            pPlayer->SendDirectMessage(&packet);
-        }
-    }
-}
+        if (!_transport)
+            return false;
 
-//Find Unfriendy transport
-Transport* CheckUnfriendlyShip(Creature* me, InstanceScript* instance, uint32 data)
-{
-    if(Creature* pCapitan = ObjectAccessor::GetCreature(*me, instance->GetData64(data)))
-        return pCapitan->GetTransport();
-    else
-        return NULL;
-}
-
-//Teleport players
-void TeleportPlayers(Map* map, uint64 TeamInInstance)
-{
-    if(map)
-    {
-        Map::PlayerList const &lPlayers = map->GetPlayers();
-        if (!lPlayers.isEmpty())
+        bool summoned = false;
+        time_t now = time(NULL);
+        for (int32 i = first; i <= last; ++i)
         {
-            for(Map::PlayerList::const_iterator itr = lPlayers.begin(); itr != lPlayers.end(); ++itr)
+            if (_respawnCooldowns[i] > now)
+                continue;
+
+            if (_controlledSlots[i])
             {
-                if (Player* pPlayer = itr->getSource())
-                {
-                    if (pPlayer->isDead() && !pPlayer->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST))
-                        pPlayer->ResurrectPlayer(1.0f);
+                Creature* current = ObjectAccessor::GetCreature(*_transport, _controlledSlots[i]);
+                if (current && current->IsAlive())
+                    continue;
+            }
 
-                    if(TeamInInstance == ALLIANCE)
-                        pPlayer->TeleportTo(631, -437.498505f, 2425.954f, 192.997f, 2.247f);
-                    else
-                        pPlayer->TeleportTo(631, -437.498505f, 1997.954f, 192.997f, 2.247f);
-                }
+            if (Creature* passenger = _transport->SummonPassenger(_slotInfo[i].Entry, SelectSpawnPoint(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, NULL, 15000))
+            {
+                _controlledSlots[i] = passenger->GetGUID();
+                _respawnCooldowns[i] = time_t(0);
+                passenger->AI()->SetData(ACTION_SET_SLOT, i);
+                summoned = true;
             }
         }
-    }
-}
 
-//Ship explosion
-void DoShipExplosion(Transport* t)
-{
-    for (Transport::CreatureSet::iterator itr = t->m_NPCPassengerSet.begin(); itr != t->m_NPCPassengerSet.end();)
+        return summoned;
+    }
+
+    void ClearSlot(PassengerSlots slot)
     {
-        if (Creature* npc = *itr)
-        {
-            if(npc->GetEntry() == NPC_GB_GUNSHIP_HULL)
-                npc->CastSpell(npc, SPELL_SHIP_EXPLOSION, true);
-        }
-        ++itr;
+        _controlledSlots[slot].Clear();
+        _respawnCooldowns[slot] = time(NULL) + _slotInfo[slot].Cooldown;
     }
-}
 
-//Wipe check
-bool DoWipeCheck(Transport* t)
-{
-    for (Transport::PlayerSet::const_iterator itr = t->GetPassengers().begin(); itr != t->GetPassengers().end();)
+    bool SlotsNeedRefill(PassengerSlots first, PassengerSlots last) const
     {
-        Player* plr = *itr;
-        ++itr;
-
-        if (plr && plr->IsAlive())
-            return true;
-    }
-    return false;
-}
-
-//Check falling players
-void DoCheckFallingPlayer(Creature* me)
-{
-    Map* map = me->GetMap();
-
-    if(map)
-    {
-        Map::PlayerList const &lPlayers = map->GetPlayers();
-        if (!lPlayers.isEmpty())
-        {
-            for(Map::PlayerList::const_iterator itr = lPlayers.begin(); itr != lPlayers.end(); ++itr)
-            {
-                if (Player* pPlayer = itr->getSource())
-                {
-                    if (pPlayer->GetPositionZ() < 420.0f && pPlayer->IsWithinDistInMap(me, 300.0f))
-                        pPlayer->NearTeleportTo(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 5.0f, me->GetOrientation());
-                }
-            }
-        }
-    }
-}
-
-//Restart event
-void RestartEvent(Transport* t1, Transport* t2, Map* instance, uint64 TeamInInstance)
-{
-    sMapMgr->UnLoadTransportFromMap(t1);
-    sMapMgr->UnLoadTransportFromMap(t2);
-	sMapMgr->LoadTransports(); // Try
-
-    Map::PlayerList const& players = instance->GetPlayers();
-    if (players.isEmpty())
-        return;
-
-                if(TeamInInstance == ALLIANCE)
-                {
-                    if(Transport* th = sMapMgr->LoadTransportInMap(instance, GO_ORGRIM_S_HAMMER_ALLIANCE_ICC, 108000))
-                    {
-                        th->AddNPCPassengerInInstance(NPC_GB_ORGRIMS_HAMMER, 1.845810f, 1.268872f, 34.526218f, 1.5890f);
-                        th->AddNPCPassengerInInstance(NPC_GB_HIGH_OVERLORD_SAURFANG, 37.18615f, 0.00016f, 36.78849f, 3.13683f);
-                        th->AddNPCPassengerInInstance(NPC_GB_INVISIBLE_STALKER, 37.18615f, 0.00016f, 36.78849f, 3.13683f);
-                        th->AddNPCPassengerInInstance(NPC_GB_KORKRON_BATTLE_MAGE, 47.2929f, -4.308941f, 37.5555f, 3.05033f);
-                        th->AddNPCPassengerInInstance(NPC_GB_KORKRON_BATTLE_MAGE, 47.34621f, 4.032004f, 37.70952f, 3.05033f);
-                        th->AddNPCPassengerInInstance(NPC_GB_KORKRON_BATTLE_MAGE, 15.03016f, 0.00016f, 37.70952f, 1.55138f);
-                        th->AddNPCPassengerInInstance(NPC_GB_GUNSHIP_HULL, -13.19547f, -27.160213f, 35.47252f, 3.10672f);
-                        th->AddNPCPassengerInInstance(NPC_GB_GUNSHIP_HULL, -18.33902f, -25.230491f, 33.04052f, 3.00672f);
-                        th->AddNPCPassengerInInstance(NPC_GB_GUNSHIP_HULL, -60.1251f, -1.27014f, 42.8335f, 5.16073f);
-                        th->AddNPCPassengerInInstance(NPC_GB_GUNSHIP_HULL, -48.2651f, 16.78034f, 34.2515f, 0.04292f);
-                        th->AddNPCPassengerInInstance(NPC_GB_GUNSHIP_HULL, -14.8356f, 27.931688f, 33.363f, 1.73231f);
-                        th->AddNPCPassengerInInstance(NPC_GB_GUNSHIP_HULL, 10.2702f, 20.62966f, 35.37483f, 1.6f);
-                        th->AddNPCPassengerInInstance(NPC_GB_GUNSHIP_HULL, 39.32459f, 14.50176f, 36.88428f, 1.6f);
-                        th->AddNPCPassengerInInstance(NPC_GB_GUNSHIP_HULL, 46.17223f, -6.638763f, 37.35444f, 1.32f);
-                        th->AddNPCPassengerInInstance(NPC_GB_GUNSHIP_HULL, 27.4456f, -13.397498f, 36.34746f, 1.6f);
-                        th->AddNPCPassengerInInstance(NPC_GB_GUNSHIP_HULL, 18.16184f, 1.37897f, 35.31705f, 1.6f);
-                        th->AddNPCPassengerInInstance(NPC_GB_GUNSHIP_HULL, -18.11516f, -0.196236f, 45.15709f, 2.9f);
-                        th->AddNPCPassengerInInstance(NPC_GB_GUNSHIP_HULL, -18.11844f, -0.19624f, 49.18192f, 1.6f);
-
-                        if (instance->ToInstanceMap()->GetMaxPlayers() == 10)
-                        {
-							th->AddNPCPassengerInInstance(NPC_GB_KORKRON_AXETHROWER, -3.170555f, 28.30652f, 34.21082f, 1.66527f);
-							th->AddNPCPassengerInInstance(NPC_GB_KORKRON_AXETHROWER, -12.0928f, 27.65942f, 33.58557f, 1.66527f);
-							th->AddNPCPassengerInInstance(NPC_GB_KORKRON_AXETHROWER, 14.92804f, 26.18018f, 35.47803f, 1.66527f);
-							th->AddNPCPassengerInInstance(NPC_GB_KORKRON_AXETHROWER, 24.70331f, 25.36584f, 35.97845f, 1.66527f);
-							th->AddNPCPassengerInInstance(NPC_GB_KORKRON_ROCKETEER, -11.44849f, -25.71838f, 33.64343f, 1.49248f);
-							th->AddNPCPassengerInInstance(NPC_GB_KORKRON_ROCKETEER, 12.30336f, -25.69653f, 35.32373f, 1.49248f);
-                        }                        
-                        else
-                        {
-							th->AddNPCPassengerInInstance(NPC_GB_KORKRON_AXETHROWER, -3.170555f, 28.30652f, 34.21082f, 1.66527f);
-							th->AddNPCPassengerInInstance(NPC_GB_KORKRON_AXETHROWER, -12.0928f, 27.65942f, 33.58557f, 1.66527f);
-							th->AddNPCPassengerInInstance(NPC_GB_KORKRON_AXETHROWER, 14.92804f, 26.18018f, 35.47803f, 1.66527f);
-							th->AddNPCPassengerInInstance(NPC_GB_KORKRON_AXETHROWER, 24.70331f, 25.36584f, 35.97845f, 1.66527f);
-							th->AddNPCPassengerInInstance(NPC_GB_KORKRON_AXETHROWER, 19.92804f, 27.18018f, 35.47803f, 1.66527f);
-							th->AddNPCPassengerInInstance(NPC_GB_KORKRON_AXETHROWER, -7.70331f, 28.36584f, 33.88557f, 1.66527f);
-							th->AddNPCPassengerInInstance(NPC_GB_KORKRON_ROCKETEER, -11.44849f, -25.71838f, 33.64343f, 1.49248f);
-							th->AddNPCPassengerInInstance(NPC_GB_KORKRON_ROCKETEER, 12.30336f, -25.69653f, 35.32373f, 1.49248f);
-							th->AddNPCPassengerInInstance(NPC_GB_KORKRON_ROCKETEER, -3.44849f, -25.71838f, 34.21082f, 1.49248f);
-							th->AddNPCPassengerInInstance(NPC_GB_KORKRON_ROCKETEER, 3.30336f, -25.69653f, 35.32373f, 1.49248f);
-                        }
-                    }
-
-                    if(Transport* t = sMapMgr->LoadTransportInMap(instance, GO_THE_SKYBREAKER_ALLIANCE_ICC, 108000))
-                    {
-                        t->AddNPCPassengerInInstance(NPC_GB_SKYBREAKER, -17.156807f, -1.633260f, 20.81273f, 4.52672f);
-                        t->AddNPCPassengerInInstance(NPC_GB_MURADIN_BRONZEBEARD, 13.51547f, -0.160213f, 20.87252f, 3.10672f);
-                        t->AddNPCPassengerInInstance(NPC_GB_HIHG_CAPTAIN_JUSTIN_BARTLETT, 42.78902f, -0.010491f, 25.24052f, 3.00672f);
-                        t->AddNPCPassengerInInstance(NPC_GB_HIGH_OVERLORD_SAURFANG_NOT_VISUAL, -12.9806f, -22.9462f, 21.659f, 4.72416f);
-                        t->AddNPCPassengerInInstance(NPC_GB_ZAFOD_BOOMBOX, 18.8042f, 9.907914f, 20.33559f, 3.10672f);
-                        t->AddNPCPassengerInInstance(NPC_GB_SKYBREAKER_DECKHAND, -64.8423f, 4.4658f, 23.4352f, 2.698897f);
-                        t->AddNPCPassengerInInstance(NPC_GB_SKYBREAKER_DECKHAND, 35.54972f, 19.93269f, 25.0333f, 4.71242f);
-                        t->AddNPCPassengerInInstance(NPC_GB_SKYBREAKER_DECKHAND, -36.39837f, 3.13127f, 20.4496f, 1.5708f);
-                        t->AddNPCPassengerInInstance(NPC_GB_SKYBREAKER_DECKHAND, -36.23974f, -2.75767f, 20.4506f, 4.69496f);
-                        t->AddNPCPassengerInInstance(NPC_GB_SKYBREAKER_DECKHAND, 41.94677f, 44.08411f, 24.66587f, 1.62032f);
-                        t->AddNPCPassengerInInstance(NPC_GB_GUNSHIP_HULL, 13.51547f, -0.160213f, 20.87252f, 3.10672f);
-                        t->AddNPCPassengerInInstance(NPC_GB_GUNSHIP_HULL, 42.78902f, -0.010491f, 25.24052f, 3.00672f);
-                        t->AddNPCPassengerInInstance(NPC_GB_GUNSHIP_HULL, 14.0551f, 3.65014f, 20.7935f, 3.16073f);
-                        t->AddNPCPassengerInInstance(NPC_GB_GUNSHIP_HULL, 14.0551f, -4.65034f, 20.7915f, 3.04292f);
-                        t->AddNPCPassengerInInstance(NPC_GB_GUNSHIP_HULL, -17.8356f, 0.031688f, 20.823f, 4.73231f);
-                        t->AddNPCPassengerInInstance(NPC_GB_GUNSHIP_HULL, -34.2702f, -26.18966f, 21.37483f, 1.6f);
-                        t->AddNPCPassengerInInstance(NPC_GB_GUNSHIP_HULL, -11.64459f, -19.85176f, 20.88428f, 1.6f);
-                        t->AddNPCPassengerInInstance(NPC_GB_GUNSHIP_HULL, -19.88223f, -6.578763f, 20.57444f, 1.6f);
-                        t->AddNPCPassengerInInstance(NPC_GB_GUNSHIP_HULL, -41.4456f, -7.647498f, 20.49746f, 1.6f);
-                        t->AddNPCPassengerInInstance(NPC_GB_GUNSHIP_HULL, 0.554884f, -1.232897f, 20.53705f, 1.6f);
-                        t->AddNPCPassengerInInstance(NPC_GB_GUNSHIP_HULL, -50.16516f, 9.716236f, 23.58709f, 1.6f);
-                        t->AddNPCPassengerInInstance(NPC_GB_GUNSHIP_HULL, 11.45844f, 16.36624f, 20.54192f, 1.6f);
-                        t->AddNPCPassengerInInstance(NPC_GB_GUNSHIP_HULL, 19.72286f, -2.193787f, 33.06982f, 1.6f);
-                        t->AddNPCPassengerInInstance(NPC_GB_GUNSHIP_HULL, 19.72286f, -2.193787f, 33.06982f, 1.6f);
-                        t->AddNPCPassengerInInstance(NPC_GB_GUNSHIP_HULL, 8.599396f, -28.55855f, 24.79919f, 1.6f);
-                        t->AddNPCPassengerInInstance(NPC_GB_GUNSHIP_HULL, 38.94339f, -33.808f,  25.39618f, 1.6f);
-                        t->AddNPCPassengerInInstance(NPC_GB_GUNSHIP_HULL, 58.15474f, 0.748094f, 41.87663f, 1.6f);
-                        t->AddNPCPassengerInInstance(NPC_GB_GUNSHIP_HULL, 5.607554f, -6.350654f, 34.00357f, 1.6f);
-                        t->AddNPCPassengerInInstance(NPC_GB_GUNSHIP_HULL, 4.780305f, -29.05227f, 35.09634f, 1.6f);
-
-                        if (instance->ToInstanceMap()->GetMaxPlayers() == 10)
-                        {
-                            t->AddNPCPassengerInInstance(NPC_GB_ALLIANCE_CANON, -5.15231f, -22.9462f, 21.659f, 4.72416f);
-                            t->AddNPCPassengerInInstance(NPC_GB_ALLIANCE_CANON, -28.0876f, -22.9462f, 21.659f, 4.72416f);
-                        }
-                        else
-                        {
-                            t->AddNPCPassengerInInstance(NPC_GB_ALLIANCE_CANON, -5.15231f, -22.9462f, 21.659f, 4.72416f);
-                            t->AddNPCPassengerInInstance(NPC_GB_ALLIANCE_CANON, -14.9806f, -22.9462f, 21.659f, 4.72416f);
-                            t->AddNPCPassengerInInstance(NPC_GB_ALLIANCE_CANON, -21.7406f, -22.9462f, 21.659f, 4.72416f);
-                            t->AddNPCPassengerInInstance(NPC_GB_ALLIANCE_CANON, -28.0876f, -22.9462f, 21.659f, 4.72416f);
-                        }
-                    }
-					     
-                }
-
-                if(TeamInInstance == HORDE)
-                {
-                    if(Transport* t = sMapMgr->LoadTransportInMap(instance, GO_THE_SKYBREAKER_HORDE_ICC, 77800))
-                    {
-                        t->AddNPCPassengerInInstance(NPC_GB_SKYBREAKER, -17.156807f, -1.633260f, 20.81273f, 4.52672f);
-                        t->AddNPCPassengerInInstance(NPC_GB_MURADIN_BRONZEBEARD, 13.51547f, -0.160213f, 20.87252f, 3.10672f);
-                        t->AddNPCPassengerInInstance(NPC_GB_HIHG_CAPTAIN_JUSTIN_BARTLETT, 42.78902f, -0.010491f, 25.24052f, 3.00672f);
-                        t->AddNPCPassengerInInstance(NPC_GB_SKYBREAKER_SORCERERS, 14.0551f, 3.65014f, 20.7935f, 3.16073f);
-                        t->AddNPCPassengerInInstance(NPC_GB_SKYBREAKER_SORCERERS, 14.0551f, -4.65034f, 20.7915f, 3.04292f);
-                        t->AddNPCPassengerInInstance(NPC_GB_SKYBREAKER_SORCERERS, -17.8356f, 0.031688f, 20.823f, 4.73231f);
-                        t->AddNPCPassengerInInstance(NPC_GB_GUNSHIP_HULL, 13.51547f, -0.160213f, 20.87252f, 3.10672f);
-                        t->AddNPCPassengerInInstance(NPC_GB_GUNSHIP_HULL, 42.78902f, -0.010491f, 25.24052f, 3.00672f);
-                        t->AddNPCPassengerInInstance(NPC_GB_GUNSHIP_HULL, 14.0551f, 3.65014f, 20.7935f, 3.16073f);
-                        t->AddNPCPassengerInInstance(NPC_GB_GUNSHIP_HULL, 14.0551f, -4.65034f, 20.7915f, 3.04292f);
-                        t->AddNPCPassengerInInstance(NPC_GB_GUNSHIP_HULL, -17.8356f, 0.031688f, 20.823f, 4.73231f);
-                        t->AddNPCPassengerInInstance(NPC_GB_GUNSHIP_HULL, -34.2702f, -26.18966f, 21.37483f, 1.6f);
-                        t->AddNPCPassengerInInstance(NPC_GB_GUNSHIP_HULL, -11.64459f, -19.85176f, 20.88428f, 1.6f);
-                        t->AddNPCPassengerInInstance(NPC_GB_GUNSHIP_HULL, -19.88223f, -6.578763f, 20.57444f, 1.6f);
-                        t->AddNPCPassengerInInstance(NPC_GB_GUNSHIP_HULL, -41.4456f, -7.647498f, 20.49746f, 1.6f);
-                        t->AddNPCPassengerInInstance(NPC_GB_GUNSHIP_HULL, 0.554884f, -1.232897f, 20.53705f, 1.6f);
-                        t->AddNPCPassengerInInstance(NPC_GB_GUNSHIP_HULL, -50.16516f, 9.716236f, 23.58709f, 1.6f);
-                        t->AddNPCPassengerInInstance(NPC_GB_GUNSHIP_HULL, 11.45844f, 16.36624f, 20.54192f, 1.6f);
-                        t->AddNPCPassengerInInstance(NPC_GB_GUNSHIP_HULL, 19.72286f, -2.193787f, 33.06982f, 1.6f);
-                        t->AddNPCPassengerInInstance(NPC_GB_GUNSHIP_HULL, 19.72286f, -2.193787f, 33.06982f, 1.6f);
-                        t->AddNPCPassengerInInstance(NPC_GB_GUNSHIP_HULL, 8.599396f, -28.55855f, 24.79919f, 1.6f);
-                        t->AddNPCPassengerInInstance(NPC_GB_GUNSHIP_HULL, 38.94339f, -33.808f,  25.39618f, 1.6f);
-                        t->AddNPCPassengerInInstance(NPC_GB_GUNSHIP_HULL, 58.15474f, 0.748094f, 41.87663f, 1.6f);
-                        t->AddNPCPassengerInInstance(NPC_GB_GUNSHIP_HULL, 5.607554f, -6.350654f, 34.00357f, 1.6f);
-                        t->AddNPCPassengerInInstance(NPC_GB_GUNSHIP_HULL, 4.780305f, -29.05227f, 35.09634f, 1.6f);
-
-                        if(instance->ToInstanceMap()->GetMaxPlayers() == 10)
-                        {
-							t->AddNPCPassengerInInstance(NPC_GB_SKYBREAKER_RIFLEMAN, -5.15231f, -22.9462f, 21.659f, 4.72416f);
-							t->AddNPCPassengerInInstance(NPC_GB_SKYBREAKER_RIFLEMAN, -14.9806f, -22.9462f, 21.659f, 4.72416f);
-							t->AddNPCPassengerInInstance(NPC_GB_SKYBREAKER_RIFLEMAN, -21.7406f, -22.9462f, 21.659f, 4.72416f);
-							t->AddNPCPassengerInInstance(NPC_GB_SKYBREAKER_RIFLEMAN, -28.0876f, -22.9462f, 21.659f, 4.72416f);
-							t->AddNPCPassengerInInstance(NPC_GB_SKYBREAKER_MORTAR_SOLDIER, -8.61003f, 15.483f, 20.4158f, 4.69854f);
-							t->AddNPCPassengerInInstance(NPC_GB_SKYBREAKER_MORTAR_SOLDIER, -27.9583f, 14.8875f, 20.4428f, 4.77865f);
-                        }
-                        else
-                        {
-							t->AddNPCPassengerInInstance(NPC_GB_SKYBREAKER_RIFLEMAN, 0.15231f, -22.9462f, 21.659f, 4.72416f);
-							t->AddNPCPassengerInInstance(NPC_GB_SKYBREAKER_RIFLEMAN, -5.15231f, -22.9462f, 21.659f, 4.72416f);
-							t->AddNPCPassengerInInstance(NPC_GB_SKYBREAKER_RIFLEMAN, -14.9806f, -22.9462f, 21.659f, 4.72416f);
-							t->AddNPCPassengerInInstance(NPC_GB_SKYBREAKER_RIFLEMAN, -21.7406f, -22.9462f, 21.659f, 4.72416f);
-							t->AddNPCPassengerInInstance(NPC_GB_SKYBREAKER_RIFLEMAN, -28.0876f, -22.9462f, 21.659f, 4.72416f);
-							t->AddNPCPassengerInInstance(NPC_GB_SKYBREAKER_RIFLEMAN, -33.0876f, -22.9462f, 21.659f, 4.72416f);
-							t->AddNPCPassengerInInstance(NPC_GB_SKYBREAKER_MORTAR_SOLDIER, -8.61003f, 15.483f, 20.4158f, 4.69854f);
-							t->AddNPCPassengerInInstance(NPC_GB_SKYBREAKER_MORTAR_SOLDIER, -27.9583f, 14.8875f, 20.4428f, 4.77865f);
-							t->AddNPCPassengerInInstance(NPC_GB_SKYBREAKER_MORTAR_SOLDIER, -15.61003f, 15.483f, 20.4158f, 4.69854f);
-							t->AddNPCPassengerInInstance(NPC_GB_SKYBREAKER_MORTAR_SOLDIER, -20.9583f, 14.8875f, 20.4428f, 4.77865f);
-                        }
-                    }
-                 
-                    if(Transport* th = sMapMgr->LoadTransportInMap(instance,GO_ORGRIM_S_HAMMER_HORDE_ICC, 77800))
-                    {
-                        th->AddNPCPassengerInInstance(NPC_GB_ORGRIMS_HAMMER, 1.845810f, 1.268872f, 34.526218f, 1.5890f);
-                        th->AddNPCPassengerInInstance(NPC_GB_HIGH_OVERLORD_SAURFANG, 37.18615f, 0.00016f, 36.78849f, 3.13683f);
-                        th->AddNPCPassengerInInstance(NPC_GB_MURADIN_BRONZEBEARD_NOT_VISUAL, -7.09684f, 30.582f, 34.5013f, 1.53591f);
-                        th->AddNPCPassengerInInstance(NPC_GB_INVISIBLE_STALKER, 37.30764f, -0.143823f, 36.7936f, 3.13683f);
-                        th->AddNPCPassengerInInstance(NPC_GB_ZAFOD_BOOMBOX, 35.18615f, 15.30652f, 37.64343f, 3.05033f);
-                        th->AddNPCPassengerInInstance(NPC_GB_GUNSHIP_HULL, -13.19547f, -27.160213f, 35.47252f, 3.10672f);
-                        th->AddNPCPassengerInInstance(NPC_GB_GUNSHIP_HULL, -18.33902f, -25.230491f, 33.04052f, 3.00672f);
-                        th->AddNPCPassengerInInstance(NPC_GB_GUNSHIP_HULL, -60.1251f, -1.27014f, 42.8335f, 5.16073f);
-                        th->AddNPCPassengerInInstance(NPC_GB_GUNSHIP_HULL, -48.2651f, 16.78034f, 34.2515f, 0.04292f);
-                        th->AddNPCPassengerInInstance(NPC_GB_GUNSHIP_HULL, -14.8356f, 27.931688f, 33.363f, 1.73231f);
-                        th->AddNPCPassengerInInstance(NPC_GB_GUNSHIP_HULL, 10.2702f, 20.62966f, 35.37483f, 1.6f);
-                        th->AddNPCPassengerInInstance(NPC_GB_GUNSHIP_HULL, 39.32459f, 14.50176f, 36.88428f, 1.6f);
-                        th->AddNPCPassengerInInstance(NPC_GB_GUNSHIP_HULL, 46.17223f, -6.638763f, 37.35444f, 1.32f);
-                        th->AddNPCPassengerInInstance(NPC_GB_GUNSHIP_HULL, 27.4456f, -13.397498f, 36.34746f, 1.6f);
-                        th->AddNPCPassengerInInstance(NPC_GB_GUNSHIP_HULL, 18.16184f, 1.37897f, 35.31705f, 1.6f);
-                        th->AddNPCPassengerInInstance(NPC_GB_GUNSHIP_HULL, -18.11516f, -0.196236f, 45.15709f, 2.9f);
-                        th->AddNPCPassengerInInstance(NPC_GB_GUNSHIP_HULL, -18.11844f, -0.19624f, 49.18192f, 1.6f);
-
-                        if(instance->ToInstanceMap()->GetMaxPlayers() == 10)
-                        {
-                            th->AddNPCPassengerInInstance(NPC_GB_HORDE_CANON, 22.6225f, 28.9309f, 36.3929f, 1.53591f);
-                            th->AddNPCPassengerInInstance(NPC_GB_HORDE_CANON, -21.7509f, 29.4207f, 34.2588f, 1.53591f);
-                        }
-                        else
-                        {
-							th->AddNPCPassengerInInstance(NPC_GB_HORDE_CANON, 22.6225f, 28.9309f, 36.3929f, 1.53591f);
-                            th->AddNPCPassengerInInstance(NPC_GB_HORDE_CANON, 9.87745f, 30.5047f, 35.7147f, 1.53591f);
-                            th->AddNPCPassengerInInstance(NPC_GB_HORDE_CANON, -7.09684f, 30.582f, 34.5013f, 1.53591f);
-                            th->AddNPCPassengerInInstance(NPC_GB_HORDE_CANON, -21.7509f, 29.4207f, 34.2588f, 1.53591f);
-                        }
-                    }
-                }
-
-
-}
-
-//Stop Fight
-void StopFight(Transport* t1, Transport* t2)
-{
-    Map* map = t1->GetMap();
-
-    for (Transport::CreatureSet::iterator itr = t1->m_NPCPassengerSet.begin(); itr != t1->m_NPCPassengerSet.end();)
-    {
-        if (Creature *npc = *itr)
-        {
-            if(npc->GetEntry() != NPC_GB_SKYBREAKER && npc->GetEntry() != NPC_GB_ORGRIMS_HAMMER && npc->GetEntry() != NPC_GB_HIGH_OVERLORD_SAURFANG
-            && npc->GetEntry() != NPC_GB_MURADIN_BRONZEBEARD && npc->GetEntry() != NPC_GB_GUNSHIP_HULL)
-            {
-                if (Vehicle* veh = npc->GetVehicleKit())
-                    veh->RemoveAllPassengers();
-                npc->Kill(npc);
-            }
-        }
-        ++itr;
-    }
-
-    for (Transport::CreatureSet::iterator itr = t2->m_NPCPassengerSet.begin(); itr != t2->m_NPCPassengerSet.end();)
-    {
-        if (Creature *npc = *itr)
-        {
-            if(npc->GetEntry() != NPC_GB_GUNSHIP_HULL && npc->GetEntry() != NPC_GB_SKYBREAKER && npc->GetEntry() != NPC_GB_ORGRIMS_HAMMER)
-                npc->Kill(npc);
-        }
-        ++itr;
-    }
-
-    for (Map::PlayerList::const_iterator itr = map->GetPlayers().begin(); itr != map->GetPlayers().end(); ++itr)
-    {
-        if (Player* pPlayer = itr->getSource())
-            pPlayer->CombatStop();
-    }
-}
-
-//Muradin Bronzebeard
-class npc_muradin_gunship : public CreatureScript
-{
-    public:
-        npc_muradin_gunship() : CreatureScript("npc_muradin_gunship") { }
-
-        bool OnGossipHello(Player* player, Creature* pCreature)
-        {
-            InstanceScript* pInstance = pCreature->GetInstanceScript();
-            if (pInstance && pInstance->GetData(DATA_TEAM_IN_INSTANCE) == ALLIANCE)
-            {
-                if ((!player->GetGroup() || !player->GetGroup()->IsLeader(player->GetGUID())) && !player->IsGameMaster())
-                {
-                    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "I'm not the raid leader...", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2);
-                    player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pCreature->GetGUID());
-                    return true;
-                }
-
-                player->ADD_GOSSIP_ITEM(0, "My companions are all accounted for, Muradin. Let's go!", 631, 1001);
-                player->SEND_GOSSIP_MENU(player->GetGossipTextId(pCreature), pCreature->GetGUID());
+        for (int32 i = first; i <= last; ++i)
+            if (!_controlledSlots[i])
                 return true;
-            }
+
+        return false;
+    }
+
+private:
+    Position SelectSpawnPoint() const
+    {
+        Position newPos;
+        float angle = frand(float(-M_PI) * 0.5f, float(M_PI) * 0.5f);
+        newPos.m_positionX = _spawnPoint->GetPositionX() + 2.0f * std::cos(angle);
+        newPos.m_positionY = _spawnPoint->GetPositionY() + 2.0f * std::sin(angle);
+        newPos.m_positionZ = _spawnPoint->GetPositionZ();
+        newPos.SetOrientation(_spawnPoint->GetOrientation());
+        return newPos;
+    }
+
+    Transport* _transport;
+    ObjectGuid _controlledSlots[MAX_SLOTS];
+    time_t _respawnCooldowns[MAX_SLOTS];
+    Position const* _spawnPoint;
+    SlotInfo const* _slotInfo;
+};
+
+class DelayedMovementEvent : public BasicEvent
+{
+public:
+    DelayedMovementEvent(Creature* owner, Position const& dest) : _owner(owner), _dest(dest) { }
+
+    bool Execute(uint64, uint32) override
+    {
+        if (!_owner->IsAlive())
+            return true;
+
+        _owner->GetMotionMaster()->MovePoint(EVENT_CHARGE_PREPATH, *_owner, false);
+
+        Movement::MoveSplineInit init(_owner);
+        init.DisableTransportPathTransformations();
+        init.MoveTo(_dest.GetPositionX(), _dest.GetPositionY(), _dest.GetPositionZ(), false);
+        init.Launch();
+
+        return true;
+    }
+
+private:
+    Creature* _owner;
+    Position const& _dest;
+};
+
+class ResetEncounterEvent : public BasicEvent
+{
+public:
+    ResetEncounterEvent(Unit* caster, uint32 spellId, ObjectGuid otherTransport) : _caster(caster), _spellId(spellId), _otherTransport(otherTransport) { }
+
+    bool Execute(uint64, uint32) override
+    {
+        _caster->CastSpell(_caster, _spellId, true);
+        _caster->GetTransport()->AddObjectToRemoveList();
+
+        if (GameObject* go = HashMapHolder<GameObject>::Find(_otherTransport))
+            go->AddObjectToRemoveList();
+
+        return true;
+    }
+
+private:
+    Unit* _caster;
+    uint32 _spellId;
+    ObjectGuid _otherTransport;
+};
+
+class BattleExperienceEvent : public BasicEvent
+{
+public:
+    static uint32 const ExperiencedSpells[5];
+    static uint32 const ExperiencedTimes[5];
+
+    BattleExperienceEvent(Creature* creature) : _creature(creature), _level(0) { }
+
+    bool Execute(uint64 timer, uint32 /*diff*/) override
+    {
+        if (!_creature->IsAlive())
+            return true;
+
+        _creature->RemoveAurasDueToSpell(ExperiencedSpells[_level]);
+        ++_level;
+
+        _creature->CastSpell(_creature, ExperiencedSpells[_level], TRIGGERED_FULL_MASK);
+        if (_level < (_creature->GetMap()->IsHeroic() ? 4 : 3))
+        {
+            _creature->m_Events.AddEvent(this, timer + ExperiencedTimes[_level]);
             return false;
         }
 
-        bool OnGossipSelect(Player* player, Creature* pCreature, uint32 /*sender*/, uint32 action)
+        return true;
+    }
+
+private:
+    Creature* _creature;
+    int32 _level;
+};
+
+uint32 const BattleExperienceEvent::ExperiencedSpells[5] = { 0, SPELL_EXPERIENCED, SPELL_VETERAN, SPELL_ELITE, SPELL_ADDS_BERSERK };
+uint32 const BattleExperienceEvent::ExperiencedTimes[5] = { 100000, 70000, 60000, 90000, 0 };
+
+struct gunship_npc_AI : public ScriptedAI
+{
+    gunship_npc_AI(Creature* creature) : ScriptedAI(creature),
+        Instance(creature->GetInstanceScript()), Slot(NULL), Index(uint32(-1))
+    {
+        BurningPitchId = Instance->GetData(DATA_TEAM_IN_INSTANCE) == HORDE ? SPELL_BURNING_PITCH_A : SPELL_BURNING_PITCH_H;
+        me->setRegeneratingHealth(false);
+    }
+
+    void SetData(uint32 type, uint32 data) override
+    {
+        if (type == ACTION_SET_SLOT && data < MAX_SLOTS)
         {
-            InstanceScript* instance = pCreature->GetInstanceScript();
-            player->PlayerTalkClass->ClearMenus();
-            player->CLOSE_GOSSIP_MENU();
+            SetSlotInfo(data);
 
-            if (action == GOSSIP_ACTION_INFO_DEF+2)
-                pCreature->MonsterSay("I'll wait for the raid leader", LANG_UNIVERSAL, player->GetGUID());
+            me->SetReactState(REACT_PASSIVE);
 
-            if (action == 1001)
-            {
-                pCreature->AI()->DoAction(ACTION_INTRO_START);
-                pCreature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-            }
-            return true;
+            float x, y, z, o;
+            Slot->TargetPosition.GetPosition(x, y, z, o);
+
+            me->SetTransportHomePosition(Slot->TargetPosition);
+            float hx = x, hy = y, hz = z, ho = o;
+            me->GetTransport()->CalculatePassengerPosition(hx, hy, hz, &ho);
+            me->SetHomePosition(hx, hy, hz, ho);
+
+            me->GetMotionMaster()->MovePoint(EVENT_CHARGE_PREPATH, Slot->TargetPosition, false);
+
+            Movement::MoveSplineInit init(me);
+            init.DisableTransportPathTransformations();
+            init.MoveTo(x, y, z, false);
+            init.Launch();
+        }
+    }
+
+    void EnterEvadeMode() override
+    {
+        if (!me->IsAlive() || !me->IsInCombat())
+            return;
+
+        me->DeleteThreatList();
+        me->CombatStop(true);
+        me->GetMotionMaster()->MoveTargetedHome();
+    }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        if (Slot)
+            if (Creature* captain = me->FindNearestCreature(Instance->GetData(DATA_TEAM_IN_INSTANCE) == HORDE ? NPC_IGB_MURADIN_BRONZEBEARD : NPC_IGB_HIGH_OVERLORD_SAURFANG, 200.0f))
+                captain->AI()->SetData(ACTION_CLEAR_SLOT, Index);
+    }
+
+    void MovementInform(uint32 type, uint32 pointId) override
+    {
+        if (type != POINT_MOTION_TYPE)
+            return;
+
+        if (pointId == EVENT_CHARGE_PREPATH && Slot)
+        {
+            me->SetFacingTo(Slot->TargetPosition.GetOrientation());
+            me->m_Events.AddEvent(new BattleExperienceEvent(me), me->m_Events.CalculateTime(BattleExperienceEvent::ExperiencedTimes[0]));
+            DoCast(me, SPELL_BATTLE_EXPERIENCE, true);
+            me->SetReactState(REACT_AGGRESSIVE);
+        }
+    }
+
+    bool CanAIAttack(Unit const* target) const override
+    {
+        if (Instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != IN_PROGRESS)
+            return false;
+        return target->HasAura(Instance->GetData(DATA_TEAM_IN_INSTANCE) == HORDE ? SPELL_ON_ORGRIMS_HAMMER_DECK : SPELL_ON_SKYBREAKER_DECK);
+    }
+
+protected:
+    void SetSlotInfo(uint32 index)
+    {
+        Index = index;
+        Slot = &((Instance->GetData(DATA_TEAM_IN_INSTANCE) == HORDE ? SkybreakerSlotInfo : OrgrimsHammerSlotInfo)[Index]);
+    }
+
+    bool SelectVictim()
+    {
+        if (Instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != IN_PROGRESS)
+        {
+            EnterEvadeMode();
+            return false;
         }
 
-        struct npc_muradin_gunshipAI : public ScriptedAI
+        if (!me->HasReactState(REACT_PASSIVE))
         {
-            npc_muradin_gunshipAI(Creature *creature) : ScriptedAI(creature),
+            if (Unit* victim = me->SelectVictim())
+                AttackStart(victim);
+
+            return me->GetVictim() != nullptr;
+        }
+        else if (me->getThreatManager().isThreatListEmpty())
+        {
+            EnterEvadeMode();
+            return false;
+        }
+
+        return true;
+    }
+
+    void TriggerBurningPitch()
+    {
+        if (Instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) == IN_PROGRESS &&
+            !me->HasUnitState(UNIT_STATE_CASTING) && !me->HasReactState(REACT_PASSIVE) &&
+            !me->HasSpellCooldown(BurningPitchId))
+        {
+            DoCastAOE(BurningPitchId, true);
+            me->_AddCreatureSpellCooldown(BurningPitchId, time(NULL) + urand(3000, 4000) / IN_MILLISECONDS);
+        }
+    }
+
+    InstanceScript* Instance;
+    SlotInfo const* Slot;
+    uint32 Index;
+    uint32 BurningPitchId;
+};
+
+class npc_gunship : public CreatureScript
+{
+    public:
+        npc_gunship() : CreatureScript("npc_gunship") { }
+
+        struct npc_gunshipAI : public NullCreatureAI
+        {
+            npc_gunshipAI(Creature* creature) : NullCreatureAI(creature),
+                _teamInInstance(creature->GetInstanceScript()->GetData(DATA_TEAM_IN_INSTANCE)),
+                _summonedFirstMage(false), _died(false)
+            {
+                me->setRegeneratingHealth(false);
+            }
+
+            void DamageTaken(Unit* /*source*/, uint32& damage) override
+            {
+                if (damage >= me->GetHealth())
+                {
+                    JustDied(NULL);
+                    damage = me->GetHealth() - 1;
+                    return;
+                }
+
+                if (_summonedFirstMage)
+                    return;
+
+                if (me->GetTransport()->GetEntry() != uint32(_teamInInstance == HORDE ? GO_THE_SKYBREAKER_H : GO_ORGRIMS_HAMMER_A))
+                    return;
+
+                if (!me->HealthBelowPctDamaged(90, damage))
+                    return;
+
+                _summonedFirstMage = true;
+                if (Creature* captain = me->FindNearestCreature(_teamInInstance == HORDE ? NPC_IGB_MURADIN_BRONZEBEARD : NPC_IGB_HIGH_OVERLORD_SAURFANG, 100.0f))
+                    captain->AI()->DoAction(ACTION_SPAWN_MAGE);
+            }
+
+            void JustDied(Unit* /*killer*/) override
+            {
+                if (_died)
+                    return;
+
+                _died = true;
+
+                bool isVictory = me->GetTransport()->GetEntry() == GO_THE_SKYBREAKER_H || me->GetTransport()->GetEntry() == GO_ORGRIMS_HAMMER_A;
+                InstanceScript* instance = me->GetInstanceScript();
+                instance->SetBossState(DATA_ICECROWN_GUNSHIP_BATTLE, isVictory ? DONE : FAIL);
+                if (Creature* creature = me->FindNearestCreature(me->GetEntry() == NPC_ORGRIMS_HAMMER ? NPC_THE_SKYBREAKER : NPC_ORGRIMS_HAMMER, 200.0f))
+                {
+                    instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, creature);
+                    creature->RemoveAurasDueToSpell(SPELL_CHECK_FOR_PLAYERS);
+                }
+
+                instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
+                me->RemoveAurasDueToSpell(SPELL_CHECK_FOR_PLAYERS);
+
+                me->GetMap()->SetZoneMusic(AREA_ICECROWN_CITADEL, 0);
+                std::list<Creature*> creatures;
+                GetCreatureListWithEntryInGrid(creatures, me, NPC_MARTYR_STALKER_IGB_SAURFANG, SIZE_OF_GRIDS);
+                for (std::list<Creature*>::iterator itr = creatures.begin(); itr != creatures.end(); ++itr)
+                {
+                    Creature* stalker = *itr;
+                    stalker->RemoveAllAuras();
+                    stalker->DeleteThreatList();
+                    stalker->CombatStop(true);
+                }
+
+                uint32 explosionSpell = isVictory ? SPELL_EXPLOSION_VICTORY : SPELL_EXPLOSION_WIPE;
+                creatures.clear();
+                GetCreatureListWithEntryInGrid(creatures, me, NPC_GUNSHIP_HULL, 200.0f);
+                for (std::list<Creature*>::iterator itr = creatures.begin(); itr != creatures.end(); ++itr)
+                {
+                    Creature* hull = *itr;
+                    if (hull->GetTransport() != me->GetTransport())
+                        continue;
+
+                    hull->CastSpell(hull, explosionSpell, TRIGGERED_FULL_MASK);
+                }
+
+                creatures.clear();
+                GetCreatureListWithEntryInGrid(creatures, me, _teamInInstance == HORDE ? NPC_HORDE_GUNSHIP_CANNON : NPC_ALLIANCE_GUNSHIP_CANNON, 200.0f);
+                for (std::list<Creature*>::iterator itr = creatures.begin(); itr != creatures.end(); ++itr)
+                {
+                    Creature* cannon = *itr;
+                    if (isVictory)
+                    {
+                        cannon->CastSpell(cannon, SPELL_EJECT_ALL_PASSENGERS_BELOW_ZERO, TRIGGERED_FULL_MASK);
+
+                        WorldPacket data(SMSG_PLAYER_VEHICLE_DATA, cannon->GetPackGUID().size() + 4);
+                        data << cannon->GetPackGUID();
+                        data << uint32(0);
+                        cannon->SendMessageToSet(&data, true);
+
+                        cannon->RemoveVehicleKit();
+                    }
+                    else
+                        cannon->CastSpell(cannon, SPELL_EJECT_ALL_PASSENGERS_WIPE, TRIGGERED_FULL_MASK);
+                }
+
+                uint32 creatureEntry = NPC_IGB_MURADIN_BRONZEBEARD;
+                uint8 textId = isVictory ? SAY_MURADIN_VICTORY : SAY_MURADIN_WIPE;
+                if (_teamInInstance == HORDE)
+                {
+                    creatureEntry = NPC_IGB_HIGH_OVERLORD_SAURFANG;
+                    textId = isVictory ? SAY_SAURFANG_VICTORY : SAY_SAURFANG_WIPE;
+                }
+
+                if (Creature* creature = me->FindNearestCreature(creatureEntry, 100.0f))
+                    creature->AI()->Talk(textId);
+
+                if (isVictory)
+                {
+                    if (GameObject* go = HashMapHolder<GameObject>::Find(instance->GetGuidData(DATA_ICECROWN_GUNSHIP_BATTLE)))
+                        if (Transport* otherTransport = go->ToTransport())
+                            otherTransport->EnableMovement(true);
+
+                    me->GetTransport()->EnableMovement(true);
+
+                    if (Creature* ship = me->FindNearestCreature(_teamInInstance == HORDE ? NPC_ORGRIMS_HAMMER : NPC_THE_SKYBREAKER, 200.0f))
+                    {
+                        ship->CastSpell(ship, SPELL_TELEPORT_PLAYERS_ON_VICTORY, TRIGGERED_FULL_MASK);
+                        ship->CastSpell(ship, SPELL_ACHIEVEMENT, TRIGGERED_FULL_MASK);
+                        ship->CastSpell(ship, SPELL_AWARD_REPUTATION_BOSS_KILL, TRIGGERED_FULL_MASK);
+                    }
+
+                    creatures.clear();
+                    GetCreatureListWithEntryInGrid(creatures, me, NPC_SKYBREAKER_MARINE, 200.0f);
+                    GetCreatureListWithEntryInGrid(creatures, me, NPC_SKYBREAKER_SERGEANT, 200.0f);
+                    GetCreatureListWithEntryInGrid(creatures, me, NPC_KOR_KRON_REAVER, 200.0f);
+                    GetCreatureListWithEntryInGrid(creatures, me, NPC_KOR_KRON_SERGEANT, 200.0f);
+                    for (std::list<Creature*>::iterator itr = creatures.begin(); itr != creatures.end(); ++itr)
+                        (*itr)->DespawnOrUnsummon(1);
+                }
+                else
+                {
+                    uint32 teleportSpellId = _teamInInstance == HORDE ? SPELL_TELEPORT_PLAYERS_ON_RESET_H : SPELL_TELEPORT_PLAYERS_ON_RESET_A;
+                    me->m_Events.AddEvent(new ResetEncounterEvent(me, teleportSpellId, me->GetInstanceScript()->GetGuidData(DATA_ENEMY_GUNSHIP)),
+                        me->m_Events.CalculateTime(8000));
+                }
+            }
+
+            void SetGUID(ObjectGuid guid, int32 id/* = 0*/) override
+            {
+                if (id != ACTION_SHIP_VISITS)
+                    return;
+
+                std::map<ObjectGuid, uint32>::iterator itr = _shipVisits.find(guid);
+                if (itr == _shipVisits.end())
+                    _shipVisits[guid] = 1;
+                else
+                    ++itr->second;
+            }
+
+            uint32 GetData(uint32 id) const override
+            {
+                if (id != ACTION_SHIP_VISITS)
+                    return 0;
+
+                uint32 max = 0;
+                for (std::map<ObjectGuid, uint32>::const_iterator itr = _shipVisits.begin(); itr != _shipVisits.end(); ++itr)
+                    max = std::max(max, itr->second);
+
+                return max;
+            }
+
+        private:
+            uint32 _teamInInstance;
+            std::map<ObjectGuid, uint32> _shipVisits;
+            bool _summonedFirstMage;
+            bool _died;
+        };
+
+        CreatureAI* GetAI(Creature* creature) const override
+        {
+            if (!creature->GetTransport())
+                return NULL;
+
+            return GetIcecrownCitadelAI<npc_gunshipAI>(creature);
+        }
+};
+
+class npc_high_overlord_saurfang_igb : public CreatureScript
+{
+    public:
+        npc_high_overlord_saurfang_igb() : CreatureScript("npc_high_overlord_saurfang_igb") { }
+
+        struct npc_high_overlord_saurfang_igbAI : public ScriptedAI
+        {
+            npc_high_overlord_saurfang_igbAI(Creature* creature) : ScriptedAI(creature),
                 _instance(creature->GetInstanceScript())
             {
-
+                _controller.ResetSlots(HORDE);
+                _controller.SetTransport(creature->GetTransport());
+                me->setRegeneratingHealth(false);
+                me->m_CombatDistance = 70.0f;
+                _firstMageCooldown = time(NULL) + 60;
+                _axethrowersYellCooldown = time_t(0);
+                _rocketeersYellCooldown = time_t(0);
             }
 
-            void Reset()
+            void InitializeAI() override
             {
-                if (_instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) == IN_PROGRESS)
+                ScriptedAI::InitializeAI();
+
+                _events.Reset();
+                _firstMageCooldown = time(NULL) + 60;
+                _axethrowersYellCooldown = time_t(0);
+                _rocketeersYellCooldown = time_t(0);
+            }
+
+            void EnterCombat(Unit* /*target*/) override
+            {
+                _events.SetPhase(PHASE_COMBAT);
+                DoCast(me, _instance->GetData(DATA_TEAM_IN_INSTANCE) == HORDE ? SPELL_FRIENDLY_BOSS_DAMAGE_MOD : SPELL_MELEE_TARGETING_ON_ORGRIMS_HAMMER, true);
+                DoCast(me, SPELL_BATTLE_FURY, true);
+                _events.ScheduleEvent(EVENT_CLEAVE, urand(2000, 10000));
+            }
+
+            void EnterEvadeMode() override
+            {
+                if (!me->IsAlive())
                     return;
-                me->SetReactState(REACT_PASSIVE);
-                me->setFaction(1802);
-                events.Reset();
-                map = me->GetMap();
-                skybreaker = me->GetTransport();
-				UpdateTransportMotionInMap(skybreaker);
-                SummonCount = RAID_MODE(3, 5, 4, 6);
-                count = 0;
-                RocketerCount = RAID_MODE(2, 4, 2, 4);
-                RiflCount = RAID_MODE(4, 6, 4, 6);
-                RocketerDieCount = 0;
-                RiflDieCount = 0;
-                me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-                EventScheduled = false;
+
+                me->DeleteThreatList();
+                me->CombatStop(true);
+                me->GetMotionMaster()->MoveTargetedHome();
+
+                Reset();
             }
 
-            void SendMusicToPlayers(uint32 musicId) const
+            void DoAction(int32 action) override
             {
-                WorldPacket data(SMSG_PLAY_MUSIC, 4);
-                data << uint32(musicId);
-                SendPacketToPlayers(&data);
-            }
-
-            // Send packet to all players
-            void SendPacketToPlayers(WorldPacket const* data) const
-            {
-                Map::PlayerList const& players = me->GetMap()->GetPlayers();
-                if (!players.isEmpty())
-                    for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-                        if (Player* player = itr->getSource())
-                            player->GetSession()->SendPacket(data);
-            }
-
-            bool CanAIAttack(Unit const* target) const
-            {
-                if (target->GetEntry() == NPC_GB_KORKRON_SERGANTE || target->GetEntry() == NPC_GB_KORKRON_REAVERS)
-                    return true;
-
-                return false;
-            }
-
-            void DoAction(int32 action)
-            {
-                switch (action)
+                if (action == ACTION_ENEMY_GUNSHIP_TALK)
                 {
-                    case ACTION_INTRO_START:
-                        events.ScheduleEvent(EVENT_INTRO_ALLIANCE_1, 1000);
-                        events.ScheduleEvent(EVENT_START_FLY, 2500);
-                        events.ScheduleEvent(EVENT_INTRO_ALLIANCE_2, 7000);
-                        events.ScheduleEvent(EVENT_INTRO_ALLIANCE_3, 28000);
-                        events.ScheduleEvent(EVENT_INTRO_ALLIANCE_4, 35000);
-                        events.ScheduleEvent(EVENT_INTRO_ALLIANCE_5, 40000);
-                        events.ScheduleEvent(EVENT_INTRO_ALLIANCE_6, 47000);
-                        events.ScheduleEvent(EVENT_INTRO_ALLIANCE_7, 53000);
-                        events.ScheduleEvent(EVENT_INTRO_ALLIANCE_8, 58900);
-                        break;
-                    case ACTION_BATTLE_EVENT:
+                    if (Creature* muradin = me->FindNearestCreature(NPC_IGB_MURADIN_BRONZEBEARD, 100.0f))
+                        muradin->AI()->DoAction(ACTION_SPAWN_ALL_ADDS);
+
+                    Talk(SAY_SAURFANG_INTRO_5);
+                    _events.ScheduleEvent(EVENT_INTRO_H_5, 4000);
+                    _events.ScheduleEvent(EVENT_INTRO_H_6, 11000);
+                    _events.ScheduleEvent(EVENT_KEEP_PLAYER_IN_COMBAT, 1);
+
+                    _instance->SetBossState(DATA_ICECROWN_GUNSHIP_BATTLE, IN_PROGRESS);
+                    // Combat starts now
+                    if (Creature* skybreaker = me->FindNearestCreature(NPC_THE_SKYBREAKER, 100.0f))
+                        _instance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, skybreaker, 1);
+
+                    if (Creature* orgrimsHammer = me->FindNearestCreature(NPC_ORGRIMS_HAMMER, 100.0f))
                     {
-                        if (_instance->GetData(DATA_TEAM_IN_INSTANCE) == ALLIANCE)
-                            events.ScheduleEvent(EVENT_WIPE_CHECK, 5000);
-
-                        Creature* pAllianceBoss = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_SKYBREAKER_BOSS));
-                        Creature* pHordeBoss = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_ORGRIMMAR_HAMMER_BOSS));
-
-                        if (pHordeBoss && pAllianceBoss)
-                        {
-                             me->SetReactState(REACT_AGGRESSIVE);
-                             pHordeBoss->SetInCombatWith(pAllianceBoss);
-                             pAllianceBoss->SetInCombatWith(pHordeBoss);
-                             pAllianceBoss->AddThreat(pHordeBoss, 0.0f);
-                             pHordeBoss->AddThreat(pAllianceBoss, 0.0f);
-                             _instance->SetBossState(DATA_ICECROWN_GUNSHIP_BATTLE, IN_PROGRESS);
-                             events.ScheduleEvent(EVENT_SUMMON_PORTAL, 30000);
-                             RelocateTransport(skybreaker);
-                             RelocateTransport(CheckUnfriendlyShip(me,_instance, DATA_GB_HIGH_OVERLORD_SAURFANG));
-                        }
-                        else
-                            me->AI()->DoAction(ACTION_FAIL);
-                        break;
+                        _instance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, orgrimsHammer, 2);
+                        orgrimsHammer->CastSpell(orgrimsHammer, SPELL_CHECK_FOR_PLAYERS, TRIGGERED_FULL_MASK);
                     }
-                    case ACTION_DONE:
-                        if (Creature* pAllianceBoss = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_SKYBREAKER_BOSS)))
-                        {
-                            _instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, pAllianceBoss);
-                        }
-                        if (Creature* pHordeBoss = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_ORGRIMMAR_HAMMER_BOSS)))
-                        {
-                            _instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, pHordeBoss);
-                        }
 
-                        me->SetReactState(REACT_PASSIVE);
-                        _instance->SetBossState(DATA_ICECROWN_GUNSHIP_BATTLE, DONE);
-                        _instance->DoCastSpellOnPlayers(SPELL_REMOVE_ROCKET_PACK);
-                        Talk(SAY_ALLIANCE_VICTORY);
-                        StartFlyShip(CheckUnfriendlyShip(me, _instance, DATA_GB_HIGH_OVERLORD_SAURFANG));
-                        StopFight(skybreaker, CheckUnfriendlyShip(me, _instance, DATA_GB_HIGH_OVERLORD_SAURFANG));
-                        events.CancelEvent(EVENT_WIPE_CHECK);
-                        events.ScheduleEvent(EVENT_OUTRO_ALLIANCE_1, 3500);
-                        events.ScheduleEvent(EVENT_OUTRO_ALLIANCE_2, 23000);
-                        events.ScheduleEvent(EVENT_OUTRO_ALLIANCE_3, 32000);
-                        break;
-                    case ACTION_FAIL:
-                        events.CancelEvent(EVENT_WIPE_CHECK);
-                        Talk(SAY_ALLIANCE_DEFEAT);
-                        if (Creature* pAllianceBoss = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_SKYBREAKER_BOSS)))
-                        {
-                            _instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, pAllianceBoss);
-                        }
-                        if (Creature* pHordeBoss = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_ORGRIMMAR_HAMMER_BOSS)))
-                        {
-                            _instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, pHordeBoss);
-                        }
-                        StopFight(skybreaker, CheckUnfriendlyShip(me, _instance, DATA_GB_HIGH_OVERLORD_SAURFANG));
-                        events.ScheduleEvent(EVENT_FAIL, 10000);
-                        break;
-                    case ACTION_MAGE_DIE:
-					    //Check, if there really is no mage
-					    if(me->GetEntry() != NPC_GB_SKYBREAKER_SORCERERS){
-							if(_instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != DONE)
-					  			events.ScheduleEvent(EVENT_SPAWN_MAGE, 33000);
-					    }
-                        break;
-                    case ACTION_ROCK_DIE:
-                        ++RocketerDieCount; 
-                        if(RocketerDieCount == RocketerCount)
-							if(_instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != DONE)
-                            events.ScheduleEvent(EVENT_RESPAWN_ROCKETEER, 60000);
-                        break;
-                    case ACTION_AXES_RIFL_DIE:
-                        ++RiflDieCount;
-                        if(RiflDieCount == RiflCount)
-							if(_instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != DONE)
-                            events.ScheduleEvent(EVENT_RESPAWN_AXES_RIFLEMEN, 60000);
-                        break;
+                    me->GetMap()->SetZoneMusic(AREA_ICECROWN_CITADEL, MUSIC_ENCOUNTER);
                 }
-            }
-
-            void DamageTaken(Unit* /*attacker*/, uint32& damage)
-            {
-                if (_instance->GetData(DATA_TEAM_IN_INSTANCE) == HORDE && me->GetHealthPct() < 2.0f )
+                else if (action == ACTION_SPAWN_MAGE)
                 {
-                   damage = 0;
+                    time_t now = time(NULL);
+                    if (_firstMageCooldown > now)
+                        _events.ScheduleEvent(EVENT_SUMMON_MAGE, (_firstMageCooldown - now) * IN_MILLISECONDS);
+                    else
+                        _events.ScheduleEvent(EVENT_SUMMON_MAGE, 1);
                 }
-                
-                if (_instance->GetData(DATA_TEAM_IN_INSTANCE) == ALLIANCE && me->GetHealthPct() < 2.0f )
+                else if (action == ACTION_SPAWN_ALL_ADDS)
                 {
-                   damage = 0;
-                   me->AI()->DoAction(ACTION_FAIL);
-                }
-            }
-
-            void MovementInform(uint32 type, uint32 pointId)
-            {
-                if (type != POINT_MOTION_TYPE)
-                    return;
-
-                if (pointId = 1)
-                    me->DespawnOrUnsummon(1000);
-            }
-
-            void UpdateAI(uint32 diff)
-            {
-                if (me->HasUnitState(UNIT_STATE_CASTING))
-                    return;
-                
-                if (!HealthAbovePct(75))
-                {
-                    me->SetHealth(me->GetMaxHealth() / 100 * 76); // find a better way to avoid the hardcore spell spam ....
-                    DoCast(me, SPELL_TASTE_OF_BLOOD);
-                }
-
-                if (UpdateVictim())
-                {
-                    if (!EventScheduled)
+                    _events.ScheduleEvent(EVENT_ADDS, 12000);
+                    _events.ScheduleEvent(EVENT_CHECK_RIFLEMAN, 13000);
+                    _events.ScheduleEvent(EVENT_CHECK_MORTAR, 13000);
+                    if (Is25ManRaid())
+                        _controller.SummonCreatures(SLOT_MAGE_1, SLOT_MORTAR_4);
+                    else
                     {
-                        EventScheduled = true; // should temp fix the hardcore casting
-                        events.ScheduleEvent(EVENT_RENDING_THROW, 3000);
+                        _controller.SummonCreatures(SLOT_MAGE_1, SLOT_MAGE_2);
+                        _controller.SummonCreatures(SLOT_MORTAR_1, SLOT_MORTAR_2);
+                        _controller.SummonCreatures(SLOT_RIFLEMAN_1, SLOT_RIFLEMAN_4);
                     }
                 }
+                else if (action == ACTION_EXIT_SHIP)
+                {
+                    Position pos;
+                    pos.Relocate(SaurfangExitPath[SaurfangExitPathSize - 1].x, SaurfangExitPath[SaurfangExitPathSize - 1].y, SaurfangExitPath[SaurfangExitPathSize - 1].z);
+                    me->GetMotionMaster()->MovePoint(EVENT_CHARGE_PREPATH, pos, false);
 
-                events.Update(diff);
+                    Movement::PointsArray path(SaurfangExitPath, SaurfangExitPath + SaurfangExitPathSize);
 
-                while (uint32 eventId = events.ExecuteEvent())
+                    Movement::MoveSplineInit init(me);
+                    init.DisableTransportPathTransformations();
+                    init.MovebyPath(path, 0);
+                    init.Launch();
+
+                    me->DespawnOrUnsummon(18000);
+                }
+            }
+
+            void SetData(uint32 type, uint32 data) override
+            {
+                if (type == ACTION_CLEAR_SLOT)
+                {
+                    _controller.ClearSlot(PassengerSlots(data));
+                    if (data == SLOT_FREEZE_MAGE)
+                        _events.ScheduleEvent(EVENT_SUMMON_MAGE, urand(30000, 33500));
+                }
+            }
+
+            void sGossipSelect(Player* /*player*/, uint32 /*sender*/, uint32 /*action*/) override
+            {
+                me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                me->GetTransport()->EnableMovement(true);
+                _events.SetPhase(PHASE_INTRO);
+                _events.ScheduleEvent(EVENT_INTRO_H_1, 5000, 0, PHASE_INTRO);
+                _events.ScheduleEvent(EVENT_INTRO_H_2, 16000, 0, PHASE_INTRO);
+                _events.ScheduleEvent(EVENT_INTRO_SUMMON_SKYBREAKER, 24600, 0, PHASE_INTRO);
+                _events.ScheduleEvent(EVENT_INTRO_H_3, 29600, 0, PHASE_INTRO);
+                _events.ScheduleEvent(EVENT_INTRO_H_4, 39200, 0, PHASE_INTRO);
+            }
+
+            void DamageTaken(Unit* , uint32& damage) override
+            {
+                if (me->HealthBelowPctDamaged(65, damage) && !me->HasAura(SPELL_TASTE_OF_BLOOD))
+                    DoCast(me, SPELL_TASTE_OF_BLOOD, true);
+
+                if (damage >= me->GetHealth())
+                    damage = me->GetHealth() - 1;
+            }
+
+            void UpdateAI(uint32 diff) override
+            {
+                if (!UpdateVictim() && !_events.IsInPhase(PHASE_INTRO) && _instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != IN_PROGRESS)
+                    return;
+
+                _events.Update(diff);
+
+                while (uint32 eventId = _events.ExecuteEvent())
                 {
                     switch (eventId)
                     {
-                        case EVENT_WIPE_CHECK:
-                            DoCheckFallingPlayer(me);
-                            if (DoWipeCheck(skybreaker))
-                                events.ScheduleEvent(EVENT_WIPE_CHECK, 3000);
-                            else
-                                me->AI()->DoAction(ACTION_FAIL);
+                        case EVENT_INTRO_H_1:
+                            Talk(SAY_SAURFANG_INTRO_1);
                             break;
-                        case EVENT_INTRO_ALLIANCE_1:
-                            Talk(SAY_INTRO_ALLIANCE_0);
+                        case EVENT_INTRO_H_2:
+                            Talk(SAY_SAURFANG_INTRO_2);
                             break;
-                        case EVENT_START_FLY:
-                            StartFlyShip(skybreaker);
+                        case EVENT_INTRO_SUMMON_SKYBREAKER:
+                            sTransportMgr->CreateTransport(GO_THE_SKYBREAKER_H, 0, me->GetMap());
                             break;
-                        case EVENT_INTRO_ALLIANCE_2:
-                            Talk(SAY_INTRO_ALLIANCE_1);
+                        case EVENT_INTRO_H_3:
+                            Talk(SAY_SAURFANG_INTRO_3);
                             break;
-                        case EVENT_INTRO_ALLIANCE_3:
-                            Talk(SAY_INTRO_ALLIANCE_2);
-                            StartFlyShip(CheckUnfriendlyShip(me, _instance, DATA_GB_HIGH_OVERLORD_SAURFANG));
+                        case EVENT_INTRO_H_4:
+                            Talk(SAY_SAURFANG_INTRO_4);
                             break;
-                        case EVENT_INTRO_ALLIANCE_4:
-                            Talk(SAY_INTRO_ALLIANCE_3);
+                        case EVENT_INTRO_H_5:
+                            if (Creature* muradin = me->FindNearestCreature(NPC_IGB_MURADIN_BRONZEBEARD, 100.0f))
+                                muradin->AI()->Talk(SAY_MURADIN_INTRO_H);
                             break;
-                        case EVENT_INTRO_ALLIANCE_5:
-                            StopFlyShip(skybreaker);
-                            StopFlyShip(CheckUnfriendlyShip(me, _instance, DATA_GB_HIGH_OVERLORD_SAURFANG));
-                            Talk(SAY_INTRO_ALLIANCE_4);
+                        case EVENT_INTRO_H_6:
+                            Talk(SAY_SAURFANG_INTRO_6);
                             break;
-                        case EVENT_INTRO_ALLIANCE_6:
-                            Talk(SAY_INTRO_ALLIANCE_5);
-                            SendMusicToPlayers(17289);
-                            me->AI()->DoAction(ACTION_BATTLE_EVENT);
-                            break;
-                        case EVENT_INTRO_ALLIANCE_7:
-                            if (Creature* pSaurfang = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_HIGH_OVERLORD_SAURFANG_NOT_VISUAL)))
+                        case EVENT_KEEP_PLAYER_IN_COMBAT:
+                            if (_instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) == IN_PROGRESS)
                             {
-                                pSaurfang->AI()->Talk(SAY_HIGH_OVERLORD_SAURFANG_NOT_VISUAL);
-                                pSaurfang->SetReactState(REACT_PASSIVE);
-                                pSaurfang->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+                                _instance->DoCastSpellOnPlayers(SPELL_LOCK_PLAYERS_AND_TAP_CHEST);
+                                _events.ScheduleEvent(EVENT_KEEP_PLAYER_IN_COMBAT, urand(5000, 8000));
                             }
                             break;
-                        case EVENT_INTRO_ALLIANCE_8:
-                            Talk(SAY_INTRO_ALLIANCE_7);
+                        case EVENT_SUMMON_MAGE:
+                            Talk(SAY_SAURFANG_MAGES);
+                            _controller.SummonCreatures(SLOT_FREEZE_MAGE, SLOT_FREEZE_MAGE);
                             break;
-                        case EVENT_SUMMON_PORTAL:
-                            if(_instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != DONE)
+                        case EVENT_ADDS:
+                            Talk(SAY_SAURFANG_ENTER_SKYBREAKER);
+                            _controller.SummonCreatures(SLOT_MAGE_1, SLOT_MAGE_2);
+                            _controller.SummonCreatures(SLOT_MARINE_1, Is25ManRaid() ? SLOT_MARINE_4 : SLOT_MARINE_2);
+                            _controller.SummonCreatures(SLOT_SERGEANT_1, Is25ManRaid() ? SLOT_SERGEANT_2 : SLOT_SERGEANT_1);
+                            if (Transport* orgrimsHammer = me->GetTransport())
+                                orgrimsHammer->SummonPassenger(NPC_TELEPORT_PORTAL, OrgrimsHammerTeleportPortal, TEMPSUMMON_TIMED_DESPAWN, NULL, 21000);
+
+                            if (GameObject* go = HashMapHolder<GameObject>::Find(_instance->GetGuidData(DATA_ICECROWN_GUNSHIP_BATTLE)))
+                                if (Transport* skybreaker = go->ToTransport())
+                                    skybreaker->SummonPassenger(NPC_TELEPORT_EXIT, SkybreakerTeleportExit, TEMPSUMMON_TIMED_DESPAWN, NULL, 23000);
+
+                            _events.ScheduleEvent(EVENT_ADDS_BOARD_YELL, 6000);
+                            _events.ScheduleEvent(EVENT_ADDS, 60000);
+                            break;
+                        case EVENT_ADDS_BOARD_YELL:
+                            if (Creature* muradin = me->FindNearestCreature(NPC_IGB_MURADIN_BRONZEBEARD, 200.0f))
+                                muradin->AI()->Talk(SAY_MURADIN_BOARD);
+                            break;
+                        case EVENT_CHECK_RIFLEMAN:
+                            if (_controller.SummonCreatures(SLOT_RIFLEMAN_1, Is25ManRaid() ? SLOT_RIFLEMAN_8 : SLOT_RIFLEMAN_4))
                             {
-                                events.ScheduleEvent(EVENT_BOARDING_TALK, 10000);
-                                events.ScheduleEvent(EVENT_BOARDING_GUNSHIP, 2500); // TODO: Fix the timers
-                                skybreaker->AddNPCPassengerInInstance(NPC_GB_PORTAL, -15.51547f, -0.160213f, 28.87252f, 1.56211f);
-                                CheckUnfriendlyShip(me, _instance, DATA_GB_HIGH_OVERLORD_SAURFANG)->AddNPCPassengerInInstance(NPC_GB_PORTAL, 47.55099f, -0.101778f, 37.61111f, 1.55138f);
-                            }
-                            break;
-                        case EVENT_RENDING_THROW:
-                            if (UpdateVictim())
-                                if (me->GetVictim()->IsWithinDistInMap(me, 30.0f, false))
+                                if (_axethrowersYellCooldown < time(NULL))
                                 {
-                                    DoCastVictim(SPELL_RENDING_THROW);
-                                    EventScheduled = false;
+                                    Talk(SAY_SAURFANG_AXETHROWERS);
+                                    _axethrowersYellCooldown = time(NULL) + 5;
                                 }
-                                else
-                                    events.CancelEvent(EVENT_RENDING_THROW);
-                            break;
-                        case EVENT_TASTE_OF_BLOOD:
-                            DoCast(me, SPELL_TASTE_OF_BLOOD);
-                            break;
-                        case EVENT_BOARDING_TALK:
-                            Talk(SAY_BOARDING_SKYBREAKER_1);
-                            break;
-                        case EVENT_BOARDING_GUNSHIP:
-							if(_instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != DONE){
-								if (Creature* pSaurfang = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_HIGH_OVERLORD_SAURFANG_NOT_VISUAL)))
-								{
-									pSaurfang->AI()->Talk(SAY_BOARDING_SKYBREAKER_SAURFANG);
-								}
-								if(Creature* Sergante = skybreaker->AddNPCPassengerInInstance(NPC_GB_KORKRON_SERGANTE, -15.51547f, -0.160213f, 20.87252f, 1.56211f))
-								{
-									Sergante->CastSpell(Sergante, SPELL_TELEPORT_VISUAL, true);
-								}
-								events.ScheduleEvent(EVENT_SUMMON_PORTAL, 90000);
-								events.ScheduleEvent(EVENT_BOARDING_REAVERS_MARINE, 3000);
-								count = 0;
-							}
-                            break;
-                        case EVENT_BOARDING_REAVERS_MARINE:
-							if(_instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != DONE){
-								if(count <= SummonCount)
-								{
-									if(Creature* Reavers = skybreaker->AddNPCPassengerInInstance(NPC_GB_KORKRON_REAVERS, -15.51547f, -0.160213f, 20.87252f, 1.56211f))
-									{
-										Reavers->CastSpell(Reavers, SPELL_TELEPORT_VISUAL, true);
-										events.ScheduleEvent(EVENT_BOARDING_REAVERS_MARINE, 21000 / SummonCount);
-										++count;
-									}
-								}
-							}
-                            break;
-                        case EVENT_OUTRO_ALLIANCE_1:
-                            _instance->DoCompleteAchievement(RAID_MODE(IM_ON_A_BOAT_10,IM_ON_A_BOAT_25,IM_ON_A_BOAT_10,IM_ON_A_BOAT_25));
-                            _instance->DoCastSpellOnPlayers(SPELL_ACHIEVEMENT_CHECK);
-                            StartFlyShip(skybreaker);
-                            StopFlyShip(CheckUnfriendlyShip(me,_instance,DATA_GB_HIGH_OVERLORD_SAURFANG));
-                            break;
-                        case EVENT_OUTRO_ALLIANCE_2:
-                            StopFlyShip(skybreaker);
-                            me->SummonGameObject(RAID_MODE(GO_CAPITAN_CHEST_A_10N, GO_CAPITAN_CHEST_A_25N, GO_CAPITAN_CHEST_A_10H, GO_CAPITAN_CHEST_A_25H), -590.200022f, 2241.193115f, 538.588269f, 0, 0, 0, 0, 0, 100000);
-                            me->AddUnitMovementFlag(MOVEMENTFLAG_WALKING);
-                            me->GetMotionMaster()->MovePoint(0, -590.700f, 2213.01f, 539.1f);
-                            break;
-                        case EVENT_OUTRO_ALLIANCE_3:
-                            me->GetMotionMaster()->MovePoint(1, -555.59f, 2213.01f, 539.28f);
-                            break;
-                        case EVENT_FAIL:
-                            TeleportPlayers(map, ALLIANCE);
-                            events.ScheduleEvent(EVENT_RESTART_EVENT, 2000);
-                            _instance->SetBossState(DATA_ICECROWN_GUNSHIP_BATTLE, NOT_STARTED);
-                            break;
-                        case EVENT_RESTART_EVENT:
-							if(_instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != DONE){
-								_instance->SetBossState(DATA_ICECROWN_GUNSHIP_BATTLE, FAIL);
-								RestartEvent(skybreaker, CheckUnfriendlyShip(me,_instance,DATA_GB_HIGH_OVERLORD_SAURFANG), map, ALLIANCE);
-							}
-                            break;
-                        case EVENT_SPAWN_MAGE:
-							if(me->GetEntry() != NPC_GB_SKYBREAKER_SORCERERS){
-							 Talk(SAY_NEW_MAGE_SPAWNED);
-							 skybreaker->AddNPCPassengerInInstance(NPC_GB_SKYBREAKER_SORCERERS, -17.8356f, 0.031688f, 20.823f, 4.73231f);
-							}
-							break;
-                        case EVENT_RESPAWN_ROCKETEER:
-                            Talk(SAY_NEW_MORTAR_TEAM_SPAWNED);
-                            if(RocketerCount == 2)
-                            {
-                                skybreaker->AddNPCPassengerInInstance(NPC_GB_SKYBREAKER_MORTAR_SOLDIER, -8.61003f, 15.483f, 20.4158f, 4.69854f);
-                                skybreaker->AddNPCPassengerInInstance(NPC_GB_SKYBREAKER_MORTAR_SOLDIER, -27.9583f, 14.8875f, 20.4428f, 4.77865f);
                             }
-                            if(RocketerCount == 4)
-                            {
-                                skybreaker->AddNPCPassengerInInstance(NPC_GB_SKYBREAKER_MORTAR_SOLDIER, -8.61003f, 15.483f, 20.4158f, 4.69854f);
-                                skybreaker->AddNPCPassengerInInstance(NPC_GB_SKYBREAKER_MORTAR_SOLDIER, -27.9583f, 14.8875f, 20.4428f, 4.77865f);
-                                skybreaker->AddNPCPassengerInInstance(NPC_GB_SKYBREAKER_MORTAR_SOLDIER, -15.61003f, 15.483f, 20.4158f, 4.69854f);
-                                skybreaker->AddNPCPassengerInInstance(NPC_GB_SKYBREAKER_MORTAR_SOLDIER, -20.9583f, 14.8875f, 20.4428f, 4.77865f);
-                            }
+                            _events.ScheduleEvent(EVENT_CHECK_RIFLEMAN, 1000);
                             break;
-                        case EVENT_RESPAWN_AXES_RIFLEMEN:
-                            Talk(SAY_NEW_RIFLEMEN_SPAWNED);
-                            if(RiflCount == 4)
+                        case EVENT_CHECK_MORTAR:
+                            if (_controller.SummonCreatures(SLOT_MORTAR_1, Is25ManRaid() ? SLOT_MORTAR_4 : SLOT_MORTAR_2))
                             {
-                                skybreaker->AddNPCPassengerInInstance(NPC_GB_SKYBREAKER_RIFLEMAN, -28.0876f, -22.9462f, 21.659f, 4.72416f);
-                                skybreaker->AddNPCPassengerInInstance(NPC_GB_SKYBREAKER_RIFLEMAN, -21.7406f, -22.9462f, 21.659f, 4.72416f);
-                                skybreaker->AddNPCPassengerInInstance(NPC_GB_SKYBREAKER_RIFLEMAN, -14.9806f, -22.9462f, 21.659f, 4.72416f);
-                                skybreaker->AddNPCPassengerInInstance(NPC_GB_SKYBREAKER_RIFLEMAN, -5.15231f, -22.9462f, 21.659f, 4.72416f);
+                                if (_rocketeersYellCooldown < time(NULL))
+                                {
+                                    Talk(SAY_SAURFANG_ROCKETEERS);
+                                    _rocketeersYellCooldown = time(NULL) + 5;
+                                }
                             }
-                            if(RiflCount == 6)
-                            {
-                                skybreaker->AddNPCPassengerInInstance(NPC_GB_SKYBREAKER_RIFLEMAN, -33.0876f, -22.9462f, 21.659f, 4.72416f);
-                                skybreaker->AddNPCPassengerInInstance(NPC_GB_SKYBREAKER_RIFLEMAN, -28.0876f, -22.9462f, 21.659f, 4.72416f);
-                                skybreaker->AddNPCPassengerInInstance(NPC_GB_SKYBREAKER_RIFLEMAN, -21.7406f, -22.9462f, 21.659f, 4.72416f);
-                                skybreaker->AddNPCPassengerInInstance(NPC_GB_SKYBREAKER_RIFLEMAN, -14.9806f, -22.9462f, 21.659f, 4.72416f);
-                                skybreaker->AddNPCPassengerInInstance(NPC_GB_SKYBREAKER_RIFLEMAN, -5.15231f, -22.9462f, 21.659f, 4.72416f);
-                                skybreaker->AddNPCPassengerInInstance(NPC_GB_SKYBREAKER_RIFLEMAN, 0.15231f, -22.9462f, 21.659f, 4.72416f);
-                            }
+                            _events.ScheduleEvent(EVENT_CHECK_MORTAR, 1000);
                             break;
-                      }
+                        case EVENT_CLEAVE:
+                            DoCastVictim(SPELL_CLEAVE);
+                            _events.ScheduleEvent(EVENT_CLEAVE, urand(2000, 10000));
+                            break;
+                        default:
+                            break;
+                    }
                 }
 
-                if (!me->GetCurrentSpell(CURRENT_MELEE_SPELL))
-                    DoCastVictim(SPELL_CLEAVE);
-
-                DoMeleeAttackIfReady();
-            }
-
-            private:
-                Transport* skybreaker;
-                Map* map;
-                uint32 SummonCount;
-                EventMap events;
-                InstanceScript* _instance;
-                uint32 count;
-                uint32 RocketerDieCount;
-                uint32 RiflDieCount;
-                uint32 RocketerCount;
-                uint32 RiflCount;
-                bool EventScheduled;
-        };
-
-        CreatureAI* GetAI(Creature* pCreature) const
-        {
-            return new npc_muradin_gunshipAI(pCreature);
-        }
-};
-
-class npc_gunship_skybreaker : public CreatureScript
-{
-    public:
-        npc_gunship_skybreaker() : CreatureScript("npc_gunship_skybreaker") { }
-
-        struct npc_gunship_skybreakerAI : public ScriptedAI
-        {
-            npc_gunship_skybreakerAI(Creature *creature) : ScriptedAI(creature), _instance(creature->GetInstanceScript())
-            {
-                Reset();
-            }
-
-            void Reset()
-            {
-                ScriptedAI::Reset();
-                me->SetReactState(REACT_PASSIVE);
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
-                me->SetDisplayId(11686);
-            }
-
-            void EnterCombat(Unit* /*who*/)
-            {
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
-                SetCombatMovement(false);
-                _instance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, me);
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-            }
-
-            void JustDied(Unit* killer)
-            {
-                if (Transport* t = me->GetTransport())
-                    DoShipExplosion(t);
-
-                if(_instance->GetData(DATA_TEAM_IN_INSTANCE) == ALLIANCE)
+                if (me->IsWithinMeleeRange(me->GetVictim()))
+                    DoMeleeAttackIfReady();
+                else if (me->isAttackReady())
                 {
-                    if (Creature* pMuradin = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_GB_MURADIN_BRONZEBEARD)))
-                        pMuradin->AI()->DoAction(ACTION_FAIL);
-                }
-                
-                else if(_instance->GetData(DATA_TEAM_IN_INSTANCE) == HORDE)
-                {
-                    if (Creature* pSaurfang = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_GB_HIGH_OVERLORD_SAURFANG)))
-                        pSaurfang->AI()->DoAction(ACTION_DONE);
+                    DoCastVictim(SPELL_RENDING_THROW);
+                    me->resetAttackTimer();
                 }
             }
 
-            private:
-                EventMap events;
-                InstanceScript* _instance;
-        };
-
-        CreatureAI* GetAI(Creature* pCreature) const
-        {
-            return new npc_gunship_skybreakerAI(pCreature);
-        }
-};
-
-class npc_gunship_orgrimmar : public CreatureScript
-{
-    public:
-        npc_gunship_orgrimmar() : CreatureScript("npc_gunship_orgrimmar") { }
-
-        struct npc_gunship_orgrimmarAI : public ScriptedAI
-        {
-            npc_gunship_orgrimmarAI(Creature *creature) : ScriptedAI(creature), _instance(creature->GetInstanceScript())
-            {
-                Reset();
-            }
-
-            void Reset()
-            {
-                ScriptedAI::Reset();
-                me->SetReactState(REACT_PASSIVE);
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
-                me->SetDisplayId(11686);
-            }
-
-            void EnterCombat(Unit* /*who*/)
-            {
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
-                SetCombatMovement(false);
-                _instance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, me);
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-            }
-
-            void JustDied(Unit* killer)
-            {
-                if (Transport* t = me->GetTransport())
-                    DoShipExplosion(t);
-
-                if(_instance->GetData(DATA_TEAM_IN_INSTANCE) == ALLIANCE)
-                {
-                    if (Creature* pMuradin = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_GB_MURADIN_BRONZEBEARD)))
-                        pMuradin->AI()->DoAction(ACTION_DONE);
-                }
-                
-                else if(_instance->GetData(DATA_TEAM_IN_INSTANCE) == HORDE)
-                {
-                    if (Creature* pSaurfang = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_GB_HIGH_OVERLORD_SAURFANG)))
-                        pSaurfang->AI()->DoAction(ACTION_FAIL);
-                }
-            }
-
-            private:
-                EventMap events;
-                InstanceScript* _instance;
-        };
-
-        CreatureAI* GetAI(Creature* pCreature) const
-        {
-            return new npc_gunship_orgrimmarAI(pCreature);
-        }
-};
-
-/* Kro'kron Axethrower */
-class npc_korkron_axethrower_rifleman : public CreatureScript
-{
-    public:
-        npc_korkron_axethrower_rifleman() : CreatureScript("npc_korkron_axethrower_rifleman") { }
-
-        struct npc_korkron_axethrower_riflemanAI : public ScriptedAI
-        {
-            npc_korkron_axethrower_riflemanAI(Creature *creature) : ScriptedAI(creature),_instance(creature->GetInstanceScript())
-            {
-                Reset();
-            }
-
-            void Reset()
-            {
-                ScriptedAI::Reset();
-                DesperateResolve = RAID_MODE( SPELL_DESPERATE_RESOLVE_10_NM, SPELL_DESPERATE_RESOLVE_25_NM, SPELL_DESPERATE_RESOLVE_10_HM, SPELL_DESPERATE_RESOLVE_25_HM);
-                desperated = false;
-                me->RemoveAurasDueToSpell(SPELL_EXPERIENCED);
-                me->RemoveAurasDueToSpell(SPELL_ELITE);
-                me->RemoveAurasDueToSpell(SPELL_VETERAN);				
-                events.ScheduleEvent(EVENT_EXPERIENCED, urand(19000, 21000)); // ~20 sec
-                events.ScheduleEvent(EVENT_VETERAN, urand(39000, 41000));     // ~40 sec
-                events.ScheduleEvent(EVENT_ELITE, urand(59000, 61000));       // ~60 sec
-                attacktimer = urand(6000, 15000);
-                if (me->GetEntry() == NPC_GB_SKYBREAKER_RIFLEMAN)
-                    SetEquipmentSlots(false, EQUIP_NO_CHANGE, EQUIP_NO_CHANGE, 47267);
-                else
-                    SetEquipmentSlots(false, 49691, EQUIP_NO_CHANGE, EQUIP_NO_CHANGE);
-            }
-
-            void DamageTaken(Unit* /*attacker*/, uint32& /*damage*/)
-            {
-                if (_instance->GetData(DATA_TEAM_IN_INSTANCE) == ALLIANCE && me->GetHealthPct() < 20.0f && !desperated)
-                {
-                    desperated = true;
-                    DoCast(me, DesperateResolve);
-                }
-            }
-
-            void JustDied(Unit* killer)
-            {
-                if (_instance->GetData(DATA_TEAM_IN_INSTANCE) == ALLIANCE)
-                {
-                    if (Creature* pSaurfangBoss = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_GB_HIGH_OVERLORD_SAURFANG)))
-                        pSaurfangBoss->AI()->DoAction(ACTION_AXES_RIFL_DIE);
-                }
-                 
-                if (_instance->GetData(DATA_TEAM_IN_INSTANCE) == HORDE)
-                {
-                    if (Creature* pMuradin = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_GB_MURADIN_BRONZEBEARD)))
-                        pMuradin->AI()->DoAction(ACTION_AXES_RIFL_DIE);
-                }
-            }
-
-            void UpdateAI(uint32 diff)
+            bool CanAIAttack(Unit const* target) const override
             {
                 if (_instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != IN_PROGRESS)
+                    return false;
+                return target->HasAura(SPELL_ON_ORGRIMS_HAMMER_DECK) || target->GetEntry() == NPC_SKYBREAKER_MARINE || target->GetEntry() == NPC_SKYBREAKER_SERGEANT;
+            }
+
+        private:
+            EventMap _events;
+            PassengerController _controller;
+            InstanceScript* _instance;
+            time_t _firstMageCooldown;
+            time_t _axethrowersYellCooldown;
+            time_t _rocketeersYellCooldown;
+        };
+
+        CreatureAI* GetAI(Creature* creature) const override
+        {
+            return GetIcecrownCitadelAI<npc_high_overlord_saurfang_igbAI>(creature);
+        }
+};
+
+class npc_muradin_bronzebeard_igb : public CreatureScript
+{
+    public:
+        npc_muradin_bronzebeard_igb() : CreatureScript("npc_muradin_bronzebeard_igb") { }
+
+        struct npc_muradin_bronzebeard_igbAI : public ScriptedAI
+        {
+            npc_muradin_bronzebeard_igbAI(Creature* creature) : ScriptedAI(creature),
+                _instance(creature->GetInstanceScript())
+            {
+                _controller.ResetSlots(ALLIANCE);
+                _controller.SetTransport(creature->GetTransport());
+                me->setRegeneratingHealth(false);
+                me->m_CombatDistance = 70.0f;
+                _firstMageCooldown = time(NULL) + 60;
+                _riflemanYellCooldown = time_t(0);
+                _mortarYellCooldown = time_t(0);
+            }
+
+            void InitializeAI() override
+            {
+                ScriptedAI::InitializeAI();
+
+                _events.Reset();
+                _firstMageCooldown = time(NULL) + 60;
+                _riflemanYellCooldown = time_t(0);
+                _mortarYellCooldown = time_t(0);
+            }
+
+            void EnterCombat(Unit* /*target*/) override
+            {
+                _events.SetPhase(PHASE_COMBAT);
+                DoCast(me, _instance->GetData(DATA_TEAM_IN_INSTANCE) == ALLIANCE ? SPELL_FRIENDLY_BOSS_DAMAGE_MOD : SPELL_MELEE_TARGETING_ON_SKYBREAKER, true);
+                DoCast(me, SPELL_BATTLE_FURY, true);
+                _events.ScheduleEvent(EVENT_CLEAVE, urand(2000, 10000));
+            }
+
+            void EnterEvadeMode() override
+            {
+                if (!me->IsAlive())
                     return;
-                
-                if (me->HasUnitState(UNIT_STATE_CASTING))
-                    return;
 
-                //me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE); // Dodato
-                me->AI()->AttackStart(SelectRandomPlayerInTheMaps(me->GetMap()));
+                me->DeleteThreatList();
+                me->CombatStop(true);
+                me->GetMotionMaster()->MoveTargetedHome();
 
-                if (!UpdateVictim())
-                    return;
+                Reset();
+            }
 
-                events.Update(diff);
-
-                if (attacktimer <= diff)
+            void DoAction(int32 action) override
+            {
+                if (action == ACTION_ENEMY_GUNSHIP_TALK)
                 {
-                    if(me->GetEntry() == NPC_GB_KORKRON_AXETHROWER)
-                        DoCast(me->GetVictim(), SPELL_HURL_AXE);
-                    else if(me->GetEntry() == NPC_GB_SKYBREAKER_RIFLEMAN)
-                        DoCast(me->GetVictim(), SPELL_SHOOT);
-                    attacktimer = urand(6000, 15000);
-                } else attacktimer -= diff;
+                    if (Creature* muradin = me->FindNearestCreature(NPC_IGB_HIGH_OVERLORD_SAURFANG, 100.0f))
+                        muradin->AI()->DoAction(ACTION_SPAWN_ALL_ADDS);
 
-                while (uint32 eventId = events.ExecuteEvent())
+                    Talk(SAY_MURADIN_INTRO_6);
+                    _events.ScheduleEvent(EVENT_INTRO_A_6, 5000);
+                    _events.ScheduleEvent(EVENT_INTRO_A_7, 11000);
+                    _events.ScheduleEvent(EVENT_KEEP_PLAYER_IN_COMBAT, 1);
+
+                    _instance->SetBossState(DATA_ICECROWN_GUNSHIP_BATTLE, IN_PROGRESS);
+                    // Combat starts now
+                    if (Creature* orgrimsHammer = me->FindNearestCreature(NPC_ORGRIMS_HAMMER, 100.0f))
+                        _instance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, orgrimsHammer, 1);
+
+                    if (Creature* skybreaker = me->FindNearestCreature(NPC_THE_SKYBREAKER, 100.0f))
+                    {
+                        _instance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, skybreaker, 2);
+                        skybreaker->CastSpell(skybreaker, SPELL_CHECK_FOR_PLAYERS, TRIGGERED_FULL_MASK);
+                    }
+
+                    me->GetMap()->SetZoneMusic(AREA_ICECROWN_CITADEL, MUSIC_ENCOUNTER);
+                }
+                else if (action == ACTION_SPAWN_MAGE)
+                {
+                    time_t now = time(NULL);
+                    if (_firstMageCooldown > now)
+                        _events.ScheduleEvent(EVENT_SUMMON_MAGE, (_firstMageCooldown - now) * IN_MILLISECONDS);
+                    else
+                        _events.ScheduleEvent(EVENT_SUMMON_MAGE, 1);
+                }
+                else if (action == ACTION_SPAWN_ALL_ADDS)
+                {
+                    _events.ScheduleEvent(EVENT_ADDS, 12000);
+                    _events.ScheduleEvent(EVENT_CHECK_RIFLEMAN, 13000);
+                    _events.ScheduleEvent(EVENT_CHECK_MORTAR, 13000);
+                    if (Is25ManRaid())
+                        _controller.SummonCreatures(SLOT_MAGE_1, SLOT_MORTAR_4);
+                    else
+                    {
+                        _controller.SummonCreatures(SLOT_MAGE_1, SLOT_MAGE_2);
+                        _controller.SummonCreatures(SLOT_MORTAR_1, SLOT_MORTAR_2);
+                        _controller.SummonCreatures(SLOT_RIFLEMAN_1, SLOT_RIFLEMAN_4);
+                    }
+                }
+                else if (action == ACTION_EXIT_SHIP)
+                {
+                    Position pos;
+                    pos.Relocate(MuradinExitPath[MuradinExitPathSize - 1].x, MuradinExitPath[MuradinExitPathSize - 1].y, MuradinExitPath[MuradinExitPathSize - 1].z);
+                    me->GetMotionMaster()->MovePoint(EVENT_CHARGE_PREPATH, pos, false);
+
+                    Movement::PointsArray path(MuradinExitPath, MuradinExitPath + MuradinExitPathSize);
+
+                    Movement::MoveSplineInit init(me);
+                    init.DisableTransportPathTransformations();
+                    init.MovebyPath(path, 0);
+                    init.Launch();
+
+                    me->DespawnOrUnsummon(18000);
+                }
+            }
+
+            void SetData(uint32 type, uint32 data) override
+            {
+                if (type == ACTION_CLEAR_SLOT)
+                {
+                    _controller.ClearSlot(PassengerSlots(data));
+                    if (data == SLOT_FREEZE_MAGE)
+                        _events.ScheduleEvent(EVENT_SUMMON_MAGE, urand(30000, 33500));
+                }
+            }
+
+            void sGossipSelect(Player* /*player*/, uint32 /*sender*/, uint32 /*action*/) override
+            {
+                me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                me->GetTransport()->EnableMovement(true);
+                _events.SetPhase(PHASE_INTRO);
+                _events.ScheduleEvent(EVENT_INTRO_A_1, 5000);
+                _events.ScheduleEvent(EVENT_INTRO_A_2, 10000, 0, PHASE_INTRO);
+                _events.ScheduleEvent(EVENT_INTRO_SUMMON_ORGRIMS_HAMMER, 28000, 0, PHASE_INTRO);
+                _events.ScheduleEvent(EVENT_INTRO_A_3, 33000, 0, PHASE_INTRO);
+                _events.ScheduleEvent(EVENT_INTRO_A_4, 39000, 0, PHASE_INTRO);
+                _events.ScheduleEvent(EVENT_INTRO_A_5, 45000, 0, PHASE_INTRO);
+            }
+
+            void DamageTaken(Unit* , uint32& damage) override
+            {
+                if (me->HealthBelowPctDamaged(65, damage) && me->HasAura(SPELL_TASTE_OF_BLOOD))
+                    DoCast(me, SPELL_TASTE_OF_BLOOD, true);
+
+                if (damage >= me->GetHealth())
+                    damage = me->GetHealth() - 1;
+            }
+
+            void UpdateAI(uint32 diff) override
+            {
+                if (!UpdateVictim() && !_events.IsInPhase(PHASE_INTRO) && _instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != IN_PROGRESS)
+                    return;
+
+                _events.Update(diff);
+
+                while (uint32 eventId = _events.ExecuteEvent())
                 {
                     switch (eventId)
                     {
-                        case EVENT_EXPERIENCED:
-                            DoCast(me, SPELL_EXPERIENCED);
+                        case EVENT_INTRO_A_1:
+                            Talk(SAY_MURADIN_INTRO_1);
                             break;
-                        case EVENT_VETERAN:
-                            me->RemoveAurasDueToSpell(SPELL_EXPERIENCED);
-                            DoCast(me, SPELL_VETERAN);
+                        case EVENT_INTRO_A_2:
+                            Talk(SAY_MURADIN_INTRO_2);
                             break;
-                        case EVENT_ELITE:
-                            me->RemoveAurasDueToSpell(SPELL_VETERAN);
-                            DoCast(me, SPELL_ELITE);
+                        case EVENT_INTRO_SUMMON_ORGRIMS_HAMMER:
+                            sTransportMgr->CreateTransport(GO_ORGRIMS_HAMMER_A, 0, me->GetMap());
+                            break;
+                        case EVENT_INTRO_A_3:
+                            Talk(SAY_MURADIN_INTRO_3);
+                            break;
+                        case EVENT_INTRO_A_4:
+                            Talk(SAY_MURADIN_INTRO_4);
+                            break;
+                        case EVENT_INTRO_A_5:
+                            Talk(SAY_MURADIN_INTRO_5);
+                            break;
+                        case EVENT_INTRO_A_6:
+                            if (Creature* saurfang = me->FindNearestCreature(NPC_IGB_HIGH_OVERLORD_SAURFANG, 100.0f))
+                                saurfang->AI()->Talk(SAY_SAURFANG_INTRO_A);
+                            break;
+                        case EVENT_INTRO_A_7:
+                            Talk(SAY_MURADIN_INTRO_7);
+                            break;
+                        case EVENT_KEEP_PLAYER_IN_COMBAT:
+                            if (_instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) == IN_PROGRESS)
+                            {
+                                _instance->DoCastSpellOnPlayers(SPELL_LOCK_PLAYERS_AND_TAP_CHEST);
+                                _events.ScheduleEvent(EVENT_KEEP_PLAYER_IN_COMBAT, urand(5000, 8000));
+                            }
+                            break;
+                        case EVENT_SUMMON_MAGE:
+                            Talk(SAY_MURADIN_SORCERERS);
+                            _controller.SummonCreatures(SLOT_FREEZE_MAGE, SLOT_FREEZE_MAGE);
+                            break;
+                        case EVENT_ADDS:
+                            Talk(SAY_MURADIN_ENTER_ORGRIMMS_HAMMER);
+                            _controller.SummonCreatures(SLOT_MAGE_1, SLOT_MAGE_2);
+                            _controller.SummonCreatures(SLOT_MARINE_1, Is25ManRaid() ? SLOT_MARINE_4 : SLOT_MARINE_2);
+                            _controller.SummonCreatures(SLOT_SERGEANT_1, Is25ManRaid() ? SLOT_SERGEANT_2 : SLOT_SERGEANT_1);
+                            if (Transport* skybreaker = me->GetTransport())
+                                skybreaker->SummonPassenger(NPC_TELEPORT_PORTAL, SkybreakerTeleportPortal, TEMPSUMMON_TIMED_DESPAWN, NULL, 21000);
+
+                            if (GameObject* go = HashMapHolder<GameObject>::Find(_instance->GetGuidData(DATA_ICECROWN_GUNSHIP_BATTLE)))
+                                if (Transport* orgrimsHammer = go->ToTransport())
+                                    orgrimsHammer->SummonPassenger(NPC_TELEPORT_EXIT, OrgrimsHammerTeleportExit, TEMPSUMMON_TIMED_DESPAWN, NULL, 23000);
+
+                            _events.ScheduleEvent(EVENT_ADDS_BOARD_YELL, 6000);
+                            _events.ScheduleEvent(EVENT_ADDS, 60000);
+                            break;
+                        case EVENT_ADDS_BOARD_YELL:
+                            if (Creature* saurfang = me->FindNearestCreature(NPC_IGB_HIGH_OVERLORD_SAURFANG, 200.0f))
+                                saurfang->AI()->Talk(SAY_SAURFANG_BOARD);
+                            break;
+                        case EVENT_CHECK_RIFLEMAN:
+                            if (_controller.SummonCreatures(SLOT_RIFLEMAN_1, Is25ManRaid() ? SLOT_RIFLEMAN_8 : SLOT_RIFLEMAN_4))
+                            {
+                                if (_riflemanYellCooldown < time(NULL))
+                                {
+                                    Talk(SAY_MURADIN_RIFLEMAN);
+                                    _riflemanYellCooldown = time(NULL) + 5;
+                                }
+                            }
+                            _events.ScheduleEvent(EVENT_CHECK_RIFLEMAN, 1000);
+                            break;
+                        case EVENT_CHECK_MORTAR:
+                            if (_controller.SummonCreatures(SLOT_MORTAR_1, Is25ManRaid() ? SLOT_MORTAR_4 : SLOT_MORTAR_2))
+                            {
+                                if (_mortarYellCooldown < time(NULL))
+                                {
+                                    Talk(SAY_MURADIN_MORTAR);
+                                    _mortarYellCooldown = time(NULL) + 5;
+                                }
+                            }
+                            _events.ScheduleEvent(EVENT_CHECK_MORTAR, 1000);
+                            break;
+                        case EVENT_CLEAVE:
+                            DoCastVictim(SPELL_CLEAVE);
+                            _events.ScheduleEvent(EVENT_CLEAVE, urand(2000, 10000));
                             break;
                         default:
                             break;
                     }
                 }
-            }
 
-            uint32 DesperateResolve;
-            uint32 attacktimer;
-
-            private:
-                EventMap events;
-                bool desperated;
-                InstanceScript* _instance;
-        };
-
-        CreatureAI* GetAI(Creature* pCreature) const
-        {
-            return new npc_korkron_axethrower_riflemanAI(pCreature);
-        }
-};
-
-class npc_sergeant : public CreatureScript
-{
-    public:
-        npc_sergeant() : CreatureScript("npc_sergeant") { }
-
-        struct npc_sergeantAI : public ScriptedAI
-        {
-            npc_sergeantAI(Creature *creature) : ScriptedAI(creature),_instance(creature->GetInstanceScript())
-            {
-                Reset();
-            }
-
-            void Reset()
-            {
-                ScriptedAI::Reset();
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
-                me->SetReactState(REACT_PASSIVE);
-                events.ScheduleEvent(EVENT_WALK_MOBS, 1500);
-                desperated = false;
-                me->RemoveAurasDueToSpell(SPELL_EXPERIENCED);
-                me->RemoveAurasDueToSpell(SPELL_ELITE);
-                DesperateResolve = RAID_MODE( SPELL_DESPERATE_RESOLVE_10_NM, SPELL_DESPERATE_RESOLVE_25_NM, SPELL_DESPERATE_RESOLVE_10_HM, SPELL_DESPERATE_RESOLVE_25_HM);
-                events.ScheduleEvent(EVENT_EXPERIENCED, urand(19000, 21000));  // ~20 sec
-                events.ScheduleEvent(EVENT_VETERAN, urand(39000, 41000));      // ~40 sec
-                events.ScheduleEvent(EVENT_BURNING_PITCH, urand(60000, 62000));// ~61 sec
-                if(me->GetMap()->ToInstanceMap()->GetMaxPlayers() == 25 && me->GetMap()->IsHeroic())
-                    events.ScheduleEvent(EVENT_ELITE, urand(59000, 61000));       // ~60 sec
-            }
-
-            void DamageTaken(Unit* /*attacker*/, uint32& /*damage*/)
-            {
-                if (me->GetHealthPct() < 20.0f && !desperated)
+                if (me->IsWithinMeleeRange(me->GetVictim()))
+                    DoMeleeAttackIfReady();
+                else if (me->isAttackReady())
                 {
-                    desperated = true;
-                    DoCast(me, DesperateResolve);
+                    DoCastVictim(SPELL_RENDING_THROW);
+                    me->resetAttackTimer();
                 }
             }
 
-            bool CanAIAttack(Unit const* target) const
+            bool CanAIAttack(Unit const* target) const override
             {
-                if (target->GetEntry() == NPC_GB_GUNSHIP_HULL)
+                if (_instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != IN_PROGRESS)
                     return false;
-
-                return true;
+                return target->HasAura(SPELL_ON_SKYBREAKER_DECK) || target->GetEntry() == NPC_KOR_KRON_REAVER || target->GetEntry() == NPC_KOR_KRON_SERGEANT;
             }
 
-            void UpdateAI(uint32 diff)
-            {
-                if(_instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != IN_PROGRESS)
-                    return;
-
-                if (me->HasUnitState(UNIT_STATE_CASTING))
-                    return;
-                    
-                events.Update(diff);
-
-                while (uint32 eventId = events.ExecuteEvent())
-                {
-                    switch (eventId)
-                    {
-                        case EVENT_WALK_MOBS:
-                            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
-                            me->SetReactState(REACT_AGGRESSIVE);
-                            switch (me->GetEntry())
-                            {
-                                case NPC_GB_KORKRON_SERGANTE:
-                                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 0.0f, true, SPELL_ON_SKYBREAKERS_DECK))
-                                    {
-                                        me->GetMotionMaster()->MoveChase(target);
-                                        me->AI()->AttackStart(target);
-                                    }
-                                break;
-                                case NPC_GB_SKYBREAKER_SERGANTE:
-                                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 0.0f, true, SPELL_ON_ORGRIMS_HAMMERS_DECK))
-                                    {
-                                        me->GetMotionMaster()->MoveChase(target);
-                                        me->AI()->AttackStart(target);
-                                    }
-                                break;
-                            }
-                            events.ScheduleEvent(EVENT_WOUNDING_STRIKE, 5000);
-                            events.ScheduleEvent(EVENT_BLADE_STORM, 3000);
-                            break;
-                        case EVENT_BURNING_PITCH:
-                            if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true))
-                            {
-                                if (me->GetEntry() == NPC_GB_KORKRON_SERGANTE)
-                                    DoCast(pTarget, SPELL_BURNING_PITCH_H);
-                                else
-                                    DoCast(pTarget, SPELL_BURNING_PITCH_A);
-                            }
-                            events.ScheduleEvent(EVENT_BURNING_PITCH, urand(60000, 62000));// ~61 sec
-                            break;
-                        case EVENT_EXPERIENCED:
-                            DoCast(me, SPELL_EXPERIENCED);
-                            break;
-                        case EVENT_VETERAN:
-                            me->RemoveAurasDueToSpell(SPELL_EXPERIENCED);
-                            DoCast(me, SPELL_VETERAN);
-                            break;
-                        case EVENT_ELITE:
-                            me->RemoveAurasDueToSpell(SPELL_VETERAN);
-                            DoCast(me, SPELL_ELITE);
-                            break;
-                        case EVENT_WOUNDING_STRIKE:
-                            if (UpdateVictim())
-                                DoCastVictim( RAID_MODE( SPELL_WOUNDING_STRIKE_10_NM, SPELL_WOUNDING_STRIKE_25_NM, SPELL_WOUNDING_STRIKE_10_HM, SPELL_WOUNDING_STRIKE_25_HM));
-                            events.ScheduleEvent(EVENT_WOUNDING_STRIKE, urand(5000, 8000));
-                            break;
-                        case EVENT_BLADE_STORM:
-                            DoCast(me, SPELL_BLADESTORM);
-                            events.ScheduleEvent(EVENT_BLADE_STORM, urand(9000, 16000));
-                            break;
-                    }
-                }
-
-                DoMeleeAttackIfReady();
-
-            }
-                uint32 DesperateResolve;
-                bool desperated;
-
-            private:
-                EventMap events;
-                InstanceScript* _instance;
+        private:
+            EventMap _events;
+            PassengerController _controller;
+            InstanceScript* _instance;
+            time_t _firstMageCooldown;
+            time_t _riflemanYellCooldown;
+            time_t _mortarYellCooldown;
         };
 
-        CreatureAI* GetAI(Creature* pCreature) const
+        CreatureAI* GetAI(Creature* creature) const override
         {
-            return new npc_sergeantAI(pCreature);
-        }
-};
-
-class npc_marine_or_reaver : public CreatureScript
-{
-    public:
-        npc_marine_or_reaver() : CreatureScript("npc_marine_or_reaver") { }
-
-        struct npc_marine_or_reaverAI : public ScriptedAI
-        {
-            npc_marine_or_reaverAI(Creature *creature) : ScriptedAI(creature), _instance(creature->GetInstanceScript())
-            {
-                Reset();
-            }
-
-            void Reset()
-            {
-                ScriptedAI::Reset();
-                desperated = false;
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
-                me->SetReactState(REACT_PASSIVE);
-                events.ScheduleEvent(EVENT_WALK_MOBS, 1500);
-                me->RemoveAurasDueToSpell(SPELL_EXPERIENCED);
-                me->RemoveAurasDueToSpell(SPELL_ELITE);
-                DesperateResolve = RAID_MODE( SPELL_DESPERATE_RESOLVE_10_NM, SPELL_DESPERATE_RESOLVE_25_NM, SPELL_DESPERATE_RESOLVE_10_HM, SPELL_DESPERATE_RESOLVE_25_HM);
-                events.ScheduleEvent(EVENT_EXPERIENCED, urand(19000, 21000));  // ~20 sec
-                events.ScheduleEvent(EVENT_VETERAN, urand(39000, 41000));      // ~40 sec
-                events.ScheduleEvent(EVENT_BURNING_PITCH, urand(60000, 62000));// ~61 sec
-            }
-
-            void DamageTaken(Unit* /*attacker*/, uint32& /*damage*/)
-            {
-                if (me->GetHealthPct() < 20.0f && !desperated)
-                {
-                    desperated = true;
-                    DoCast(me, DesperateResolve);
-                }
-            }
-
-            bool CanAIAttack(Unit const* target) const
-            {
-                if (target->GetEntry() == NPC_GB_GUNSHIP_HULL)
-                    return false;
-
-                return true;
-            }
-
-            void UpdateAI(uint32 diff)
-            {
-                if(_instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != IN_PROGRESS)
-                    return;
-
-                if (me->HasUnitState(UNIT_STATE_CASTING))
-                    return;
-
-                events.Update(diff);
-
-                while (uint32 eventId = events.ExecuteEvent())
-                {
-                    switch (eventId)
-                    {
-                        case EVENT_WALK_MOBS:
-                            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
-                            me->SetReactState(REACT_AGGRESSIVE);
-                            switch (me->GetEntry())
-                            {
-                                case NPC_GB_KORKRON_REAVERS:
-                                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 0.0f, true, SPELL_ON_SKYBREAKERS_DECK))
-                                    {
-                                        me->GetMotionMaster()->MoveChase(target);
-                                        me->AI()->AttackStart(target);
-                                    }
-                                break;
-                                case NPC_GB_SKYBREAKER_MARINE:
-                                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 0.0f, true, SPELL_ON_ORGRIMS_HAMMERS_DECK))
-                                    {
-                                        me->GetMotionMaster()->MoveChase(target);
-                                        me->AI()->AttackStart(target);
-                                    }
-                                break;
-                            }
-                            break;
-                        case EVENT_BURNING_PITCH:
-                            if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
-                            {
-                                if (me->GetEntry() == NPC_GB_KORKRON_REAVERS)
-                                    DoCast(pTarget, SPELL_BURNING_PITCH_H);
-                                else
-                                    DoCast(pTarget, SPELL_BURNING_PITCH_A);
-                            }
-                            events.ScheduleEvent(EVENT_BURNING_PITCH, urand(60000, 62000));// ~61 sec
-                            break;
-                        case EVENT_EXPERIENCED:
-                            DoCast(me, SPELL_EXPERIENCED);
-                            break;
-                        case EVENT_VETERAN:
-                            me->RemoveAurasDueToSpell(SPELL_EXPERIENCED);
-                            DoCast(me, SPELL_VETERAN);
-                            break;
-                    }
-                }
-
-                DoMeleeAttackIfReady();
-            }
-                uint32 DesperateResolve;
-                bool desperated;
-
-            private:
-                EventMap events;
-                InstanceScript* _instance;
-        };
-
-        CreatureAI* GetAI(Creature* pCreature) const
-        {
-            return new npc_marine_or_reaverAI(pCreature);
-        }
-};
-
-class npc_gunship_mage : public CreatureScript
-{
-    public:
-        npc_gunship_mage() : CreatureScript("npc_gunship_mage") { }
-
-        struct npc_gunship_mageAI : public ScriptedAI
-        {
-            npc_gunship_mageAI(Creature *creature) : ScriptedAI(creature),_instance(creature->GetInstanceScript())
-            {
-                Reset();
-            }
-
-            void Reset()
-            {
-                ScriptedAI::Reset();
-                timer_BelowZero = urand(10000, 15000);
-            }
-
-            void DoAction(int32 action)
-            {
-                switch (action)
-                {
-                    case EVENT_FREEZE_CANNON:
-                        if (_instance->GetData(DATA_TEAM_IN_INSTANCE) == ALLIANCE)
-                        {
-
-                            std::list<Creature*> cannonsA;
-                            GetCreatureListWithEntryInGrid(cannonsA, me, NPC_GB_ALLIANCE_CANON, 500.0f);
-                            for (std::list<Creature*>::iterator itr = cannonsA.begin(); itr != cannonsA.end(); ++itr)
-                            {
-                                if (Vehicle* veh = (*itr)->GetVehicleKit())
-                                    veh->RemoveAllPassengers();
-									
-                                DoCast((*itr),SPELL_BELOW_ZERO,true);
-                            }
-                        }
-                        else if (_instance->GetData(DATA_TEAM_IN_INSTANCE) == HORDE)
-                        {
-                            std::list<Creature*> cannonsH;
-                            GetCreatureListWithEntryInGrid(cannonsH, me, NPC_GB_HORDE_CANON, 500.0f);
-                            for (std::list<Creature*>::iterator itr = cannonsH.begin(); itr != cannonsH.end(); ++itr)
-                            {
-                                if (Vehicle* veh = (*itr)->GetVehicleKit())
-                                    veh->RemoveAllPassengers();
-									
-                                 DoCast((*itr),SPELL_BELOW_ZERO,true);
-                            }
-                        }
-                    break;
-                }
-            }
-
-            void JustDied(Unit* killer)
-            {
-                if (_instance->GetData(DATA_TEAM_IN_INSTANCE) == ALLIANCE)
-                {
-                    if (me->GetGUID() == _instance->GetData64(DATA_GB_BATTLE_MAGE))
-                    {
-                        if (Creature* pSaurfangBoss = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_GB_HIGH_OVERLORD_SAURFANG)))
-                            pSaurfangBoss->AI()->DoAction(ACTION_MAGE_DIE);
-                    }
-                 }
-                 
-                 if (_instance->GetData(DATA_TEAM_IN_INSTANCE) == HORDE)
-                 {
-                     if (me->GetGUID() == _instance->GetData64(DATA_GB_BATTLE_MAGE))
-                     {
-                         if (Creature* pMuradin = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_GB_MURADIN_BRONZEBEARD)))
-                             pMuradin->AI()->DoAction(ACTION_MAGE_DIE);
-                     }
-                 }
-            }
-
-            void UpdateAI(uint32 diff)
-            {
-                if(_instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != IN_PROGRESS)
-                    return;
-
-				me->SetReactState(REACT_DEFENSIVE); // Dodato
-
-                if (me->HasUnitState(UNIT_STATE_CASTING))
-                    return;
-                    
-                if (me->GetGUID() == _instance->GetData64(DATA_GB_BATTLE_MAGE))
-                {
-
-                    if( timer_BelowZero <= diff)
-                    {
-                        me->AI()->DoAction(EVENT_FREEZE_CANNON);
-                        timer_BelowZero = urand(10000, 15000);
-                    } else timer_BelowZero -= diff;
-                }
-                else
-                {					
-                    DoCast(me,SPELL_SHADOW_CHANNELING);
-                }
-            }
-                uint32 timer_BelowZero;
-            private:
-                EventMap events;
-                InstanceScript* _instance;
-        };
-
-        CreatureAI* GetAI(Creature* pCreature) const
-        {
-            return new npc_gunship_mageAI(pCreature);
-        }
-};
-
-/* Gunship Cannon (Horde / Ally) */
-class npc_gunship_cannon : public CreatureScript
-{
-    public:
-        npc_gunship_cannon() : CreatureScript("npc_gunship_cannon") { }
-
-        struct npc_gunship_cannonAI : public ScriptedAI
-        {
-            npc_gunship_cannonAI(Creature *creature) : ScriptedAI(creature) { }
-
-            void Reset()
-            {
-                me->SetReactState(REACT_PASSIVE);
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
-                DoCast(me, SPELL_HEAT_DRAIN, true);
-            }
-
-            void SpellHit(Unit* /*caster*/, SpellInfo const* spellEntry)
-            {
-                if (spellEntry->Id == SPELL_BELOW_ZERO)
-                    me->GetVehicleKit()->RemoveAllPassengers();
-            }
-
-            void DamageTaken(Unit* attacker, uint32& damage)
-            {
-                if(me->GetEntry() == NPC_GB_ALLIANCE_CANON)
-                {
-                    if (Creature* pAllianceBoss = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetData64(DATA_SKYBREAKER_BOSS)))
-                        attacker->DealDamage(pAllianceBoss, damage);
-                }
-
-                if(me->GetEntry() == NPC_GB_HORDE_CANON)
-                {
-                    if (Creature* pHordeBoss = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetData64(DATA_ORGRIMMAR_HAMMER_BOSS)))
-                        attacker->DealDamage(pHordeBoss, damage);
-                }
-            }
-
-            void UpdateAI(uint32 diff)
-            {
-            	me->RemoveExtraUnitMovementFlag(MOVEMENTFLAG_STRAFE_LEFT);
-		me->RemoveExtraUnitMovementFlag(MOVEMENTFLAG_STRAFE_RIGHT);
-		me->RemoveExtraUnitMovementFlag(MOVEMENTFLAG2_INTERPOLATED_TURNING);
-		
-                if(me->HasAura(SPELL_BELOW_ZERO))
-                {
-			me->RemoveAurasByType(SPELL_AURA_CONTROL_VEHICLE);
-			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-					
-                    if (Vehicle* veh = me->GetVehicleKit())
-                        veh->RemoveAllPassengers();
-                }
-                else
-                {
-			me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-			me->RemoveExtraUnitMovementFlag(MOVEMENTFLAG_STRAFE_LEFT);
-			me->RemoveExtraUnitMovementFlag(MOVEMENTFLAG_STRAFE_RIGHT);
-			me->RemoveExtraUnitMovementFlag(MOVEMENTFLAG2_INTERPOLATED_TURNING);
-					
-                }
-            }
-
-        };
-
-        CreatureAI* GetAI(Creature* pCreature) const
-        {
-            return new npc_gunship_cannonAI(pCreature);
-        }
-};
-
-class npc_mortar_soldier_or_rocketeer : public CreatureScript
-{
-    public:
-        npc_mortar_soldier_or_rocketeer() : CreatureScript("npc_mortar_soldier_or_rocketeer") { }
-
-        struct npc_mortar_soldier_or_rocketeerAI : public ScriptedAI
-        {
-            npc_mortar_soldier_or_rocketeerAI(Creature *creature) : ScriptedAI(creature),_instance(creature->GetInstanceScript())
-            {
-                Reset();
-            }
-
-            void Reset()
-            {
-                ScriptedAI::Reset();
-                me->RemoveAurasDueToSpell(SPELL_EXPERIENCED);
-                me->RemoveAurasDueToSpell(SPELL_ELITE);
-                me->RemoveAurasDueToSpell(SPELL_VETERAN);
-                events.ScheduleEvent(EVENT_EXPERIENCED, urand(19000, 21000)); // ~20 sec
-                events.ScheduleEvent(EVENT_VETERAN, urand(39000, 41000));     // ~40 sec
-                events.ScheduleEvent(EVENT_ELITE, urand(59000, 61000));       // ~60 sec
-                events.ScheduleEvent(EVENT_ROCKET_ART, urand(10000, 15000));   // ~12 sec
-            }
-
-            void JustDied(Unit* killer)
-            {
-                if (_instance->GetData(DATA_TEAM_IN_INSTANCE) == ALLIANCE)
-                {
-                    if (Creature* pSaurfangBoss = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_GB_HIGH_OVERLORD_SAURFANG)))
-                        pSaurfangBoss->AI()->DoAction(ACTION_ROCK_DIE);
-                }
-                if (_instance->GetData(DATA_TEAM_IN_INSTANCE) == HORDE)
-                {
-                    if (Creature* pMuradin = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_GB_MURADIN_BRONZEBEARD)))
-                        pMuradin->AI()->DoAction(ACTION_ROCK_DIE);
-                }
-            }
-
-            void UpdateAI(uint32 diff)
-            {
-                if(_instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != IN_PROGRESS)
-                    return;
-
-				me->SetReactState(REACT_DEFENSIVE); // Dodato
-
-                if (me->HasUnitState(UNIT_STATE_CASTING))
-                    return;
-                    
-                events.Update(diff);
-
-                while (uint32 eventId = events.ExecuteEvent())
-                {
-                    switch (eventId)
-                    {
-                        case EVENT_EXPERIENCED:
-                            DoCast(me, SPELL_EXPERIENCED);
-                            break;
-                        case EVENT_VETERAN:
-                            me->RemoveAurasDueToSpell(SPELL_EXPERIENCED);
-                            DoCast(me, SPELL_VETERAN);
-                            break;
-                        case EVENT_ELITE:
-                            me->RemoveAurasDueToSpell(SPELL_VETERAN);
-                            DoCast(me, SPELL_ELITE);
-                            break;
-                        case EVENT_ROCKET_ART:
-                            if(Player* target = SelectRandomPlayerInTheMaps(me->GetMap()))
-                            {
-                                if(me->GetEntry() == NPC_GB_KORKRON_ROCKETEER && target->HasAura(SPELL_ON_SKYBREAKERS_DECK))
-                                {
-                                    me->CastSpell(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), SPELL_ROCKET_ARTILLERY_TRIGGERED, true);
-                                    me->CastSpell(target, 69400, true);
-                                }
-                                else if(me->GetEntry() == NPC_GB_SKYBREAKER_MORTAR_SOLDIER && target->HasAura(SPELL_ON_ORGRIMS_HAMMERS_DECK))
-                                {
-                                    me->CastSpell(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), SPELL_ROCKET_ARTILLERY_TRIGGERED, true);
-                                    me->CastSpell(target, 70173, true);
-                                }
-                            }
-                            events.ScheduleEvent(EVENT_ROCKET_ART, urand(10000, 15000));   // ~12 sec
-                            break;
-                        default:
-                            break;
-                    }
-                }
-            }
-
-            private:
-                EventMap events;
-                InstanceScript* _instance;
-        };
-
-        CreatureAI* GetAI(Creature* pCreature) const
-        {
-            return new npc_mortar_soldier_or_rocketeerAI(pCreature);
+            return GetIcecrownCitadelAI<npc_muradin_bronzebeard_igbAI>(creature);
         }
 };
 
@@ -1962,1420 +1385,1123 @@ class npc_zafod_boombox : public CreatureScript
     public:
         npc_zafod_boombox() : CreatureScript("npc_zafod_boombox") { }
 
-        bool OnGossipHello(Player* pPlayer, Creature* pCreature)
+        struct npc_zafod_boomboxAI : public gunship_npc_AI
         {
-            // Maybe this isn't blizzlike but I can't find any spell in the DBCs
-            if (pPlayer->GetItemCount(49278, false) == 0)
-                pPlayer->ADD_GOSSIP_ITEM(0, "Yeah, I'm sure that safety is your top priority. Give me a jetpack.", 631, 1);
-            pPlayer->SEND_GOSSIP_MENU(pPlayer->GetGossipTextId(pCreature), pCreature->GetGUID());
-            return true;
-        }
-
-        bool OnGossipSelect(Player* player, Creature* pCreature, uint32 /*sender*/, uint32 action)
-        {
-            player->PlayerTalkClass->ClearMenus();
-            player->CLOSE_GOSSIP_MENU();
-            if (action == 1)
+            npc_zafod_boomboxAI(Creature* creature) : gunship_npc_AI(creature)
             {
-                // Seurity, this shouldn't happen. Maybe useless.
-                uint32 curItemCount = player->GetItemCount(49278, false);
-                if (curItemCount >= 1)
-                {
-                    pCreature->MonsterWhisper("You already have my jetpack!", player->GetGUIDLow());
-                    return false;
-                }
-
-                ItemPosCountVec dest;
-                uint8 msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, 49278, 1);
-                if (msg == EQUIP_ERR_OK)
-                {
-                    Item* item = player->StoreNewItem(dest, 49278, true);
-                    player->SendNewItem(item, 1, true, false);
-                }
-                else
-                {
-                    pCreature->MonsterWhisper("You do not have empty space for my jet-pack!", player->GetGUIDLow());
-                    return false;
-                }
             }
 
-            return true;
+            void Reset() override
+            {
+                me->SetReactState(REACT_PASSIVE);
+            }
+
+            void sGossipSelect(Player* player, uint32 /*sender*/, uint32 /*action*/) override
+            {
+                player->AddItem(ITEM_GOBLIN_ROCKET_PACK, 1);
+                player->PlayerTalkClass->SendCloseGossip();
+            }
+
+            void UpdateAI(uint32 /*diff*/) override
+            {
+                UpdateVictim();
+            }
+        };
+
+        CreatureAI* GetAI(Creature* creature) const override
+        {
+            return GetIcecrownCitadelAI<npc_zafod_boomboxAI>(creature);
         }
 };
 
-//
-class npc_saurfang_gunship : public CreatureScript
+struct npc_gunship_boarding_addAI : public gunship_npc_AI
+{
+    npc_gunship_boarding_addAI(Creature* creature) : gunship_npc_AI(creature)
+    {
+        me->m_CombatDistance = 80.0f;
+        _usedDesperateResolve = false;
+    }
+
+    void SetData(uint32 type, uint32 data) override
+    {
+        // detach from captain
+        if (type == ACTION_SET_SLOT)
+        {
+            SetSlotInfo(data);
+
+            me->SetReactState(REACT_PASSIVE);
+
+            me->m_Events.AddEvent(new DelayedMovementEvent(me, Slot->TargetPosition), me->m_Events.CalculateTime(3000 * (Index - SLOT_MARINE_1)));
+
+            if (Creature* captain = me->FindNearestCreature(Instance->GetData(DATA_TEAM_IN_INSTANCE) == HORDE ? NPC_IGB_MURADIN_BRONZEBEARD : NPC_IGB_HIGH_OVERLORD_SAURFANG, 200.0f))
+                captain->AI()->SetData(ACTION_CLEAR_SLOT, Index);
+        }
+    }
+
+    void MovementInform(uint32 type, uint32 pointId) override
+    {
+        if (type != POINT_MOTION_TYPE)
+            return;
+
+        if (pointId == EVENT_CHARGE_PREPATH && Slot)
+        {
+            Position const& otherTransportPos = Instance->GetData(DATA_TEAM_IN_INSTANCE) == HORDE ? OrgrimsHammerTeleportExit : SkybreakerTeleportExit;
+            float x, y, z, o;
+            otherTransportPos.GetPosition(x, y, z, o);
+
+            Transport* myTransport = me->GetTransport();
+            if (!myTransport)
+                return;
+
+            if (GameObject* go = HashMapHolder<GameObject>::Find(Instance->GetGuidData(DATA_ICECROWN_GUNSHIP_BATTLE)))
+                if (Transport* destTransport = go->ToTransport())
+                    destTransport->CalculatePassengerPosition(x, y, z, &o);
+
+            float angle = frand(0, float(M_PI) * 2.0f);
+            x += 2.0f * std::cos(angle);
+            y += 2.0f * std::sin(angle);
+
+            me->SetHomePosition(x, y, z, o);
+            myTransport->CalculatePassengerOffset(x, y, z, &o);
+            me->SetTransportHomePosition(x, y, z, o);
+
+            me->m_Events.AddEvent(new BattleExperienceEvent(me), me->m_Events.CalculateTime(BattleExperienceEvent::ExperiencedTimes[0]));
+            DoCast(me, SPELL_BATTLE_EXPERIENCE, true);
+            DoCast(me, SPELL_TELEPORT_TO_ENEMY_SHIP, true);
+            DoCast(me, Instance->GetData(DATA_TEAM_IN_INSTANCE) == HORDE ? SPELL_MELEE_TARGETING_ON_ORGRIMS_HAMMER : SPELL_MELEE_TARGETING_ON_SKYBREAKER, true);
+            me->_AddCreatureSpellCooldown(BurningPitchId, time(NULL) + 3);
+
+            std::list<Player*> players;
+            Trinity::UnitAuraCheck check(true, Instance->GetData(DATA_TEAM_IN_INSTANCE) == HORDE ? SPELL_ON_ORGRIMS_HAMMER_DECK : SPELL_ON_SKYBREAKER_DECK);
+            Trinity::PlayerListSearcher<Trinity::UnitAuraCheck> searcher(me, players, check);
+            me->VisitNearbyWorldObject(200.0f, searcher);
+
+            players.remove_if([this](Player* player)
+            {
+                return !me->_IsTargetAcceptable(player) || !me->CanStartAttack(player, true);
+            });
+
+            if (!players.empty())
+            {
+                players.sort(Trinity::ObjectDistanceOrderPred(me));
+                for (std::list<Player*>::iterator itr = players.begin(); itr != players.end(); ++itr)
+                    me->AddThreat(*itr, 1.0f);
+
+                AttackStart(players.front());
+            }
+
+            me->SetReactState(REACT_AGGRESSIVE);
+        }
+    }
+
+    void DamageTaken(Unit* /*attacker*/, uint32& damage) override
+    {
+        if (_usedDesperateResolve)
+            return;
+
+        if (!me->HealthBelowPctDamaged(25, damage))
+            return;
+
+        _usedDesperateResolve = true;
+        DoCast(me, SPELL_DESPERATE_RESOLVE, true);
+    }
+
+    void UpdateAI(uint32 /*diff*/) override
+    {
+        if (!SelectVictim())
+        {
+            TriggerBurningPitch();
+            return;
+        }
+
+        if (!HasAttackablePlayerNearby())
+            TriggerBurningPitch();
+
+        DoMeleeAttackIfReady();
+    }
+
+    bool CanAIAttack(Unit const* target) const override
+    {
+        uint32 spellId = SPELL_ON_SKYBREAKER_DECK;
+        uint32 creatureEntry = NPC_IGB_MURADIN_BRONZEBEARD;
+        if (Instance->GetData(DATA_TEAM_IN_INSTANCE) == HORDE)
+        {
+            spellId = SPELL_ON_ORGRIMS_HAMMER_DECK;
+            creatureEntry = NPC_IGB_HIGH_OVERLORD_SAURFANG;
+        }
+
+        return target->HasAura(spellId) || target->GetEntry() == creatureEntry;
+    }
+
+    bool HasAttackablePlayerNearby()
+    {
+        std::list<Player*> players;
+        Trinity::UnitAuraCheck check(true, Instance->GetData(DATA_TEAM_IN_INSTANCE) == HORDE ? SPELL_ON_ORGRIMS_HAMMER_DECK : SPELL_ON_SKYBREAKER_DECK);
+        Trinity::PlayerListSearcher<Trinity::UnitAuraCheck> searcher(me, players, check);
+        me->VisitNearbyWorldObject(200.0f, searcher);
+
+        players.remove_if([this](Player* player)
+        {
+            return !me->_IsTargetAcceptable(player) || !me->CanStartAttack(player, true);
+        });
+
+        return !players.empty();
+    }
+
+private:
+    bool _usedDesperateResolve;
+};
+
+class npc_gunship_boarding_leader : public CreatureScript
 {
     public:
-        npc_saurfang_gunship() : CreatureScript("npc_saurfang_gunship") { }
+        npc_gunship_boarding_leader() : CreatureScript("npc_gunship_boarding_leader") { }
 
-        bool OnGossipHello(Player* player, Creature* pCreature)
+        struct npc_gunship_boarding_leaderAI : public npc_gunship_boarding_addAI
         {
-            InstanceScript* pInstance = pCreature->GetInstanceScript();
-            if (pInstance && pInstance->GetData(DATA_TEAM_IN_INSTANCE) == HORDE)
+            npc_gunship_boarding_leaderAI(Creature* creature) : npc_gunship_boarding_addAI(creature)
             {
-                if ((!player->GetGroup() || !player->GetGroup()->IsLeader(player->GetGUID())) && !player->IsGameMaster())
+            }
+
+            void EnterCombat(Unit* target) override
+            {
+                npc_gunship_boarding_addAI::EnterCombat(target);
+                _events.ScheduleEvent(EVENT_BLADESTORM, urand(13000, 18000));
+                _events.ScheduleEvent(EVENT_WOUNDING_STRIKE, urand(8000, 10000));
+            }
+
+            void UpdateAI(uint32 diff) override
+            {
+                if (!SelectVictim())
                 {
-                    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "I'm not the raid leader...", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2);
-                    player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pCreature->GetGUID());
-                    return true;
-                }
-
-                player->ADD_GOSSIP_ITEM(0, "My companions are all accounted for, Saurfang. Let's go!", 631, 1001);
-                player->SEND_GOSSIP_MENU(player->GetGossipTextId(pCreature), pCreature->GetGUID());
-                return true;
-            }
-            return false;
-        }
-
-        bool OnGossipSelect(Player* player, Creature* pCreature, uint32 /*sender*/, uint32 action)
-        {
-            InstanceScript* instance = pCreature->GetInstanceScript();
-            player->PlayerTalkClass->ClearMenus();
-            player->CLOSE_GOSSIP_MENU();
-
-            if (action == GOSSIP_ACTION_INFO_DEF+2)
-                pCreature->MonsterSay("I'll wait for the raid leader.", LANG_UNIVERSAL, player->GetGUID());
-
-            if (action == 1001)
-            {
-                pCreature->AI()->DoAction(ACTION_INTRO_START);
-                pCreature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-            }
-            return true;
-        }
-        struct npc_saurfang_gunshipAI : public ScriptedAI
-        {
-            npc_saurfang_gunshipAI(Creature *creature) : ScriptedAI(creature),
-                _instance(creature->GetInstanceScript())
-            {
-            }
-
-            void Reset()
-            {
-                if (_instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) == IN_PROGRESS)
+                    TriggerBurningPitch();
                     return;
+                }
+
+                _events.Update(diff);
+
+                if (me->HasUnitState(UNIT_STATE_CASTING) || me->HasAura(SPELL_BLADESTORM))
+                    return;
+
+                if (!HasAttackablePlayerNearby())
+                    TriggerBurningPitch();
+
+                while (uint32 eventId = _events.ExecuteEvent())
+                {
+                    switch (eventId)
+                    {
+                        case EVENT_BLADESTORM:
+                            DoCastAOE(SPELL_BLADESTORM);
+                            _events.ScheduleEvent(EVENT_BLADESTORM, urand(25000, 30000));
+                            break;
+                        case EVENT_WOUNDING_STRIKE:
+                            DoCastVictim(SPELL_WOUNDING_STRIKE);
+                            _events.ScheduleEvent(EVENT_WOUNDING_STRIKE, urand(9000, 13000));
+                            break;
+                        default:
+                            break;
+                    }
+                }
+
+                DoMeleeAttackIfReady();
+            }
+
+        private:
+            EventMap _events;
+        };
+
+        CreatureAI* GetAI(Creature* creature) const override
+        {
+            return GetIcecrownCitadelAI<npc_gunship_boarding_leaderAI>(creature);
+        }
+};
+
+class npc_gunship_boarding_add : public CreatureScript
+{
+    public:
+        npc_gunship_boarding_add() : CreatureScript("npc_gunship_boarding_add") { }
+
+
+        CreatureAI* GetAI(Creature* creature) const override
+        {
+            return GetIcecrownCitadelAI<npc_gunship_boarding_addAI>(creature);
+        }
+};
+
+class npc_gunship_gunner : public CreatureScript
+{
+    public:
+        npc_gunship_gunner() : CreatureScript("npc_gunship_gunner") { }
+
+        struct npc_gunship_gunnerAI : public gunship_npc_AI
+        {
+            npc_gunship_gunnerAI(Creature* creature) : gunship_npc_AI(creature)
+            {
+                creature->m_CombatDistance = 200.0f;
+            }
+
+            void AttackStart(Unit* target) override
+            {
+                me->Attack(target, false);
+            }
+
+            void MovementInform(uint32 type, uint32 pointId) override
+            {
+                gunship_npc_AI::MovementInform(type, pointId);
+                if (type == POINT_MOTION_TYPE && pointId == EVENT_CHARGE_PREPATH)
+                    me->SetControlled(true, UNIT_STATE_ROOT);
+            }
+
+            void UpdateAI(uint32 /*diff*/) override
+            {
+                if (!SelectVictim())
+                {
+                    TriggerBurningPitch();
+                    return;
+                }
+
+                DoSpellAttackIfReady(me->GetEntry() == NPC_SKYBREAKER_RIFLEMAN ? SPELL_SHOOT : SPELL_HURL_AXE);
+            }
+        };
+
+        CreatureAI* GetAI(Creature* creature) const override
+        {
+            return GetIcecrownCitadelAI<npc_gunship_gunnerAI>(creature);
+        }
+};
+
+class npc_gunship_rocketeer : public CreatureScript
+{
+    public:
+        npc_gunship_rocketeer() : CreatureScript("npc_gunship_rocketeer") { }
+
+        struct npc_gunship_rocketeerAI : public gunship_npc_AI
+        {
+            npc_gunship_rocketeerAI(Creature* creature) : gunship_npc_AI(creature)
+            {
+                creature->m_CombatDistance = 200.0f;
+            }
+
+            void MovementInform(uint32 type, uint32 pointId) override
+            {
+                gunship_npc_AI::MovementInform(type, pointId);
+                if (type == POINT_MOTION_TYPE && pointId == EVENT_CHARGE_PREPATH)
+                    me->SetControlled(true, UNIT_STATE_ROOT);
+            }
+
+            void UpdateAI(uint32 /*diff*/) override
+            {
+                if (!SelectVictim())
+                    return;
+
+                if (me->HasUnitState(UNIT_STATE_CASTING))
+                    return;
+
+                uint32 spellId = me->GetEntry() == NPC_SKYBREAKER_MORTAR_SOLDIER ? SPELL_ROCKET_ARTILLERY_A : SPELL_ROCKET_ARTILLERY_H;
+                if (me->HasSpellCooldown(spellId))
+                    return;
+
+                DoCastAOE(spellId, true);
+                me->_AddCreatureSpellCooldown(spellId, time(NULL) + 9);
+            }
+        };
+
+        CreatureAI* GetAI(Creature* creature) const override
+        {
+            return GetIcecrownCitadelAI<npc_gunship_rocketeerAI>(creature);
+        }
+};
+
+class npc_gunship_mage : public CreatureScript
+{
+    public:
+        npc_gunship_mage() : CreatureScript("npc_gunship_mage") { }
+
+        struct npc_gunship_mageAI : public gunship_npc_AI
+        {
+            npc_gunship_mageAI(Creature* creature) : gunship_npc_AI(creature)
+            {
                 me->SetReactState(REACT_PASSIVE);
-                me->setFaction(1801);
-                events.Reset();
-                map = me->GetMap();
-                orgrimmar = me->GetTransport();
-				 UpdateTransportMotionInMap(orgrimmar);
-                RocketerDieCount = 0;
-                AxesDieCount = 0;
-                SummonCount = RAID_MODE(3, 5, 4, 6);
-                count = 0;
-                RocketerCount = RAID_MODE(2, 4, 2, 4);
-                AxesCount = RAID_MODE(4, 6, 4, 6);
-                EventScheduled = false;
             }
 
-            void SendMusicToPlayers(uint32 musicId) const
+            void EnterEvadeMode() override
             {
-                WorldPacket data(SMSG_PLAY_MUSIC, 4);
-                data << uint32(musicId);
-                SendPacketToPlayers(&data);
+                ScriptedAI::EnterEvadeMode();
             }
 
-            // Send packet to all players
-            void SendPacketToPlayers(WorldPacket const* data) const
-            {
-                Map::PlayerList const& players = me->GetMap()->GetPlayers();
-                if (!players.isEmpty())
-                    for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-                        if (Player* player = itr->getSource())
-                            player->GetSession()->SendPacket(data);
-            }
-
-            bool CanAIAttack(Unit const* target) const
-            {
-                if (target->GetEntry() == NPC_GB_SKYBREAKER_SERGANTE || target->GetEntry() == NPC_GB_SKYBREAKER_MARINE)
-                    return true;
-
-                return false;
-            }
-
-            void DoAction(int32 action)
-            {
-                switch (action)
-                {
-                     case ACTION_INTRO_START:
-                         events.ScheduleEvent(EVENT_INTRO_HORDE_1, 1000);
-                         events.ScheduleEvent(EVENT_INTRO_HORDE_1_1, 11000);
-                         events.ScheduleEvent(EVENT_START_FLY, 5000);
-                         events.ScheduleEvent(EVENT_INTRO_HORDE_2, 32000);
-                         events.ScheduleEvent(EVENT_INTRO_HORDE_3, 51000);
-                         events.ScheduleEvent(EVENT_INTRO_HORDE_4, 57000);
-                         events.ScheduleEvent(EVENT_INTRO_HORDE_5, 62000);
-                         break;
-                     case ACTION_BATTLE_EVENT:
-                     {
-                         if (_instance->GetData(DATA_TEAM_IN_INSTANCE) == HORDE)
-                             events.ScheduleEvent(EVENT_WIPE_CHECK, 5000);
-
-                         Creature* pHordeBoss = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_ORGRIMMAR_HAMMER_BOSS));
-                         Creature* pAllianceBoss = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_SKYBREAKER_BOSS));
-
-                         if (pHordeBoss && pAllianceBoss)
-                         {
-                             me->SetReactState(REACT_AGGRESSIVE);
-                             pHordeBoss->SetInCombatWith(pAllianceBoss);
-                             pAllianceBoss->SetInCombatWith(pHordeBoss);
-                             pAllianceBoss->AddThreat(pHordeBoss, 0.0f);
-                             pHordeBoss->AddThreat(pAllianceBoss, 0.0f);
-                             _instance->SetBossState(DATA_ICECROWN_GUNSHIP_BATTLE, IN_PROGRESS);
-                             events.ScheduleEvent(EVENT_SUMMON_PORTAL, 30000);
-                             RelocateTransport(orgrimmar);
-                             RelocateTransport(CheckUnfriendlyShip(me,_instance, DATA_GB_MURADIN_BRONZEBEARD));
-                         }
-                         else
-                             me->AI()->DoAction(ACTION_FAIL);
-                         break;
-                     }
-                     case ACTION_DONE:
-                         if (Creature* pAllianceBoss = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_SKYBREAKER_BOSS)))
-                         {
-                             _instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, pAllianceBoss);
-                         }
-                         if (Creature* pHordeBoss = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_ORGRIMMAR_HAMMER_BOSS)))
-                         {
-                             _instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, pHordeBoss);
-                         }
-
-                         me->SetReactState(REACT_PASSIVE);
-                         _instance->SetBossState(DATA_ICECROWN_GUNSHIP_BATTLE, DONE);
-                         _instance->DoCastSpellOnPlayers(SPELL_REMOVE_ROCKET_PACK);
-                         Talk(SAY_HORDE_VICTORY);
-                         StartFlyShip(CheckUnfriendlyShip(me, _instance, DATA_GB_MURADIN_BRONZEBEARD));
-                         StopFight(orgrimmar,CheckUnfriendlyShip(me,_instance, DATA_GB_MURADIN_BRONZEBEARD));
-                         events.CancelEvent(EVENT_WIPE_CHECK);
-                         events.ScheduleEvent(EVENT_OUTRO_HORDE_1, 3500);
-                         events.ScheduleEvent(EVENT_OUTRO_HORDE_2, 21000);
-                         events.ScheduleEvent(EVENT_OUTRO_HORDE_3, 32000);
-                         break;
-                     case ACTION_FAIL:
-                         events.CancelEvent(EVENT_WIPE_CHECK);
-                         Talk(SAY_HORDE_DEFEAT);
-                         if (Creature* pHordeBoss = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_ORGRIMMAR_HAMMER_BOSS)))
-                         {
-                             _instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, pHordeBoss);
-                         }
-                         if (Creature* pAllianceBoss = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_SKYBREAKER_BOSS)))
-                         {
-                             _instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, pAllianceBoss);
-                         }
-                         StopFight(orgrimmar,CheckUnfriendlyShip(me,_instance, DATA_GB_MURADIN_BRONZEBEARD));
-                         events.ScheduleEvent(EVENT_FAIL, 10000);
-                         break;
-                     case ACTION_MAGE_DIE:
-						 //Check, if there really is no mage
-						 if(me->GetEntry() != NPC_GB_KORKRON_BATTLE_MAGE){
-						  events.ScheduleEvent(EVENT_SPAWN_MAGE, 60000);
-						 }
-                        break;
-                     case ACTION_ROCK_DIE:
-                         ++RocketerDieCount;
-                         if(RocketerDieCount == RocketerCount)
-                             events.ScheduleEvent(EVENT_RESPAWN_ROCKETEER, 60000);
-                         break;
-                     case ACTION_AXES_RIFL_DIE:
-                         ++AxesDieCount;
-                         if(AxesDieCount == AxesCount)
-                             events.ScheduleEvent(EVENT_RESPAWN_AXES_RIFLEMEN, 60000);
-                         break;
-                 }
-            }
-
-            void DamageTaken(Unit* /*attacker*/, uint32& damage)
-            {
-                if (_instance->GetData(DATA_TEAM_IN_INSTANCE) == ALLIANCE && me->GetHealthPct() < 2.0f )
-                {
-                    damage = 0;
-                }
-                
-                if (_instance->GetData(DATA_TEAM_IN_INSTANCE) == HORDE && me->GetHealthPct() < 2.0f )
-                {
-                    damage = 0;
-                    me->AI()->DoAction(ACTION_FAIL);
-                }
-            }
-
-            void MovementInform(uint32 type, uint32 pointId)
+            void MovementInform(uint32 type, uint32 pointId) override
             {
                 if (type != POINT_MOTION_TYPE)
                     return;
 
-                if (pointId = 1)
-                    me->DespawnOrUnsummon(1000);
-            }
-
-            void UpdateAI(uint32 diff)
-            {
-                if (me->HasUnitState(UNIT_STATE_CASTING))
-                    return;
-                    
-                if(_instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) == IN_PROGRESS)
+                if (pointId == EVENT_CHARGE_PREPATH && Slot)
                 {
-                    if (!HealthAbovePct(75))
+                    SlotInfo const* slots = Instance->GetData(DATA_TEAM_IN_INSTANCE) == HORDE ? SkybreakerSlotInfo : OrgrimsHammerSlotInfo;
+                    me->SetFacingTo(slots[Index].TargetPosition.GetOrientation());
+                    switch (Index)
                     {
-                        me->SetHealth(me->GetMaxHealth() / 100 * 76); // find a better way to avoid the hardcore spell spam ....
-                        DoCast(me, SPELL_TASTE_OF_BLOOD);
-                    } 
-
-                    if (UpdateVictim())
-                    {
-                        if (!EventScheduled)
-                        {
-                            events.ScheduleEvent(EVENT_RENDING_THROW, 1500);
-                            EventScheduled = true;
-                        }
-                    }
-                }
-
-                events.Update(diff);
-
-                while (uint32 eventId = events.ExecuteEvent())
-                {
-                    switch (eventId)
-                    {
-                        case EVENT_WIPE_CHECK:
-                            DoCheckFallingPlayer(me);
-                            if (DoWipeCheck(orgrimmar))
-                                events.ScheduleEvent(EVENT_WIPE_CHECK, 3000);
-                            else
-                                me->AI()->DoAction(ACTION_FAIL);
+                        case SLOT_FREEZE_MAGE:
+                            DoCastAOE(SPELL_BELOW_ZERO);
                             break;
-                        case EVENT_INTRO_HORDE_1:
-                            Talk(SAY_INTRO_HORDE_0);
-                            StartFlyShip(orgrimmar);
+                        case SLOT_MAGE_1:
+                        case SLOT_MAGE_2:
+                            DoCastAOE(SPELL_SHADOW_CHANNELING);
                             break;
-                        case EVENT_INTRO_HORDE_1_1:
-                            Talk(SAY_INTRO_HORDE_0_1);
-                            break;
-                        case EVENT_START_FLY:
-							StartFlyShip(orgrimmar); // Try
-                            break;
-                        case EVENT_INTRO_HORDE_2:
-                            StopFlyShip(orgrimmar);
-                            StartFlyShip(CheckUnfriendlyShip(me, _instance, DATA_GB_MURADIN_BRONZEBEARD));
-                            Talk(SAY_INTRO_HORDE_1);
-                            break;
-                        case EVENT_INTRO_HORDE_3:
-                            StopFlyShip(CheckUnfriendlyShip(me, _instance, DATA_GB_MURADIN_BRONZEBEARD));
-                            Talk(SAY_INTRO_HORDE_2);
-                            break;
-                        case EVENT_INTRO_HORDE_4:
-                            SendMusicToPlayers(17289);
-                            me->AI()->DoAction(ACTION_BATTLE_EVENT);
-                            if (Creature* pMuradin = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_MURADIN_BRONZEBEARD_NOT_VISUAL)))
-                            {
-                                pMuradin->AI()->Talk(SAY_MURADIN_BRONZEBEARD_NOT_VISUAL);
-                                pMuradin->SetReactState(REACT_PASSIVE);
-                                pMuradin->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
-                            }
-                            break;
-                        case EVENT_INTRO_HORDE_5:
-                            Talk(SAY_INTRO_HORDE_4);
-                            break;
-                        case EVENT_SUMMON_PORTAL:
-							if(_instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != DONE){
-								orgrimmar->AddNPCPassengerInInstance(NPC_GB_PORTAL, 15.03016f, -7.00016f, 37.70952f, 1.55138f);
-								CheckUnfriendlyShip(me, _instance, DATA_MURADIN_BRONZEBEARD_NOT_VISUAL)->AddNPCPassengerInInstance(NPC_GB_PORTAL, 3.51547f, -0.160213f, 20.87252f, 3.05033f);
-								events.ScheduleEvent(EVENT_BOARDING_TALK, 10000);
-								events.ScheduleEvent(EVENT_BOARDING_GUNSHIP, 2500); // TODO: Fix the timers
-							}
-                            break;
-                        case EVENT_BOARDING_TALK:
-                            Talk(SAY_BOARDING_ORGRIMS_HAMMER_1);
-                            break;
-                        case EVENT_BOARDING_GUNSHIP:
-							if(_instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != DONE){
-								count = 0;
-								if (Creature* pSaurfang = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_MURADIN_BRONZEBEARD_NOT_VISUAL)))
-								{
-									pSaurfang->AI()->Talk(SAY_BOARDING_SKYBREAKER_MURADIN);
-								}
-								if (Creature* Sergante = orgrimmar->AddNPCPassengerInInstance(NPC_GB_SKYBREAKER_SERGANTE, 15.03016f, -7.00016f, 37.70952f, 1.55138f))
-								{
-									Sergante->CastSpell(Sergante, SPELL_TELEPORT_VISUAL, true);
-								}
-								events.ScheduleEvent(EVENT_BOARDING_REAVERS_MARINE, 3000);
-								events.ScheduleEvent(EVENT_SUMMON_PORTAL, 90000);
-							}
-                            break;
-                        case EVENT_BOARDING_REAVERS_MARINE:
-							if(_instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != DONE){
-								if(count <= SummonCount)
-								{
-									if(Creature* Marine = orgrimmar->AddNPCPassengerInInstance(NPC_GB_SKYBREAKER_MARINE, 15.03016f, -7.00016f, 37.70952f, 1.55138f))
-									{
-										Marine->CastSpell(Marine, SPELL_TELEPORT_VISUAL, true);
-										count++;
-										events.ScheduleEvent(EVENT_BOARDING_REAVERS_MARINE, 2500);
-									}
-								}
-							}
-                            break;
-                        case EVENT_OUTRO_HORDE_1:
-                            _instance->DoCompleteAchievement(RAID_MODE(IM_ON_A_BOAT_10,IM_ON_A_BOAT_25,IM_ON_A_BOAT_10,IM_ON_A_BOAT_25));
-                            _instance->DoCastSpellOnPlayers(SPELL_ACHIEVEMENT_CHECK);
-                            StartFlyShip(orgrimmar);
-                            StopFlyShip(CheckUnfriendlyShip(me,_instance,DATA_GB_MURADIN_BRONZEBEARD));
-                            break;
-                        case EVENT_OUTRO_HORDE_2:
-                            StopFlyShip(orgrimmar);
-                            me->SummonGameObject(RAID_MODE(GO_CAPITAN_CHEST_H_10N, GO_CAPITAN_CHEST_H_25N, GO_CAPITAN_CHEST_H_10H, GO_CAPITAN_CHEST_H_25H), -590.200022f, 2241.193115f, 539.588269f, 0, 0, 0, 0, 0, 100000);
-                            me->AddUnitMovementFlag(MOVEMENTFLAG_WALKING);
-                            me->GetMotionMaster()->MovePoint(0, -590.700f, 2213.01f, 539.1f);
-                            break;
-                        case EVENT_OUTRO_HORDE_3:
-                            me->GetMotionMaster()->MovePoint(1, -555.59f, 2213.01f, 539.28f);
-                            break;
-                        case EVENT_FAIL:
-                            TeleportPlayers(map, HORDE);
-                            events.ScheduleEvent(EVENT_RESTART_EVENT, 2000);
-                            _instance->SetBossState(DATA_ICECROWN_GUNSHIP_BATTLE, NOT_STARTED);
-                            break;
-                        case EVENT_RESTART_EVENT:
-							if(_instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != DONE){
-								_instance->SetBossState(DATA_ICECROWN_GUNSHIP_BATTLE, FAIL);
-								RestartEvent(orgrimmar, CheckUnfriendlyShip(me,_instance,DATA_GB_MURADIN_BRONZEBEARD), map, HORDE);
-							}
-                            break;
-                        case EVENT_RENDING_THROW:
-                            if (UpdateVictim())
-                                if (me->GetVictim()->IsWithinDistInMap(me, 30.0f, false))
-                                {
-                                    DoCastVictim(SPELL_RENDING_THROW);
-                                    EventScheduled = false;
-                               }
-                               else
-                                   events.CancelEvent(EVENT_RENDING_THROW);
-                            break;
-							case EVENT_SPAWN_MAGE:
-								   //Prevent from spawning multiple Mages
-									if(me->GetEntry() != NPC_GB_KORKRON_BATTLE_MAGE){
-									Talk(SAY_NEW_BATTLE_MAGE_SPAWNED);
-									orgrimmar->AddNPCPassengerInInstance(NPC_GB_KORKRON_BATTLE_MAGE, 15.03016f, 0.00016f, 37.70952f, 1.55138f);
-									}
-                            break;
-                        case EVENT_RESPAWN_ROCKETEER:
-                            Talk(SAY_NEW_ROCKETEERS_SPAWNED);
-                            if(RocketerCount == 2)
-                            {
-                                orgrimmar->AddNPCPassengerInInstance(NPC_GB_KORKRON_ROCKETEER, -11.44849f, -25.71838f, 33.64343f, 1.49248f);
-                                orgrimmar->AddNPCPassengerInInstance(NPC_GB_KORKRON_ROCKETEER, 12.30336f, -25.69653f, 35.32373f, 1.49248f);
-                            }
-                            if(RocketerCount == 4)
-                            {
-                                orgrimmar->AddNPCPassengerInInstance(NPC_GB_KORKRON_ROCKETEER, -11.44849f, -25.71838f, 33.64343f, 1.49248f);
-                                orgrimmar->AddNPCPassengerInInstance(NPC_GB_KORKRON_ROCKETEER, 12.30336f, -25.69653f, 35.32373f, 1.49248f);
-                                orgrimmar->AddNPCPassengerInInstance(NPC_GB_KORKRON_ROCKETEER, -3.44849f, -25.71838f, 34.21082f, 1.49248f);
-                                orgrimmar->AddNPCPassengerInInstance(NPC_GB_KORKRON_ROCKETEER, 3.30336f, -25.69653f, 35.32373f, 1.49248f);
-                            }
-                            break;
-                         case EVENT_RESPAWN_AXES_RIFLEMEN:
-                            Talk(SAY_NEW_AXETHROWER_SPAWNED);
-                            if(AxesCount == 4)
-                            {
-                                orgrimmar->AddNPCPassengerInInstance(NPC_GB_KORKRON_AXETHROWER, -3.170555f, 28.30652f, 34.21082f, 1.66527f);
-                                orgrimmar->AddNPCPassengerInInstance(NPC_GB_KORKRON_AXETHROWER, -12.0928f, 27.65942f, 33.58557f, 1.66527f);
-                                orgrimmar->AddNPCPassengerInInstance(NPC_GB_KORKRON_AXETHROWER, 14.92804f, 26.18018f, 35.47803f, 1.66527f);
-                                orgrimmar->AddNPCPassengerInInstance(NPC_GB_KORKRON_AXETHROWER, 24.70331f, 25.36584f, 35.97845f, 1.66527f);
-                            }
-                            if(AxesCount == 6)
-                            {
-                                orgrimmar->AddNPCPassengerInInstance(NPC_GB_KORKRON_AXETHROWER, -3.170555f, 28.30652f, 34.21082f, 1.66527f);
-                                orgrimmar->AddNPCPassengerInInstance(NPC_GB_KORKRON_AXETHROWER, -12.0928f, 27.65942f, 33.58557f, 1.66527f);
-                                orgrimmar->AddNPCPassengerInInstance(NPC_GB_KORKRON_AXETHROWER, 14.92804f, 26.18018f, 35.47803f, 1.66527f);
-                                orgrimmar->AddNPCPassengerInInstance(NPC_GB_KORKRON_AXETHROWER, 24.70331f, 25.36584f, 35.97845f, 1.66527f);
-                                orgrimmar->AddNPCPassengerInInstance(NPC_GB_KORKRON_AXETHROWER, 19.92804f, 27.18018f, 35.47803f, 1.66527f);
-                                orgrimmar->AddNPCPassengerInInstance(NPC_GB_KORKRON_AXETHROWER, -7.70331f, 28.36584f, 33.88557f, 1.66527f);
-                           }
-                           break;
-                      }
-                }
-
-                if (!me->GetCurrentSpell(CURRENT_MELEE_SPELL))
-                    DoCastVictim(SPELL_CLEAVE);
-
-                DoMeleeAttackIfReady();
-            }
-
-
-            private:
-                Transport* orgrimmar;
-                uint32 RocketerDieCount;
-                uint32 AxesDieCount;
-                uint32 RocketerCount;
-                uint32 AxesCount;
-                uint32 SummonCount;
-                uint32 count;
-                bool EventScheduled;
-                Map* map;
-                EventMap events;
-                InstanceScript* _instance;
-        };
-
-        CreatureAI* GetAI(Creature* pCreature) const
-        {
-            return new npc_saurfang_gunshipAI(pCreature);
-        }
-};
-
-class npc_gunship_portal : public CreatureScript
-{
-    public:
-        npc_gunship_portal() : CreatureScript("npc_gunship_portal") { }
-
-        struct npc_gunship_portalAI : public ScriptedAI
-        {
-            npc_gunship_portalAI(Creature *creature) : ScriptedAI(creature),_instance(creature->GetInstanceScript())
-            {
-                Reset();
-            }
-
-            void Reset()
-            {
-               events.ScheduleEvent(EVENT_UNSUMMON_PORTAL, 20500); // TODO: Fix the timers
-               me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-            }
-
-            void JustDied(Unit* killer)
-            {
-                me->RemoveFromWorld();
-            }
-
-            void UpdateAI( const uint32 diff)
-            {
-
-             events.Update(diff);
-
-                while (uint32 eventId = events.ExecuteEvent())
-                {
-                    switch (eventId)
-                    {
-                        case EVENT_UNSUMMON_PORTAL:
-                            me->RemoveFromWorld();
+                        default:
                             break;
                     }
+
+                    me->SetControlled(true, UNIT_STATE_ROOT);
                 }
             }
 
-    private:
-        EventMap events;
-        InstanceScript* _instance;
-
-        };
-
-        CreatureAI* GetAI(Creature* pCreature) const
-        {
-            return new npc_gunship_portalAI(pCreature);
-        }
-};
-
-
-class npc_gunship_trigger : public CreatureScript
-{
-    public:
-        npc_gunship_trigger() : CreatureScript("npc_gunship_trigger") { }
-
-        struct npc_gunship_triggerAI : public ScriptedAI
-        {
-            npc_gunship_triggerAI(Creature *creature) : ScriptedAI(creature),_instance(creature->GetInstanceScript())
+            void UpdateAI(uint32 /*diff*/) override
             {
-
-                Reset();
+                UpdateVictim();
             }
 
-            void Reset()
+            bool CanAIAttack(Unit const* /*target*/) const override
             {
-                ScriptedAI::Reset();
-                me->SetReactState(REACT_PASSIVE);
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
-            }
-
-            void EnterCombat(Unit* /*who*/)
-            {
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
-                SetCombatMovement(false);
-            }
-
-            void DamageTaken(Unit* attacker, uint32& damage)
-            {
-                damage = 0;
-            }
-
-            void UpdateAI(uint32 diff)
-            {
-
-            }
-
-            private:
-                EventMap events;
-                InstanceScript* _instance;
-        };
-
-        CreatureAI* GetAI(Creature* pCreature) const
-        {
-            return new npc_gunship_triggerAI(pCreature);
-        }
-};
-
-/* ----------------------------------- Rampart of Skulls NPCs ----------------------------------- */
-
-/* Kor'kron Primalist  37030*/
-class npc_korkron_primalist: public CreatureScript
-{
-    public:
-        npc_korkron_primalist() : CreatureScript("npc_korkron_primalist") { }
-
-        struct npc_korkron_primalistAI : public ScriptedAI
-        {
-            npc_korkron_primalistAI(Creature* creature) : ScriptedAI(creature)
-            {
-                instance = creature->GetInstanceScript();
-            }
-
-            void Reset()
-            {
-                _started = instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) == DONE;
-                events.Reset();
-                events.ScheduleEvent(EVENT_WRATH, 10000); // TODO: Fix the timers
-                events.ScheduleEvent(EVENT_HEAL, 20000); // TODO: Fix the timers
-            }
-
-            void MoveInLineOfSight(Unit* who)
-            {
-                if (!instance)
-                    return;
-
-                if (instance->GetData(DATA_TEAM_IN_INSTANCE) != HORDE)
-                    return;
-
-                if (who->GetTypeId() != TYPEID_PLAYER)
-                    return;
-
-                if (instance->GetData(DATA_FIRST_SQUAD_STATE) == DONE)
-                    return;
-
-                if (!_started && me->IsWithinDistInMap(who, 25.0f))
-                {
-                    _started = true;
-                    events.ScheduleEvent(EVENT_FIRST_SQUAD_ASSISTED_1, 1000);
-                    events.ScheduleEvent(EVENT_FIRST_SQUAD_ASSISTED_2, 15000); // TODO : fix the timer
-                }
-            }
-
-            void UpdateAI(uint32 diff)
-            {
-                if (!instance)
-                    return;
-
-                if (me->HasUnitState(UNIT_STATE_CASTING))
-                    return;
-
-                events.Update(diff);
-
-                while (uint32 eventId = events.ExecuteEvent())
-                {
-                    switch (eventId)
-                    {
-                        case EVENT_FIRST_SQUAD_ASSISTED_1:
-                            Talk(SAY_FIRST_SQUAD_RESCUED_HORDE_0);
-                            break;
-                        case EVENT_FIRST_SQUAD_ASSISTED_2:
-                            if (Creature* tempUnit = me->FindNearestCreature(NPC_KORKRON_INVOKER, 120.0f, true))
-                            {
-                                tempUnit->AI()->Talk(SAY_FIRST_SQUAD_RESCUED_HORDE_1);
-                                tempUnit->AI()->Talk(SAY_SUMMON_BATTLE_STANDARD);
-                                tempUnit->CastSpell(tempUnit, SPELL_SUMMON_BATTLE_STANDART_H, true);
-                            }
-                            instance->SetData(DATA_FIRST_SQUAD_STATE, DONE);
-                            break;
-                        case EVENT_WRATH:
-                            if (UpdateVictim())
-                                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 10.0f))
-                                    DoCast(target, SPELL_WRATH);
-                            events.ScheduleEvent(EVENT_WRATH, 10000);
-                            break;
-                        case EVENT_HEAL:
-                            if (UpdateVictim())
-                            {
-                                std::list<Unit*> TargetList;
-                                Unit* finalTarget = me;
-                                Trinity::AnyFriendlyUnitInObjectRangeCheck checker(me, me, 30.0f);
-                                Trinity::UnitListSearcher<Trinity::AnyFriendlyUnitInObjectRangeCheck> searcher(me, TargetList, checker);
-                                me->VisitNearbyObject(30.0f, searcher);
-                                for (std::list<Unit*>::iterator itr = TargetList.begin(); itr != TargetList.end(); ++itr)
-                                    if ((*itr)->GetHealthPct() < finalTarget->GetHealthPct())
-                                        finalTarget = *itr;
-
-                                uint32 spellId = SPELL_HEALING_TOUCH;
-                                uint32 healthPct = uint32(finalTarget->GetHealthPct());
-                                if (healthPct > 15 && healthPct < 20)
-                                    spellId = (urand (0, 1) ? SPELL_REGROWTH : SPELL_HEALING_TOUCH);
-                                else if (healthPct >= 20 && healthPct < 40)
-                                    spellId = SPELL_REGROWTH;
-                                else if (healthPct > 40)
-                                    spellId = (urand(0, 1) ? SPELL_REJUVENATION : SPELL_REGROWTH);
-
-                                me->CastSpell(finalTarget, spellId, false);
-                                events.ScheduleEvent(EVENT_HEAL, 20000);
-                            }
-                            break;
-                    }
-                }
-
-                DoMeleeAttackIfReady();
-            }
-
-            private:
-                bool _started;
-                EventMap events;
-                InstanceScript* instance;
-        };
-
-        CreatureAI* GetAI(Creature* pCreature) const
-        {
-            return new npc_korkron_primalistAI(pCreature);
-        }
-};
-
-/* Kor'kron Defender  37032*/
-class npc_korkron_defender: public CreatureScript
-{
-    public:
-        npc_korkron_defender() : CreatureScript("npc_korkron_defender") { }
-
-        struct npc_korkron_defenderAI : public ScriptedAI
-        {
-            npc_korkron_defenderAI(Creature* creature) : ScriptedAI(creature)
-            {
-                instance = creature->GetInstanceScript();
-            }
-
-            void Reset()
-            {
-                events.Reset();
-                events.ScheduleEvent(EVENT_DEVASTATE, 10000);
-                events.ScheduleEvent(EVENT_THUNDERCLAP, 20000);
-                events.ScheduleEvent(EVENT_SPELL_REFLECT, 25000);
-                events.ScheduleEvent(EVENT_SUNDER_ARMOR, 15000);
-            }
-
-            void MoveInLineOfSight(Unit* who)
-            {
-                if (!instance)
-                    return;
-
-                if (instance->GetData(DATA_TEAM_IN_INSTANCE) != HORDE)
-                    return;
-
-                if (who->GetTypeId() != TYPEID_PLAYER)
-                    return;
-
-                if (me->IsWithinDistInMap(who, 25.0f))
-                {
-                    if (instance->GetData(DATA_FIRST_SQUAD_STATE) == DONE && instance->GetData(DATA_SECOND_SQUAD_STATE) != DONE)
-                    {
-                        instance->SetData(DATA_SECOND_SQUAD_STATE, DONE);
-                        events.ScheduleEvent(EVENT_SECOND_SQUAD_ASSISTED_1, 1000);
-                        events.ScheduleEvent(EVENT_SECOND_SQUAD_ASSISTED_2, 15000); // TODO : fix the timer
-                    }
-                }
-            }
-
-            void UpdateAI(uint32 diff)
-            {
-                if (!instance)
-                    return;
-
-                if (me->HasUnitState(UNIT_STATE_CASTING))
-                    return;
-
-                events.Update(diff);
-
-                while (uint32 eventId = events.ExecuteEvent())
-                {
-                    switch (eventId)
-                    {
-                        case EVENT_SECOND_SQUAD_ASSISTED_1:
-                            Talk(SAY_SECOND_SQUAD_RESCUED_HORDE_0);
-                            break;
-                        case EVENT_SECOND_SQUAD_ASSISTED_2:
-                            Talk(SAY_SECOND_SQUAD_RESCUED_HORDE_1);
-                            Talk(SAY_FROSTWYRM_SUMMON_0);
-                            break;
-                        case EVENT_DEVASTATE:
-                            if (UpdateVictim())
-                            {
-                                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
-                                    DoCast(target, SPELL_DEVASTATE);
-                            }
-                            events.ScheduleEvent(EVENT_DEVASTATE, 10000);
-                            break;
-                        case EVENT_SPELL_REFLECT:
-                            if (UpdateVictim())
-                            {
-                                DoCast(me, SPELL_SPELL_REFLECT);
-                            }
-                            events.ScheduleEvent(EVENT_SPELL_REFLECT, 25000);
-                            break;
-                        case EVENT_THUNDERCLAP:
-                            if (UpdateVictim())
-                            {
-                                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1))
-                                    DoCast(target, SPELL_THUNDERCLAP);
-                            }
-                            events.ScheduleEvent(EVENT_THUNDERCLAP, 20000);
-                            break;
-                        case EVENT_SUNDER_ARMOR:
-                            if (UpdateVictim())
-                            {
-                                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1))
-                                    DoCast(target, SPELL_SUNDER_ARMOR);
-                            }
-                            events.ScheduleEvent(EVENT_SUNDER_ARMOR, 15000);
-                            break;
-                    }
-                }
-
-                DoMeleeAttackIfReady();
-            }
-
-            private:
-                EventMap events;
-                InstanceScript* instance;
-        };
-
-        CreatureAI* GetAI(Creature* pCreature) const
-        {
-            return new npc_korkron_defenderAI(pCreature);
-        }
-};
-
-/* Skybreaker Vindicator  37003*/
-class npc_skybreaker_vindicator: public CreatureScript
-{
-    public:
-        npc_skybreaker_vindicator() : CreatureScript("npc_skybreaker_vindicator") { }
-
-        struct npc_skybreaker_vindicatorAI : public ScriptedAI
-        {
-            npc_skybreaker_vindicatorAI(Creature* creature) : ScriptedAI(creature)
-            {
-                instance = creature->GetInstanceScript();
-            }
-
-            void Reset()
-            {
-                _started = instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) == DONE;
-                events.Reset();
-                events.ScheduleEvent(EVENT_AVENGERS_SHILED, 10000); // TODO: Fix the timers
-                events.ScheduleEvent(EVENT_CONCENTRATION, 20000); // TODO: Fix the timers
-                events.ScheduleEvent(EVENT_HOLY_WRATH, 20000); // TODO: Fix the timers
-            }
-
-            void MoveInLineOfSight(Unit* who)
-            {
-                if (!instance)
-                    return;
-
-                if (instance->GetData(DATA_TEAM_IN_INSTANCE) != ALLIANCE)
-                    return;
-
-                if (who->GetTypeId() != TYPEID_PLAYER)
-                    return;
-
-                if (instance->GetData(DATA_FIRST_SQUAD_STATE) == DONE)
-                    return;
-
-                if (!_started && me->IsWithinDistInMap(who, 25.0f))
-                {
-                    _started = true;
-                    events.ScheduleEvent(EVENT_FIRST_SQUAD_ASSISTED_1, 1000);
-                    events.ScheduleEvent(EVENT_FIRST_SQUAD_ASSISTED_2, 15000); // TODO : fix the timer
-                }
-            }
-
-            void UpdateAI(uint32 diff)
-            {
-                if (!instance)
-                    return;
-
-                if (me->HasUnitState(UNIT_STATE_CASTING))
-                    return;
-
-                events.Update(diff);
-
-                while (uint32 eventId = events.ExecuteEvent())
-                {
-                    switch (eventId)
-                    {
-                        case EVENT_FIRST_SQUAD_ASSISTED_1:
-                            Talk(SAY_FIRST_SQUAD_RESCUED_ALLIANCE_0);
-                            break;
-                        case EVENT_FIRST_SQUAD_ASSISTED_2:
-                            if (Creature* tempUnit = me->FindNearestCreature(NPC_GB_SKYBREAKER_SORCERER, 120.0f, true))
-                            {
-                                tempUnit->AI()->Talk(SAY_FIRST_SQUAD_RESCUED_ALLIANCE_1);
-                                tempUnit->AI()->Talk(SAY_SUMMON_BATTLE_STANDARD);
-                                tempUnit->CastSpell(tempUnit, SPELL_SUMMON_BATTLE_STANDART_A, true);
-                            }
-                            instance->SetData(DATA_FIRST_SQUAD_STATE, DONE);
-                            break;
-                        case EVENT_AVENGERS_SHILED:
-                            if (UpdateVictim())
-                                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 10.0f))
-                                    DoCast(target, SPELL_WRATH);
-                            events.ScheduleEvent(EVENT_AVENGERS_SHILED, 10000);
-                            break;
-                        case EVENT_CONCENTRATION:
-                            if (UpdateVictim())
-                                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 10.0f))
-                                    DoCast(target, SPELL_CONCENTRATION);
-                            events.ScheduleEvent(EVENT_CONCENTRATION, 20000);
-                            break;
-                        case EVENT_HOLY_WRATH:
-                            if (UpdateVictim())
-                                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 10.0f))
-                                    DoCast(target, SPELL_HOLY_WRATH);
-                            events.ScheduleEvent(EVENT_HOLY_WRATH, 15000);
-                            break;
-                    }
-                }
-
-                DoMeleeAttackIfReady();
-            }
-
-            private:
-                bool _started;
-                EventMap events;
-                InstanceScript* instance;
-        };
-
-        CreatureAI* GetAI(Creature* pCreature) const
-        {
-            return new npc_skybreaker_vindicatorAI(pCreature);
-        }
-};
-
-/* Skybreaker Protector  36998*/
-class npc_skybreaker_protector: public CreatureScript
-{
-    public:
-        npc_skybreaker_protector() : CreatureScript("npc_skybreaker_protector") { }
-
-        struct npc_skybreaker_protectorAI : public ScriptedAI
-        {
-            npc_skybreaker_protectorAI(Creature* creature) : ScriptedAI(creature)
-            {
-                instance = creature->GetInstanceScript();
-            }
-
-            void Reset()
-            {
-                events.Reset();
-                events.ScheduleEvent(EVENT_DEVASTATE, 10000);
-                events.ScheduleEvent(EVENT_THUNDERCLAP, 20000);
-                events.ScheduleEvent(EVENT_SPELL_REFLECT, 25000);
-                events.ScheduleEvent(EVENT_SUNDER_ARMOR, 15000);
-            }
-
-            void MoveInLineOfSight(Unit* who)
-            {
-                if (!instance)
-                    return;
-
-                if (instance->GetData(DATA_TEAM_IN_INSTANCE) != ALLIANCE)
-                    return;
-
-                if (who->GetTypeId() != TYPEID_PLAYER)
-                    return;
-
-                if (me->IsWithinDistInMap(who, 25.0f))
-                {
-                    if (instance->GetData(DATA_FIRST_SQUAD_STATE) == DONE && instance->GetData(DATA_SECOND_SQUAD_STATE) != DONE)
-                    {
-                        instance->SetData(DATA_SECOND_SQUAD_STATE, DONE);
-                        events.ScheduleEvent(EVENT_SECOND_SQUAD_ASSISTED_1, 1000);
-                        events.ScheduleEvent(EVENT_SECOND_SQUAD_ASSISTED_2, 11000); // TODO : fix the timer
-                        events.ScheduleEvent(EVENT_SECOND_SQUAD_ASSISTED_3, 17000); // TODO : fix the timer
-                    }
-                }
-            }
-
-            void UpdateAI(uint32 diff)
-            {
-                if (!instance)
-                    return;
-
-                if (me->HasUnitState(UNIT_STATE_CASTING))
-                    return;
-
-                events.Update(diff);
-
-                while (uint32 eventId = events.ExecuteEvent())
-                {
-                    switch (eventId)
-                    {
-                        case EVENT_SECOND_SQUAD_ASSISTED_1:
-                            Talk(SAY_SECOND_SQUAD_RESCUED_ALLIANCE_0);
-                            break;
-                        case EVENT_SECOND_SQUAD_ASSISTED_2:
-                            Talk(SAY_SECOND_SQUAD_RESCUED_ALLIANCE_1);
-                            break;
-                        case EVENT_SECOND_SQUAD_ASSISTED_3:
-                            Talk(SAY_SECOND_SQUAD_RESCUED_ALLIANCE_2);
-                            Talk(SAY_FROSTWYRM_SUMMON_1);
-                            break;
-                        case EVENT_DEVASTATE:
-                            if (UpdateVictim())
-                            {
-                                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
-                                    DoCast(target, SPELL_DEVASTATE);
-                            }
-                            events.ScheduleEvent(EVENT_DEVASTATE, 10000);
-                            break;
-                        case EVENT_SPELL_REFLECT:
-                            if (UpdateVictim())
-                            {
-                                DoCast(me, SPELL_SPELL_REFLECT);
-                            }
-                            events.ScheduleEvent(EVENT_SPELL_REFLECT, 25000);
-                            break;
-                        case EVENT_THUNDERCLAP:
-                            if (UpdateVictim())
-                            {
-                                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1))
-                                    DoCast(target, SPELL_THUNDERCLAP);
-                            }
-                            events.ScheduleEvent(EVENT_THUNDERCLAP, 20000);
-                            break;
-                        case EVENT_SUNDER_ARMOR:
-                            if (UpdateVictim())
-                            {
-                                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1))
-                                    DoCast(target, SPELL_SUNDER_ARMOR);
-                            }
-                            events.ScheduleEvent(EVENT_SUNDER_ARMOR, 15000);
-                            break;
-                    }
-                }
-
-                DoMeleeAttackIfReady();
-            }
-
-            private:
-                EventMap events;
-                InstanceScript* instance;
-        };
-        CreatureAI* GetAI(Creature* pCreature) const
-        {
-            return new npc_skybreaker_protectorAI(pCreature);
-        }
-};
-
-
-/* Spire Frostwyrm  37230*/
-class npc_icc_spire_frostwyrm: public CreatureScript
-{
-    public:
-        npc_icc_spire_frostwyrm() : CreatureScript("npc_icc_spire_frostwyrm") { }
-
-        struct npc_icc_spire_frostwyrmAI : public ScriptedAI
-        {
-            npc_icc_spire_frostwyrmAI(Creature* creature) : ScriptedAI(creature)
-            {
-                instance = creature->GetInstanceScript();
-            }
-
-            void Reset()
-            {
-                landed = false;
-                events.Reset();
-                me->SetCanFly(true);
-                me->SetReactState(REACT_AGGRESSIVE);
-                me->AddUnitMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY);
-                events.ScheduleEvent(EVENT_FROST_BREATH, 20000);
-                events.ScheduleEvent(EVENT_BLIZZARD, 25000);
-                events.ScheduleEvent(EVENT_CLEAVE, 10000);
-            }
-
-            void MoveInLineOfSight(Unit* who)
-            {
-                if (!instance)
-                    return;
-
-                if (who->GetTypeId() != TYPEID_PLAYER)
-                    return;
-
-                if (!who->isTargetableForAttack())
-                    return;
-
-                if (!landed && me->IsWithinDistInMap(who, 35.0f))
-                {
-                    if (instance->GetData(DATA_TEAM_IN_INSTANCE) == HORDE)
-                        Talk(SAY_FROSTWYRM_LAND_H_0);
-                    else
-                        Talk(SAY_FROSTWYRM_LAND_A_1);
-                    landed = true;
-                    me->SetCanFly(true);
-                    me->RemoveUnitMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY);
-                    me->SetInCombatWith(who);
-                    me->AddThreat(who, 1.0f);
-                    me->GetMotionMaster()->MoveChase(who);
-                }
-            }
-
-            void UpdateAI(uint32 diff)
-            {
-                if (!UpdateVictim())
-                    return;
-
-                if (me->HasUnitState(UNIT_STATE_CASTING))
-                    return;
-
-                events.Update(diff);
-
-                while (uint32 eventId = events.ExecuteEvent())
-                {
-                    switch (eventId)
-                    {
-                        case EVENT_FROST_BREATH:
-                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 10.0f))
-                                DoCast(target, SPELL_FROST_BREATH);
-                            events.ScheduleEvent(EVENT_FROST_BREATH, 20000);
-                            break;
-                        case EVENT_BLIZZARD:
-                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 10.0f))
-                                DoCast(target, SPELL_BLIZZARD);
-                            events.ScheduleEvent(EVENT_BLIZZARD, 25000);
-                            break;
-                        case EVENT_CLEAVE:
-                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 10.0f))
-                                DoCast(target, SPELL_FROST_CLEAVE);
-                            events.ScheduleEvent(EVENT_CLEAVE, 10000);
-                            break;
-                    }
-                }
-
-                DoMeleeAttackIfReady();
-            }
-
-            private:
-                bool landed;
-                EventMap events;
-                InstanceScript* instance;
-        };
-
-        CreatureAI* GetAI(Creature* pCreature) const
-        {
-            return new npc_icc_spire_frostwyrmAI(pCreature);
-        }
-};
-
-/* ---------------------------------- AreaTrigger Scripts ------------------------------------- */
-class at_icc_land_frostwyrm : public AreaTriggerScript
-{
-    public:
-        at_icc_land_frostwyrm() : AreaTriggerScript("at_icc_land_frostwyrm") { }
-
-        bool OnTrigger(Player* player, AreaTriggerEntry const* areaTrigger)
-        {
-            if (InstanceScript* instance = player->GetInstanceScript())
-            {
-                if (instance->GetData(DATA_SPIRE_FROSTWYRM_STATE) == NOT_STARTED && instance->GetData(DATA_SECOND_SQUAD_STATE) == DONE)
-                {
-                    if (instance->GetData(DATA_TEAM_IN_INSTANCE) == ALLIANCE)
-                        player->GetMap()->SummonCreature(NPC_SPIRE_FROSTWYRM, FrostWyrmPosA);
-                    else
-                        player->GetMap()->SummonCreature(NPC_SPIRE_FROSTWYRM, FrostWyrmPosH);
-
-                    instance->SetData(DATA_SPIRE_FROSTWYRM_STATE, IN_PROGRESS);
-                }
-            }
-
-            return true;
-        }
-};
-
-/* transport script */
-class transport_gunship : public TransportScript
-{
-    public:
-        transport_gunship() : TransportScript("transport_gunship") { }
-
-        void OnRelocate(Transport* transport, uint32 waypointId, uint32 mapId, float x, float y, float z)
-        {
-        }
-
-        void OnAddPassenger(Transport* transport, Player* player)
-        {
-            if (!transport || !player)
-                return;
-
-            switch (transport->GetEntry())
-            {
-                case GO_THE_SKYBREAKER_ALLIANCE_ICC:
-                    player->AddAura(SPELL_ON_SKYBREAKERS_DECK, player);
-                    break;
-                case GO_ORGRIM_S_HAMMER_HORDE_ICC:
-                    player->AddAura(SPELL_ON_ORGRIMS_HAMMERS_DECK, player);
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        void OnRemovePassenger(Transport* /*transport*/, Player* player)
-        {
-            if (!player)
-                return;
-
-            player->RemoveAurasDueToSpell(SPELL_ON_ORGRIMS_HAMMERS_DECK);
-            player->RemoveAurasDueToSpell(SPELL_ON_SKYBREAKERS_DECK);
-        }
-};
-
-/* Remove Rocket Pack - 70713 */
-class spell_remove_rocket_pack : public SpellScriptLoader
-{
-    public:
-        spell_remove_rocket_pack() : SpellScriptLoader("spell_remove_rocket_pack") { }
- 
-        class spell_remove_rocket_pack_SpellScript : public SpellScript
-        {
-            PrepareSpellScript(spell_remove_rocket_pack_SpellScript);
- 
-            void HandleEffect(SpellEffIndex /*effIndex*/)
-            {
-                Player* hitPlr = GetHitPlayer();
-                if (!hitPlr) // If player is offline
-                    return;
- 
-                int32 itemId = GetEffectValue();
-                uint32 itemCount = hitPlr->GetItemCount(itemId, false); // Should be 1, but just in case.
-                hitPlr->DestroyItemCount(itemId, -itemCount, true, false);
-            }
- 
-            void Register()
-            {
-                OnEffectHit += SpellEffectFn(spell_remove_rocket_pack_SpellScript::HandleEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-            }
-        };
- 
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_remove_rocket_pack_SpellScript();
-        }
-};
-
-/* spell 69471 Heat Drain */
-class spell_gb_heat_drain : public SpellScriptLoader
-{
-    public:
-        spell_gb_heat_drain() : SpellScriptLoader("spell_gb_heat_drain") { }
-
-        class spell_gb_heat_drain_SpellScript : public SpellScript
-        {
-            PrepareSpellScript(spell_gb_heat_drain_SpellScript);
-
-            void HandleDummy(SpellEffIndex /*effIndex*/)
-            {
-                Unit* caster = GetCaster();
-
-                if (caster->GetPower(POWER_ENERGY) != 0)
-                    caster->ModifyPower(POWER_ENERGY, -1);
-
-                if (caster->GetPower(POWER_ENERGY) >= 99)
-                    caster->CastSpell(caster, SPELL_OVERHEAT, true);
-            }
-
-            void Register()
-            {
-                OnEffectHit += SpellEffectFn(spell_gb_heat_drain_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+                return true;
             }
         };
 
-        SpellScript* GetSpellScript() const
+        CreatureAI* GetAI(Creature* creature) const override
         {
-            return new spell_gb_heat_drain_SpellScript();
+            return GetIcecrownCitadelAI<npc_gunship_mageAI>(creature);
         }
 };
 
-/* spell 69488 Overheat Drain */
-class spell_gb_overheat_drain : public SpellScriptLoader
+/** @HACK This AI only resets MOVEMENTFLAG_ROOT on the vehicle.
+          Currently the core always removes MOVEMENTFLAG_ROOT sent from client packets to prevent cheaters from freezing clients of other players
+          but it actually is a valid flag - needs more research to fix both freezes and keep the flag as is (see WorldSession::ReadMovementInfo)
+
+Example packet:
+ClientToServer: CMSG_FORCE_MOVE_ROOT_ACK (0x00E9) Length: 67 ConnectionIndex: 0 Time: 03/04/2010 03:57:55.000 Number: 471326
+Guid:
+Movement Counter: 80
+Movement Flags: OnTransport, Root (2560)
+Extra Movement Flags: None (0)
+Time: 52291611
+Position: X: -396.0302 Y: 2482.906 Z: 249.86
+Orientation: 1.468665
+Transport GUID: Full: 0x1FC0000000000460 Type: MOTransport Low: 1120
+Transport Position: X: -6.152398 Y: -23.49037 Z: 21.64464 O: 4.827727
+Transport Time: 9926
+Transport Seat: 255
+Fall Time: 824
+*/
+class npc_gunship_cannon : public CreatureScript
 {
     public:
-        spell_gb_overheat_drain() : SpellScriptLoader("spell_gb_overheat_drain") { }
+        npc_gunship_cannon() : CreatureScript("npc_gunship_cannon") { }
 
-        class spell_gb_overheat_drain_SpellScript : public SpellScript
+        struct npc_gunship_cannonAI : public PassiveAI
         {
-            PrepareSpellScript(spell_gb_overheat_drain_SpellScript);
-
-            void HandleDummy(SpellEffIndex /*effIndex*/)
+            npc_gunship_cannonAI(Creature* creature) : PassiveAI(creature)
             {
-                Unit* caster = GetCaster();
-
-                if (caster->GetPower(POWER_ENERGY) >= 10)
-                    caster->ModifyPower(POWER_ENERGY, -10);
             }
 
-            void Register()
+            void OnCharmed(bool /*apply*/) override { }
+
+            void PassengerBoarded(Unit* /*passenger*/, int8 /*seat*/, bool apply) override
             {
-                OnEffectHit += SpellEffectFn(spell_gb_overheat_drain_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+                if (!apply)
+                {
+                    me->SetControlled(false, UNIT_STATE_ROOT);
+                    me->SetControlled(true, UNIT_STATE_ROOT);
+                }
             }
         };
 
-        SpellScript* GetSpellScript() const
+        CreatureAI* GetAI(Creature* creature) const override
         {
-            return new spell_gb_overheat_drain_SpellScript();
+            return new npc_gunship_cannonAI(creature);
         }
 };
 
-/* spell 69402 Incinerating Blast */
-class spell_gb_incinerating_blast : public SpellScriptLoader
+class spell_igb_rocket_pack : public SpellScriptLoader
 {
     public:
-        spell_gb_incinerating_blast() : SpellScriptLoader("spell_gb_incinerating_blast") { }
+        spell_igb_rocket_pack() : SpellScriptLoader("spell_igb_rocket_pack") { }
 
-        class spell_gb_incinerating_blast_SpellScript : public SpellScript
+        class spell_igb_rocket_pack_AuraScript : public AuraScript
         {
-            PrepareSpellScript(spell_gb_incinerating_blast_SpellScript);
+            PrepareAuraScript(spell_igb_rocket_pack_AuraScript);
 
-            void AddExtraDamage()
+            bool Validate(SpellInfo const* /*spellInfo*/) override
             {
-                Unit* caster = GetCaster();
-                if (!caster || !caster->GetPower(POWER_ENERGY))
-                    return;
-
-                SetHitDamage(int32(GetHitDamage() + (caster->GetPower(POWER_ENERGY) * 100.0f))); // TODO: How much should be?
-                caster->SetPower(POWER_ENERGY, 0);
-            }
-
-            void Register()
-            {
-                OnHit += SpellHitFn(spell_gb_incinerating_blast_SpellScript::AddExtraDamage);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_gb_incinerating_blast_SpellScript();
-        }
-};
-
-/* spell 71335, 70339 Burning Pitch */
-class spell_gb_burning_pitch : public SpellScriptLoader
-{
-    public:
-        spell_gb_burning_pitch() : SpellScriptLoader("spell_gb_burning_pitch") { }
-
-        class spell_gb_burning_pitch_SpellScript : public SpellScript
-        {
-            PrepareSpellScript(spell_gb_burning_pitch_SpellScript);
-
-            bool Validate(SpellInfo const* /*spellInfo*/)
-            {
-                if (!sSpellMgr->GetSpellInfo(SPELL_BURNING_PITCH_SIEGE_DMG_A))
+                if (!sSpellMgr->GetSpellInfo(SPELL_ROCKET_PACK_DAMAGE) ||
+                    !sSpellMgr->GetSpellInfo(SPELL_ROCKET_BURST))
                     return false;
-                if (!sSpellMgr->GetSpellInfo(SPELL_BURNING_PITCH_SIEGE_DMG_H))
-                    return false;
-                if (!sSpellMgr->GetSpellInfo(SPELL_BURNING_PITCH_AOE_DAMAGE))
-                    return false;
+
                 return true;
             }
 
-            void HandleDummy(SpellEffIndex /*effIndex*/)
+            void HandlePeriodic(AuraEffect const* /*aurEff*/)
             {
-                Unit* caster = GetCaster();
-                Unit* target = GetHitUnit();
-
-                if (!caster || !target)
-                    return;
-
-                if (GetSpellInfo()->Id == SPELL_BURNING_PITCH_A)
-                    caster->CastSpell(target, SPELL_BURNING_PITCH_SIEGE_DMG_A, true);
-                else
-                    caster->CastSpell(target, SPELL_BURNING_PITCH_SIEGE_DMG_H, true);
-
-                caster->CastSpell(target, SPELL_BURNING_PITCH_AOE_DAMAGE, true);
+                if (GetTarget()->movespline->Finalized())
+                    Remove(AURA_REMOVE_BY_EXPIRE);
             }
 
-            void Register()
+            void HandleRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
             {
-                OnEffectHitTarget += SpellEffectFn(spell_gb_burning_pitch_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+                SpellInfo const* damageInfo = sSpellMgr->EnsureSpellInfo(SPELL_ROCKET_PACK_DAMAGE);
+                GetTarget()->CastCustomSpell(SPELL_ROCKET_PACK_DAMAGE, SPELLVALUE_BASE_POINT0, 2 * (damageInfo->Effects[EFFECT_0].CalcValue() + aurEff->GetTickNumber() * aurEff->GetAmplitude()), NULL, TRIGGERED_FULL_MASK);
+                GetTarget()->CastSpell(NULL, SPELL_ROCKET_BURST, TRIGGERED_FULL_MASK);
+            }
+
+            void Register() override
+            {
+                OnEffectPeriodic += AuraEffectPeriodicFn(spell_igb_rocket_pack_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+                OnEffectRemove += AuraEffectRemoveFn(spell_igb_rocket_pack_AuraScript::HandleRemove, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
             }
         };
 
-        SpellScript* GetSpellScript() const
+        AuraScript* GetAuraScript() const override
         {
-            return new spell_gb_burning_pitch_SpellScript();
+            return new spell_igb_rocket_pack_AuraScript();
         }
 };
 
-/* spell 68645 Rocket Pack */
-class spell_rocket_pack : public SpellScriptLoader
+class spell_igb_rocket_pack_useable : public SpellScriptLoader
 {
     public:
-        spell_rocket_pack() : SpellScriptLoader("spell_rocket_pack") { }
+        spell_igb_rocket_pack_useable() : SpellScriptLoader("spell_igb_rocket_pack_useable") { }
 
-        class spell_rocket_pack_AuraScript : public AuraScript
+        class spell_igb_rocket_pack_useable_AuraScript : public AuraScript
         {
-            PrepareAuraScript(spell_rocket_pack_AuraScript);
+            PrepareAuraScript(spell_igb_rocket_pack_useable_AuraScript);
 
-            void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+            bool Load()
             {
-                GetTarget()->CastSpell(GetTarget(), 68721, true);
+                return GetOwner()->GetInstanceScript() != nullptr;
             }
 
-            void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+            bool CheckAreaTarget(Unit* target)
             {
-                GetTarget()->RemoveAurasDueToSpell(68721);
+                return target->GetTypeId() == TYPEID_PLAYER && GetOwner()->GetInstanceScript()->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != DONE;
             }
 
-            void Register()
+            void HandleApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
-                OnEffectApply += AuraEffectApplyFn(spell_rocket_pack_AuraScript::OnApply, EFFECT_1, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-                OnEffectRemove += AuraEffectRemoveFn(spell_rocket_pack_AuraScript::OnRemove, EFFECT_1, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+                if (Creature* owner = GetOwner()->ToCreature())
+                    if (Player* target = GetTarget()->ToPlayer())
+                        if (target->HasItemCount(ITEM_GOBLIN_ROCKET_PACK, 1))
+                            sCreatureTextMgr->SendChat(owner, SAY_ZAFOD_ROCKET_PACK_ACTIVE, target, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_NORMAL, 0, TEAM_OTHER, false, target);
+            }
+
+            void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+            {
+                if (Creature* owner = GetOwner()->ToCreature())
+                    if (Player* target = GetTarget()->ToPlayer())
+                        if (target->HasItemCount(ITEM_GOBLIN_ROCKET_PACK, 1))
+                            sCreatureTextMgr->SendChat(owner, SAY_ZAFOD_ROCKET_PACK_DISABLED, target, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_NORMAL, 0, TEAM_OTHER, false, target);
+            }
+
+            void Register() override
+            {
+                DoCheckAreaTarget += AuraCheckAreaTargetFn(spell_igb_rocket_pack_useable_AuraScript::CheckAreaTarget);
+                AfterEffectApply += AuraEffectApplyFn(spell_igb_rocket_pack_useable_AuraScript::HandleApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+                AfterEffectRemove += AuraEffectRemoveFn(spell_igb_rocket_pack_useable_AuraScript::HandleRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
             }
         };
 
-        AuraScript* GetAuraScript() const
+        AuraScript* GetAuraScript() const override
         {
-            return new spell_rocket_pack_AuraScript();
+            return new spell_igb_rocket_pack_useable_AuraScript();
         }
 };
 
-
-void AddSC_boss_gunship_battle()
+class spell_igb_on_gunship_deck : public SpellScriptLoader
 {
-    new npc_muradin_gunship();
-    new npc_saurfang_gunship();
+    public:
+        spell_igb_on_gunship_deck() : SpellScriptLoader("spell_igb_on_gunship_deck") { }
+
+        class spell_igb_on_gunship_deck_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_igb_on_gunship_deck_AuraScript);
+
+        public:
+            spell_igb_on_gunship_deck_AuraScript()
+            {
+                _teamInInstance = 0;
+            }
+
+        private:
+            bool Load() override
+            {
+                if (InstanceScript* instance = GetOwner()->GetInstanceScript())
+                    _teamInInstance = instance->GetData(DATA_TEAM_IN_INSTANCE);
+                else
+                    _teamInInstance = 0;
+                return true;
+            }
+
+            bool CheckAreaTarget(Unit* unit)
+            {
+                return unit->GetTypeId() == TYPEID_PLAYER;
+            }
+
+            void HandleApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+            {
+                if (GetSpellInfo()->Id == uint32(_teamInInstance == HORDE ? SPELL_ON_SKYBREAKER_DECK : SPELL_ON_ORGRIMS_HAMMER_DECK))
+                    if (Creature* gunship = GetOwner()->FindNearestCreature(_teamInInstance == HORDE ? NPC_ORGRIMS_HAMMER : NPC_THE_SKYBREAKER, 200.0f))
+                        gunship->AI()->SetGUID(GetTarget()->GetGUID(), ACTION_SHIP_VISITS);
+            }
+
+            void Register() override
+            {
+                DoCheckAreaTarget += AuraCheckAreaTargetFn(spell_igb_on_gunship_deck_AuraScript::CheckAreaTarget);
+                AfterEffectApply += AuraEffectApplyFn(spell_igb_on_gunship_deck_AuraScript::HandleApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+            }
+
+            uint32 _teamInInstance;
+        };
+
+        AuraScript* GetAuraScript() const override
+        {
+            return new spell_igb_on_gunship_deck_AuraScript();
+        }
+};
+
+class spell_igb_periodic_trigger_with_power_cost : public SpellScriptLoader
+{
+    public:
+        spell_igb_periodic_trigger_with_power_cost() : SpellScriptLoader("spell_igb_periodic_trigger_with_power_cost") { }
+
+        class spell_igb_periodic_trigger_with_power_cost_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_igb_periodic_trigger_with_power_cost_AuraScript);
+
+            void HandlePeriodicTick(AuraEffect const* /*aurEff*/)
+            {
+                PreventDefaultAction();
+                GetTarget()->CastSpell(GetTarget(), GetSpellInfo()->Effects[EFFECT_0].TriggerSpell, TriggerCastFlags(TRIGGERED_FULL_MASK & ~TRIGGERED_IGNORE_POWER_AND_REAGENT_COST));
+            }
+
+            void Register() override
+            {
+                OnEffectPeriodic += AuraEffectPeriodicFn(spell_igb_periodic_trigger_with_power_cost_AuraScript::HandlePeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+            }
+        };
+
+        AuraScript* GetAuraScript() const override
+        {
+            return new spell_igb_periodic_trigger_with_power_cost_AuraScript();
+        }
+};
+
+class spell_igb_cannon_blast : public SpellScriptLoader
+{
+    public:
+        spell_igb_cannon_blast() : SpellScriptLoader("spell_igb_cannon_blast") { }
+
+        class spell_igb_cannon_blast_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_igb_cannon_blast_SpellScript);
+
+            bool Load()
+            {
+                return GetCaster()->GetTypeId() == TYPEID_UNIT;
+            }
+
+            void CheckEnergy()
+            {
+                if (GetCaster()->GetPower(POWER_ENERGY) >= 100)
+                {
+                    GetCaster()->CastSpell(GetCaster(), SPELL_OVERHEAT, TRIGGERED_FULL_MASK);
+                    if (Vehicle* vehicle = GetCaster()->GetVehicleKit())
+                        if (Unit* passenger = vehicle->GetPassenger(0))
+                            sCreatureTextMgr->SendChat(GetCaster()->ToCreature(), SAY_OVERHEAT, passenger);
+                }
+            }
+
+            void Register() override
+            {
+                AfterHit += SpellHitFn(spell_igb_cannon_blast_SpellScript::CheckEnergy);
+            }
+        };
+
+        SpellScript* GetSpellScript() const override
+        {
+            return new spell_igb_cannon_blast_SpellScript();
+        }
+};
+
+class spell_igb_incinerating_blast : public SpellScriptLoader
+{
+    public:
+        spell_igb_incinerating_blast() : SpellScriptLoader("spell_igb_incinerating_blast") { }
+
+        class spell_igb_incinerating_blast_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_igb_incinerating_blast_SpellScript);
+
+        public:
+            spell_igb_incinerating_blast_SpellScript()
+            {
+                _energyLeft = 0;
+            }
+
+        private:
+            void StoreEnergy()
+            {
+                _energyLeft = GetCaster()->GetPower(POWER_ENERGY) - 10;
+            }
+
+            void RemoveEnergy()
+            {
+                GetCaster()->SetPower(POWER_ENERGY, 0);
+            }
+
+            void CalculateDamage(SpellEffIndex /*effIndex*/)
+            {
+                SetEffectValue(GetEffectValue() + _energyLeft * _energyLeft * 8);
+            }
+
+            void Register() override
+            {
+                OnCast += SpellCastFn(spell_igb_incinerating_blast_SpellScript::StoreEnergy);
+                AfterCast += SpellCastFn(spell_igb_incinerating_blast_SpellScript::RemoveEnergy);
+                OnEffectLaunchTarget += SpellEffectFn(spell_igb_incinerating_blast_SpellScript::CalculateDamage, EFFECT_1, SPELL_EFFECT_SCHOOL_DAMAGE);
+            }
+
+            uint32 _energyLeft;
+        };
+
+        SpellScript* GetSpellScript() const override
+        {
+            return new spell_igb_incinerating_blast_SpellScript();
+        }
+};
+
+class spell_igb_overheat : public SpellScriptLoader
+{
+    public:
+        spell_igb_overheat() : SpellScriptLoader("spell_igb_overheat") { }
+
+        class spell_igb_overheat_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_igb_overheat_AuraScript);
+
+            bool Load() override
+            {
+                if (GetAura()->GetType() != UNIT_AURA_TYPE)
+                    return false;
+                return GetUnitOwner()->IsVehicle();
+            }
+
+            void SendClientControl(uint8 value)
+            {
+                if (Vehicle* vehicle = GetUnitOwner()->GetVehicleKit())
+                {
+                    if (Unit* passenger = vehicle->GetPassenger(0))
+                    {
+                        if (Player* player = passenger->ToPlayer())
+                        {
+                            WorldPacket data(SMSG_CLIENT_CONTROL_UPDATE, GetUnitOwner()->GetPackGUID().size() + 1);
+                            data << GetUnitOwner()->GetPackGUID();
+                            data << uint8(value);
+                            player->GetSession()->SendPacket(&data);
+                        }
+                    }
+                }
+            }
+
+            void HandleApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+            {
+                SendClientControl(0);
+            }
+
+            void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+            {
+                SendClientControl(1);
+            }
+
+            void Register() override
+            {
+                AfterEffectApply += AuraEffectApplyFn(spell_igb_overheat_AuraScript::HandleApply, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
+                AfterEffectRemove += AuraEffectRemoveFn(spell_igb_overheat_AuraScript::HandleRemove, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
+            }
+        };
+
+        AuraScript* GetAuraScript() const override
+        {
+            return new spell_igb_overheat_AuraScript();
+        }
+};
+
+class spell_igb_below_zero : public SpellScriptLoader
+{
+    public:
+        spell_igb_below_zero() : SpellScriptLoader("spell_igb_below_zero") { }
+
+        class spell_igb_below_zero_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_igb_below_zero_SpellScript);
+
+            void RemovePassengers()
+            {
+                GetHitUnit()->CastSpell(GetHitUnit(), SPELL_EJECT_ALL_PASSENGERS_BELOW_ZERO, TRIGGERED_FULL_MASK);
+            }
+
+            void Register() override
+            {
+                BeforeHit += SpellHitFn(spell_igb_below_zero_SpellScript::RemovePassengers);
+            }
+        };
+
+        SpellScript* GetSpellScript() const override
+        {
+            return new spell_igb_below_zero_SpellScript();
+        }
+};
+
+class spell_igb_teleport_to_enemy_ship : public SpellScriptLoader
+{
+    public:
+        spell_igb_teleport_to_enemy_ship() : SpellScriptLoader("spell_igb_teleport_to_enemy_ship") { }
+
+        class spell_igb_teleport_to_enemy_ship_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_igb_teleport_to_enemy_ship_SpellScript);
+
+            void RelocateTransportOffset(SpellEffIndex /*effIndex*/)
+            {
+                WorldLocation const* dest = GetHitDest();
+                Unit* target = GetHitUnit();
+                if (!dest || !target || !target->GetTransport())
+                    return;
+
+                float x, y, z, o;
+                dest->GetPosition(x, y, z, o);
+                target->GetTransport()->CalculatePassengerOffset(x, y, z, &o);
+                target->m_movementInfo.transport.pos.Relocate(x, y, z, o);
+            }
+
+            void Register() override
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_igb_teleport_to_enemy_ship_SpellScript::RelocateTransportOffset, EFFECT_0, SPELL_EFFECT_TELEPORT_UNITS);
+            }
+        };
+
+        SpellScript* GetSpellScript() const override
+        {
+            return new spell_igb_teleport_to_enemy_ship_SpellScript();
+        }
+};
+
+class spell_igb_burning_pitch_selector : public SpellScriptLoader
+{
+    public:
+        spell_igb_burning_pitch_selector() : SpellScriptLoader("spell_igb_burning_pitch_selector") { }
+
+        class spell_igb_burning_pitch_selector_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_igb_burning_pitch_selector_SpellScript);
+
+            void FilterTargets(std::list<WorldObject*>& targets)
+            {
+                uint32 team = HORDE;
+                if (InstanceScript* instance = GetCaster()->GetInstanceScript())
+                    team = instance->GetData(DATA_TEAM_IN_INSTANCE);
+
+                targets.remove_if([team](WorldObject* target) -> bool
+                {
+                    if (Transport* transport = target->GetTransport())
+                        return transport->GetEntry() != uint32(team == HORDE ? GO_ORGRIMS_HAMMER_H : GO_THE_SKYBREAKER_A);
+                    return true;
+                });
+
+                if (!targets.empty())
+                {
+                    WorldObject* target = Trinity::Containers::SelectRandomContainerElement(targets);
+                    targets.clear();
+                    targets.push_back(target);
+                }
+            }
+
+            void HandleDummy(SpellEffIndex effIndex)
+            {
+                PreventHitDefaultEffect(effIndex);
+                GetCaster()->CastSpell(GetHitUnit(), uint32(GetEffectValue()), TRIGGERED_NONE);
+            }
+
+            void Register() override
+            {
+                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_igb_burning_pitch_selector_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
+                OnEffectHitTarget += SpellEffectFn(spell_igb_burning_pitch_selector_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+            }
+        };
+
+        SpellScript* GetSpellScript() const override
+        {
+            return new spell_igb_burning_pitch_selector_SpellScript();
+        }
+};
+
+class spell_igb_burning_pitch : public SpellScriptLoader
+{
+    public:
+        spell_igb_burning_pitch() : SpellScriptLoader("spell_igb_burning_pitch") { }
+
+        class spell_igb_burning_pitch_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_igb_burning_pitch_SpellScript);
+
+            void HandleDummy(SpellEffIndex effIndex)
+            {
+                PreventHitDefaultEffect(effIndex);
+                GetCaster()->CastCustomSpell(uint32(GetEffectValue()), SPELLVALUE_BASE_POINT0, 8000, NULL, TRIGGERED_FULL_MASK);
+                GetHitUnit()->CastSpell(GetHitUnit(), SPELL_BURNING_PITCH, TRIGGERED_FULL_MASK);
+            }
+
+            void Register() override
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_igb_burning_pitch_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+            }
+        };
+
+        SpellScript* GetSpellScript() const override
+        {
+            return new spell_igb_burning_pitch_SpellScript();
+        }
+};
+
+class spell_igb_rocket_artillery : public SpellScriptLoader
+{
+    public:
+        spell_igb_rocket_artillery() : SpellScriptLoader("spell_igb_rocket_artillery") { }
+
+        class spell_igb_rocket_artillery_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_igb_rocket_artillery_SpellScript);
+
+            void SelectRandomTarget(std::list<WorldObject*>& targets)
+            {
+                if (!targets.empty())
+                {
+                    WorldObject* target = Trinity::Containers::SelectRandomContainerElement(targets);
+                    targets.clear();
+                    targets.push_back(target);
+                }
+            }
+
+            void HandleScript(SpellEffIndex effIndex)
+            {
+                PreventHitDefaultEffect(effIndex);
+                GetCaster()->CastSpell(GetHitUnit(), uint32(GetEffectValue()), TRIGGERED_NONE);
+            }
+
+            void Register() override
+            {
+                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_igb_rocket_artillery_SpellScript::SelectRandomTarget, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+                OnEffectHitTarget += SpellEffectFn(spell_igb_rocket_artillery_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+            }
+        };
+
+        SpellScript* GetSpellScript() const override
+        {
+            return new spell_igb_rocket_artillery_SpellScript();
+        }
+};
+
+class spell_igb_rocket_artillery_explosion : public SpellScriptLoader
+{
+    public:
+        spell_igb_rocket_artillery_explosion() : SpellScriptLoader("spell_igb_rocket_artillery_explosion") { }
+
+        class spell_igb_rocket_artillery_explosion_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_igb_rocket_artillery_explosion_SpellScript);
+
+            void DamageGunship(SpellEffIndex /*effIndex*/)
+            {
+                if (InstanceScript* instance = GetCaster()->GetInstanceScript())
+                    GetCaster()->CastCustomSpell(instance->GetData(DATA_TEAM_IN_INSTANCE) == HORDE ? SPELL_BURNING_PITCH_DAMAGE_A : SPELL_BURNING_PITCH_DAMAGE_H, SPELLVALUE_BASE_POINT0, 5000, NULL, TRIGGERED_FULL_MASK);
+            }
+
+            void Register() override
+            {
+                OnEffectHit += SpellEffectFn(spell_igb_rocket_artillery_explosion_SpellScript::DamageGunship, EFFECT_0, SPELL_EFFECT_TRIGGER_MISSILE);
+            }
+        };
+
+        SpellScript* GetSpellScript() const override
+        {
+            return new spell_igb_rocket_artillery_explosion_SpellScript();
+        }
+};
+
+class spell_igb_gunship_fall_teleport : public SpellScriptLoader
+{
+    public:
+        spell_igb_gunship_fall_teleport() : SpellScriptLoader("spell_igb_gunship_fall_teleport") { }
+
+        class spell_igb_gunship_fall_teleport_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_igb_gunship_fall_teleport_SpellScript);
+
+            bool Load()
+            {
+                return GetCaster()->GetInstanceScript() != nullptr;
+            }
+
+            void SelectTransport(WorldObject*& target)
+            {
+                if (InstanceScript* instance = target->GetInstanceScript())
+                    target = HashMapHolder<GameObject>::Find(instance->GetGuidData(DATA_ICECROWN_GUNSHIP_BATTLE));
+            }
+
+            void RelocateDest(SpellEffIndex /*effIndex*/)
+            {
+                if (GetCaster()->GetInstanceScript()->GetData(DATA_TEAM_IN_INSTANCE) == HORDE)
+                    GetHitDest()->RelocateOffset({ 0.0f, 0.0f, 36.0f, 0.0f });
+                else
+                    GetHitDest()->RelocateOffset({ 0.0f, 0.0f, 21.0f, 0.0f });
+            }
+
+            void Register() override
+            {
+                OnObjectTargetSelect += SpellObjectTargetSelectFn(spell_igb_gunship_fall_teleport_SpellScript::SelectTransport, EFFECT_0, TARGET_DEST_NEARBY_ENTRY);
+                OnEffectLaunch += SpellEffectFn(spell_igb_gunship_fall_teleport_SpellScript::RelocateDest, EFFECT_0, SPELL_EFFECT_TELEPORT_UNITS);
+            }
+        };
+
+        SpellScript* GetSpellScript() const override
+        {
+            return new spell_igb_gunship_fall_teleport_SpellScript();
+        }
+};
+
+class spell_igb_check_for_players : public SpellScriptLoader
+{
+    public:
+        spell_igb_check_for_players() : SpellScriptLoader("spell_igb_check_for_players") { }
+
+        class spell_igb_check_for_players_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_igb_check_for_players_SpellScript);
+
+        public:
+            spell_igb_check_for_players_SpellScript()
+            {
+                _playerCount = 0;
+            }
+
+        private:
+            bool Load() override
+            {
+                return GetCaster()->GetTypeId() == TYPEID_UNIT;
+            }
+
+            void CountTargets(std::list<WorldObject*>& targets)
+            {
+                _playerCount = targets.size();
+            }
+
+            void TriggerWipe()
+            {
+                if (!_playerCount)
+                    GetCaster()->ToCreature()->AI()->JustDied(NULL);
+            }
+
+            void TeleportPlayer(SpellEffIndex /*effIndex*/)
+            {
+                if (GetHitUnit()->GetPositionZ() < GetCaster()->GetPositionZ() - 10.0f)
+                    GetHitUnit()->CastSpell(GetHitUnit(), SPELL_GUNSHIP_FALL_TELEPORT, TRIGGERED_FULL_MASK);
+            }
+
+            void Register() override
+            {
+                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_igb_check_for_players_SpellScript::CountTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
+                AfterCast += SpellCastFn(spell_igb_check_for_players_SpellScript::TriggerWipe);
+                OnEffectHitTarget += SpellEffectFn(spell_igb_check_for_players_SpellScript::TeleportPlayer, EFFECT_0, SPELL_EFFECT_DUMMY);
+            }
+
+            uint32 _playerCount;
+        };
+
+        SpellScript* GetSpellScript() const override
+        {
+            return new spell_igb_check_for_players_SpellScript();
+        }
+};
+
+class spell_igb_teleport_players_on_victory : public SpellScriptLoader
+{
+    public:
+        spell_igb_teleport_players_on_victory() : SpellScriptLoader("spell_igb_teleport_players_on_victory") { }
+
+        class spell_igb_teleport_players_on_victory_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_igb_teleport_players_on_victory_SpellScript);
+
+            bool Load() override
+            {
+                return GetCaster()->GetInstanceScript() != nullptr;
+            }
+
+            void FilterTargets(std::list<WorldObject*>& targets)
+            {
+                InstanceScript* instance = GetCaster()->GetInstanceScript();
+                targets.remove_if([instance](WorldObject* target) -> bool
+                {
+                    return target->GetTransGUID() != instance->GetGuidData(DATA_ENEMY_GUNSHIP);
+                });
+            }
+
+            void Register() override
+            {
+                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_igb_teleport_players_on_victory_SpellScript::FilterTargets, EFFECT_1, TARGET_UNIT_DEST_AREA_ENTRY);
+            }
+        };
+
+        SpellScript* GetSpellScript() const override
+        {
+            return new spell_igb_teleport_players_on_victory_SpellScript();
+        }
+};
+
+class achievement_im_on_a_boat : public AchievementCriteriaScript
+{
+    public:
+        achievement_im_on_a_boat() : AchievementCriteriaScript("achievement_im_on_a_boat") { }
+
+        bool OnCheck(Player* /*source*/, Unit* target) override
+        {
+            return target->GetAI() && target->GetAI()->GetData(ACTION_SHIP_VISITS) <= 2;
+        }
+};
+
+void AddSC_boss_icecrown_gunship_battle()
+{
+    new npc_gunship();
+    new npc_high_overlord_saurfang_igb();
+    new npc_muradin_bronzebeard_igb();
     new npc_zafod_boombox();
-    new npc_korkron_axethrower_rifleman();
-    new npc_mortar_soldier_or_rocketeer();
+    new npc_gunship_boarding_leader();
+    new npc_gunship_boarding_add();
+    new npc_gunship_gunner();
+    new npc_gunship_rocketeer();
     new npc_gunship_mage();
     new npc_gunship_cannon();
-    new npc_sergeant();
-    new npc_marine_or_reaver();
-    new npc_gunship_trigger();
-    new npc_gunship_portal();
-    new npc_korkron_primalist();
-    new npc_korkron_defender();
-    new npc_skybreaker_vindicator();
-    new npc_skybreaker_protector();
-    new npc_icc_spire_frostwyrm();
-    new at_icc_land_frostwyrm();
-    new npc_gunship_skybreaker();
-    new npc_gunship_orgrimmar();
-    new transport_gunship();
-    new spell_remove_rocket_pack();
-    new spell_gb_heat_drain();
-    new spell_gb_overheat_drain();
-    new spell_gb_incinerating_blast();
-    new spell_gb_burning_pitch();
-    new spell_rocket_pack();
+    new spell_igb_rocket_pack();
+    new spell_igb_rocket_pack_useable();
+    new spell_igb_on_gunship_deck();
+    new spell_igb_periodic_trigger_with_power_cost();
+    new spell_igb_cannon_blast();
+    new spell_igb_incinerating_blast();
+    new spell_igb_overheat();
+    new spell_igb_below_zero();
+    new spell_igb_teleport_to_enemy_ship();
+    new spell_igb_burning_pitch_selector();
+    new spell_igb_burning_pitch();
+    new spell_igb_rocket_artillery();
+    new spell_igb_rocket_artillery_explosion();
+    new spell_igb_gunship_fall_teleport();
+    new spell_igb_check_for_players();
+    new spell_igb_teleport_players_on_victory();
+    new achievement_im_on_a_boat();
 }

@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -80,7 +80,7 @@ enum Misc
     MAX_FROST_RESISTANCE    = 100
 };
 
-typedef std::map<uint64, uint64> IceBlockMap;
+typedef std::map<ObjectGuid, ObjectGuid> IceBlockMap;
 
 class boss_sapphiron : public CreatureScript
 {
@@ -90,12 +90,24 @@ class boss_sapphiron : public CreatureScript
         struct boss_sapphironAI : public BossAI
         {
             boss_sapphironAI(Creature* creature) :
-                BossAI(creature, BOSS_SAPPHIRON), _phase(PHASE_NULL),
-                _map(me->GetMap())
-            { }
-
-            void InitializeAI()
+                BossAI(creature, BOSS_SAPPHIRON), _map(me->GetMap())
             {
+                Initialize();
+                _iceboltCount = 0;
+            }
+
+            void Initialize()
+            {
+                _phase = PHASE_NULL;
+
+                _canTheHundredClub = true;
+                _checkFrostResistTimer = 5 * IN_MILLISECONDS;
+            }
+
+            void InitializeAI() override
+            {
+                _canTheHundredClub = true;
+
                 float x, y, z;
                 me->GetPosition(x, y, z);
                 me->SummonGameObject(GO_BIRTH, x, y, z, 0, 0, 0, 0, 0, 0);
@@ -106,20 +118,17 @@ class boss_sapphiron : public CreatureScript
                 BossAI::InitializeAI();
             }
 
-            void Reset()
+            void Reset() override
             {
                 _Reset();
 
                 if (_phase == PHASE_FLIGHT)
                     ClearIceBlock();
 
-                _phase = PHASE_NULL;
-
-                _canTheHundredClub = true;
-                _checkFrostResistTimer = 5 * IN_MILLISECONDS;
+                Initialize();
             }
 
-            void EnterCombat(Unit* /*who*/)
+            void EnterCombat(Unit* /*who*/) override
             {
                 _EnterCombat();
 
@@ -131,20 +140,20 @@ class boss_sapphiron : public CreatureScript
                 CheckPlayersFrostResist();
             }
 
-            void SpellHitTarget(Unit* target, SpellInfo const* spell)
+            void SpellHitTarget(Unit* target, SpellInfo const* spell) override
             {
                 if (spell->Id == SPELL_ICEBOLT)
                 {
                     IceBlockMap::iterator itr = _iceblocks.find(target->GetGUID());
                     if (itr != _iceblocks.end() && !itr->second)
                     {
-                        if (GameObject* iceblock = me->SummonGameObject(GO_ICEBLOCK, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0, 0, 0, 0, 0, 25000))
+                        if (GameObject* iceblock = me->SummonGameObject(GO_ICEBLOCK, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0, 0, 0, 0, 0, 25))
                             itr->second = iceblock->GetGUID();
                     }
                 }
             }
 
-            void JustDied(Unit* /*killer*/)
+            void JustDied(Unit* /*killer*/) override
             {
                 _JustDied();
                 me->CastSpell(me, SPELL_DIES, true);
@@ -152,13 +161,13 @@ class boss_sapphiron : public CreatureScript
                 CheckPlayersFrostResist();
             }
 
-            void MovementInform(uint32 /*type*/, uint32 id)
+            void MovementInform(uint32 /*type*/, uint32 id) override
             {
                 if (id == 1)
                     events.ScheduleEvent(EVENT_LIFTOFF, 0);
             }
 
-            void DoAction(int32 param)
+            void DoAction(int32 param) override
             {
                 if (param == DATA_SAPPHIRON_BIRTH)
                 {
@@ -174,7 +183,7 @@ class boss_sapphiron : public CreatureScript
                     Map::PlayerList const &players = _map->GetPlayers();
                     for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
                     {
-                        if (itr->getSource()->GetResistance(SPELL_SCHOOL_FROST) > MAX_FROST_RESISTANCE)
+                        if (itr->GetSource()->GetResistance(SPELL_SCHOOL_FROST) > MAX_FROST_RESISTANCE)
                         {
                             _canTheHundredClub = false;
                             break;
@@ -208,7 +217,7 @@ class boss_sapphiron : public CreatureScript
                 _iceblocks.clear();
             }
 
-            uint32 GetData(uint32 data) const
+            uint32 GetData(uint32 data) const override
             {
                 if (data == DATA_THE_HUNDRED_CLUB)
                     return _canTheHundredClub;
@@ -216,7 +225,7 @@ class boss_sapphiron : public CreatureScript
                 return 0;
             }
 
-            void UpdateAI(uint32 diff)
+            void UpdateAI(uint32 diff) override
             {
                 if (!_phase)
                     return;
@@ -294,7 +303,6 @@ class boss_sapphiron : public CreatureScript
                             case EVENT_LIFTOFF:
                                 Talk(EMOTE_AIR_PHASE);
                                 me->SetDisableGravity(true);
-                                me->SendMovementFlagUpdate();
                                 events.ScheduleEvent(EVENT_ICEBOLT, 1500);
                                 _iceboltCount = RAID_MODE(2, 3);
                                 return;
@@ -311,8 +319,8 @@ class boss_sapphiron : public CreatureScript
                                 else
                                 {
                                     std::vector<Unit*>::const_iterator itr = targets.begin();
-                                    advance(itr, rand()%targets.size());
-                                    _iceblocks.insert(std::make_pair((*itr)->GetGUID(), 0));
+                                    advance(itr, rand32() % targets.size());
+                                    _iceblocks.insert(std::make_pair((*itr)->GetGUID(), ObjectGuid::Empty));
                                     DoCast(*itr, SPELL_ICEBOLT);
                                     --_iceboltCount;
                                 }
@@ -339,7 +347,6 @@ class boss_sapphiron : public CreatureScript
                                 me->HandleEmoteCommand(EMOTE_ONESHOT_LAND);
                                 Talk(EMOTE_GROUND_PHASE);
                                 me->SetDisableGravity(false);
-                                me->SendMovementFlagUpdate();
                                 events.ScheduleEvent(EVENT_GROUND, 1500);
                                 return;
                             case EVENT_GROUND:
@@ -375,7 +382,7 @@ class boss_sapphiron : public CreatureScript
 
                     for (IceBlockMap::const_iterator itr = _iceblocks.begin(); itr != _iceblocks.end(); ++itr)
                     {
-                        if (GameObject* go = GameObject::GetGameObject(*me, itr->second))
+                        if (GameObject* go = ObjectAccessor::GetGameObject(*me, itr->second))
                         {
                             if (go->IsInBetween(me, target, 2.0f)
                                 && me->GetExactDist2d(target->GetPositionX(), target->GetPositionY()) - me->GetExactDist2d(go->GetPositionX(), go->GetPositionY()) < 5.0f)
@@ -403,9 +410,9 @@ class boss_sapphiron : public CreatureScript
             Map* _map;
         };
 
-        CreatureAI* GetAI(Creature* creature) const
+        CreatureAI* GetAI(Creature* creature) const override
         {
-            return new boss_sapphironAI (creature);
+            return new boss_sapphironAI(creature);
         }
 };
 
@@ -414,7 +421,7 @@ class achievement_the_hundred_club : public AchievementCriteriaScript
     public:
         achievement_the_hundred_club() : AchievementCriteriaScript("achievement_the_hundred_club") { }
 
-        bool OnCheck(Player* /*source*/, Unit* target)
+        bool OnCheck(Player* /*source*/, Unit* target) override
         {
             return target && target->GetAI()->GetData(DATA_THE_HUNDRED_CLUB);
         }

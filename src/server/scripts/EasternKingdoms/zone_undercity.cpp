@@ -1,6 +1,6 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
- 
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -77,12 +77,12 @@ class npc_lady_sylvanas_windrunner : public CreatureScript
 public:
     npc_lady_sylvanas_windrunner() : CreatureScript("npc_lady_sylvanas_windrunner") { }
 
-    bool OnQuestReward(Player* /*player*/, Creature* creature, const Quest *_Quest, uint32 /*slot*/)
+    bool OnQuestReward(Player* /*player*/, Creature* creature, const Quest *_Quest, uint32 /*slot*/) override
     {
         if (_Quest->GetQuestId() == QUEST_JOURNEY_TO_UNDERCITY)
         {
-            CAST_AI(npc_lady_sylvanas_windrunner::npc_lady_sylvanas_windrunnerAI, creature->AI())->LamentEvent = true;
-            CAST_AI(npc_lady_sylvanas_windrunner::npc_lady_sylvanas_windrunnerAI, creature->AI())->DoPlaySoundToSet(creature, SOUND_CREDIT);
+            ENSURE_AI(npc_lady_sylvanas_windrunner::npc_lady_sylvanas_windrunnerAI, creature->AI())->LamentEvent = true;
+            ENSURE_AI(npc_lady_sylvanas_windrunner::npc_lady_sylvanas_windrunnerAI, creature->AI())->DoPlaySoundToSet(creature, SOUND_CREDIT);
             creature->CastSpell(creature, SPELL_SYLVANAS_CAST, false);
 
             for (uint8 i = 0; i < 4; ++i)
@@ -92,30 +92,23 @@ public:
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_lady_sylvanas_windrunnerAI (creature);
+        return new npc_lady_sylvanas_windrunnerAI(creature);
     }
 
     struct npc_lady_sylvanas_windrunnerAI : public ScriptedAI
     {
-        npc_lady_sylvanas_windrunnerAI(Creature* creature) : ScriptedAI(creature) {}
+        npc_lady_sylvanas_windrunnerAI(Creature* creature) : ScriptedAI(creature)
+        {
+            Initialize();
+        }
 
-        uint32 LamentEventTimer;
-        bool LamentEvent;
-        uint64 targetGUID;
-
-        uint32 FadeTimer;
-        uint32 SummonSkeletonTimer;
-        uint32 BlackArrowTimer;
-        uint32 ShotTimer;
-        uint32 MultiShotTimer;
-
-        void Reset()
+        void Initialize()
         {
             LamentEventTimer = 5000;
             LamentEvent = false;
-            targetGUID = 0;
+            targetGUID.Clear();
 
             FadeTimer = 30000;
             SummonSkeletonTimer = 20000;
@@ -124,13 +117,28 @@ public:
             MultiShotTimer = 10000;
         }
 
-        void EnterCombat(Unit* /*who*/) {}
+        uint32 LamentEventTimer;
+        bool LamentEvent;
+        ObjectGuid targetGUID;
 
-        void JustSummoned(Creature* summoned)
+        uint32 FadeTimer;
+        uint32 SummonSkeletonTimer;
+        uint32 BlackArrowTimer;
+        uint32 ShotTimer;
+        uint32 MultiShotTimer;
+
+        void Reset() override
+        {
+            Initialize();
+        }
+
+        void EnterCombat(Unit* /*who*/) override { }
+
+        void JustSummoned(Creature* summoned) override
         {
             if (summoned->GetEntry() == ENTRY_HIGHBORNE_BUNNY)
             {
-                if (Creature* target = Unit::GetCreature(*summoned, targetGUID))
+                if (Creature* target = ObjectAccessor::GetCreature(*summoned, targetGUID))
                 {
                     target->MonsterMoveWithSpeed(target->GetPositionX(), target->GetPositionY(), me->GetPositionZ()+15.0f, 0);
                     target->SetPosition(target->GetPositionX(), target->GetPositionY(), me->GetPositionZ()+15.0f, 0.0f);
@@ -142,7 +150,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (LamentEvent)
             {
@@ -170,7 +178,7 @@ public:
                 DoCast(me, SPELL_FADE);
                 // add a blink to simulate a stealthed movement and reappearing elsewhere
                 DoCast(me, SPELL_FADE_BLINK);
-                FadeTimer = 30000 + rand()%5000;
+                FadeTimer = 30000 + rand32() % 5000;
                 // if the victim is out of melee range she cast multi shot
                 if (Unit* victim = me->GetVictim())
                     if (me->GetDistance(victim) > 10.0f)
@@ -180,7 +188,7 @@ public:
             if (SummonSkeletonTimer <= diff)
             {
                 DoCast(me, SPELL_SUMMON_SKELETON);
-                SummonSkeletonTimer = 20000 + rand()%10000;
+                SummonSkeletonTimer = 20000 + rand32() % 10000;
             } else SummonSkeletonTimer -= diff;
 
             if (BlackArrowTimer <= diff)
@@ -188,7 +196,7 @@ public:
                 if (Unit* victim = me->GetVictim())
                 {
                     DoCast(victim, SPELL_BLACK_ARROW);
-                    BlackArrowTimer = 15000 + rand()%5000;
+                    BlackArrowTimer = 15000 + rand32() % 5000;
                 }
             } else BlackArrowTimer -= diff;
 
@@ -197,7 +205,7 @@ public:
                 if (Unit* victim = me->GetVictim())
                 {
                     DoCast(victim, SPELL_SHOT);
-                    ShotTimer = 8000 + rand()%2000;
+                    ShotTimer = 8000 + rand32() % 2000;
                 }
             } else ShotTimer -= diff;
 
@@ -206,7 +214,7 @@ public:
                 if (Unit* victim = me->GetVictim())
                 {
                     DoCast(victim, SPELL_MULTI_SHOT);
-                    MultiShotTimer = 10000 + rand()%3000;
+                    MultiShotTimer = 10000 + rand32() % 3000;
                 }
             } else MultiShotTimer -= diff;
 
@@ -224,21 +232,19 @@ class npc_highborne_lamenter : public CreatureScript
 public:
     npc_highborne_lamenter() : CreatureScript("npc_highborne_lamenter") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_highborne_lamenterAI (creature);
+        return new npc_highborne_lamenterAI(creature);
     }
 
     struct npc_highborne_lamenterAI : public ScriptedAI
     {
-        npc_highborne_lamenterAI(Creature* creature) : ScriptedAI(creature) {}
+        npc_highborne_lamenterAI(Creature* creature) : ScriptedAI(creature)
+        {
+            Initialize();
+        }
 
-        uint32 EventMoveTimer;
-        uint32 EventCastTimer;
-        bool EventMove;
-        bool EventCast;
-
-        void Reset()
+        void Initialize()
         {
             EventMoveTimer = 10000;
             EventCastTimer = 17500;
@@ -246,9 +252,19 @@ public:
             EventCast = true;
         }
 
-        void EnterCombat(Unit* /*who*/) {}
+        uint32 EventMoveTimer;
+        uint32 EventCastTimer;
+        bool EventMove;
+        bool EventCast;
 
-        void UpdateAI(uint32 diff)
+        void Reset() override
+        {
+            Initialize();
+        }
+
+        void EnterCombat(Unit* /*who*/) override { }
+
+        void UpdateAI(uint32 diff) override
         {
             if (EventMove)
             {
@@ -276,18 +292,21 @@ public:
 ## npc_parqual_fintallas
 ######*/
 
-#define SPELL_MARK_OF_SHAME 6767
+enum ParqualFintallas
+{
+    SPELL_MARK_OF_SHAME         = 6767
+};
 
-#define GOSSIP_HPF1 "Gul'dan"
-#define GOSSIP_HPF2 "Kel'Thuzad"
-#define GOSSIP_HPF3 "Ner'zhul"
+#define GOSSIP_HPF1             "Gul'dan"
+#define GOSSIP_HPF2             "Kel'Thuzad"
+#define GOSSIP_HPF3             "Ner'zhul"
 
 class npc_parqual_fintallas : public CreatureScript
 {
 public:
     npc_parqual_fintallas() : CreatureScript("npc_parqual_fintallas") { }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
     {
         player->PlayerTalkClass->ClearMenus();
         if (action == GOSSIP_ACTION_INFO_DEF+1)
@@ -303,9 +322,9 @@ public:
         return true;
     }
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    bool OnGossipHello(Player* player, Creature* creature) override
     {
-        if (creature->isQuestGiver())
+        if (creature->IsQuestGiver())
             player->PrepareQuestMenu(creature->GetGUID());
 
         if (player->GetQuestStatus(6628) == QUEST_STATUS_INCOMPLETE && !player->HasAura(SPELL_MARK_OF_SHAME))

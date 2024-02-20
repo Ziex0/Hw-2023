@@ -1,6 +1,6 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
- 
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -24,10 +24,10 @@ SDCategory: Terokkar Forest
 EndScriptData */
 
 /* ContentData
-mob_unkor_the_ruthless
-mob_infested_root_walker
-mob_rotting_forest_rager
-mob_netherweb_victim
+npc_unkor_the_ruthless
+npc_infested_root_walker
+npc_rotting_forest_rager
+npc_netherweb_victim
 npc_floon
 npc_isla_starmane
 npc_slim
@@ -42,7 +42,7 @@ EndContentData */
 #include "WorldSession.h"
 
 /*######
-## mob_unkor_the_ruthless
+## npc_unkor_the_ruthless
 ######*/
 
 enum UnkorTheRuthless
@@ -56,34 +56,42 @@ enum UnkorTheRuthless
     SPELL_PULVERIZE                 = 2676
 };
 
-class mob_unkor_the_ruthless : public CreatureScript
+class npc_unkor_the_ruthless : public CreatureScript
 {
 public:
-    mob_unkor_the_ruthless() : CreatureScript("mob_unkor_the_ruthless") { }
+    npc_unkor_the_ruthless() : CreatureScript("npc_unkor_the_ruthless") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new mob_unkor_the_ruthlessAI (creature);
+        return new npc_unkor_the_ruthlessAI(creature);
     }
 
-    struct mob_unkor_the_ruthlessAI : public ScriptedAI
+    struct npc_unkor_the_ruthlessAI : public ScriptedAI
     {
-        mob_unkor_the_ruthlessAI(Creature* creature) : ScriptedAI(creature) {}
+        npc_unkor_the_ruthlessAI(Creature* creature) : ScriptedAI(creature)
+        {
+            Initialize();
+        }
+
+        void Initialize()
+        {
+            CanDoQuest = false;
+            UnkorUnfriendly_Timer = 0;
+            Pulverize_Timer = 3000;
+        }
 
         bool CanDoQuest;
         uint32 UnkorUnfriendly_Timer;
         uint32 Pulverize_Timer;
 
-        void Reset()
+        void Reset() override
         {
-            CanDoQuest = false;
-            UnkorUnfriendly_Timer = 0;
-            Pulverize_Timer = 3000;
+            Initialize();
             me->SetStandState(UNIT_STAND_STATE_STAND);
             me->setFaction(FACTION_HOSTILE);
         }
 
-        void EnterCombat(Unit* /*who*/) {}
+        void EnterCombat(Unit* /*who*/) override { }
 
         void DoNice()
         {
@@ -96,7 +104,7 @@ public:
             UnkorUnfriendly_Timer = 60000;
         }
 
-        void DamageTaken(Unit* done_by, uint32 &damage)
+        void DamageTaken(Unit* done_by, uint32 &damage) override
         {
             Player* player = done_by->ToPlayer();
 
@@ -106,7 +114,7 @@ public:
                 {
                     for (GroupReference* itr = group->GetFirstMember(); itr != NULL; itr = itr->next())
                     {
-                        Player* groupie = itr->getSource();
+                        Player* groupie = itr->GetSource();
                         if (groupie &&
                             groupie->GetQuestStatus(QUEST_DONTKILLTHEFATONE) == QUEST_STATUS_INCOMPLETE &&
                             groupie->GetReqKillOrCastCurrentCount(QUEST_DONTKILLTHEFATONE, 18260) == 10)
@@ -126,7 +134,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (CanDoQuest)
             {
@@ -160,31 +168,31 @@ public:
 };
 
 /*######
-## mob_infested_root_walker
+## npc_infested_root_walker
 ######*/
 
-class mob_infested_root_walker : public CreatureScript
+class npc_infested_root_walker : public CreatureScript
 {
 public:
-    mob_infested_root_walker() : CreatureScript("mob_infested_root_walker") { }
+    npc_infested_root_walker() : CreatureScript("npc_infested_root_walker") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new mob_infested_root_walkerAI (creature);
+        return new npc_infested_root_walkerAI(creature);
     }
 
-    struct mob_infested_root_walkerAI : public ScriptedAI
+    struct npc_infested_root_walkerAI : public ScriptedAI
     {
-        mob_infested_root_walkerAI(Creature* creature) : ScriptedAI(creature) {}
+        npc_infested_root_walkerAI(Creature* creature) : ScriptedAI(creature) { }
 
-        void Reset() { }
-        void EnterCombat(Unit* /*who*/) { }
+        void Reset() override { }
+        void EnterCombat(Unit* /*who*/) override { }
 
-        void DamageTaken(Unit* done_by, uint32 &damage)
+        void DamageTaken(Unit* done_by, uint32 &damage) override
         {
             if (done_by && done_by->GetTypeId() == TYPEID_PLAYER)
                 if (me->GetHealth() <= damage)
-                    if (rand()%100 < 75)
+                    if (rand32() % 100 < 75)
                         //Summon Wood Mites
                         DoCast(me, 39130, true);
         }
@@ -192,14 +200,14 @@ public:
 };
 
 /*######
-## mob_skywing
+## npc_skywing
 ######*/
 class npc_skywing : public CreatureScript
 {
 public:
     npc_skywing() : CreatureScript("npc_skywing") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_skywingAI(creature);
     }
@@ -207,9 +215,9 @@ public:
     struct npc_skywingAI : public npc_escortAI
     {
     public:
-        npc_skywingAI(Creature* creature) : npc_escortAI(creature) {}
+        npc_skywingAI(Creature* creature) : npc_escortAI(creature) { }
 
-        void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 waypointId) override
         {
             Player* player = GetPlayerForEscort();
             if (!player)
@@ -223,9 +231,10 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/) {}
+        void EnterCombat(Unit* /*who*/) override { }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
+
         {
             if (HasEscortState(STATE_ESCORT_ESCORTING))
                 return;
@@ -236,9 +245,9 @@ public:
                     Start(false, false, who->GetGUID());
         }
 
-        void Reset() { }
+        void Reset() override { }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             npc_escortAI::UpdateAI(diff);
         }
@@ -246,31 +255,31 @@ public:
 };
 
 /*######
-## mob_rotting_forest_rager
+## npc_rotting_forest_rager
 ######*/
 
-class mob_rotting_forest_rager : public CreatureScript
+class npc_rotting_forest_rager : public CreatureScript
 {
 public:
-    mob_rotting_forest_rager() : CreatureScript("mob_rotting_forest_rager") { }
+    npc_rotting_forest_rager() : CreatureScript("npc_rotting_forest_rager") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new mob_rotting_forest_ragerAI (creature);
+        return new npc_rotting_forest_ragerAI(creature);
     }
 
-    struct mob_rotting_forest_ragerAI : public ScriptedAI
+    struct npc_rotting_forest_ragerAI : public ScriptedAI
     {
-        mob_rotting_forest_ragerAI(Creature* creature) : ScriptedAI(creature) {}
+        npc_rotting_forest_ragerAI(Creature* creature) : ScriptedAI(creature) { }
 
-        void Reset() { }
-        void EnterCombat(Unit* /*who*/) { }
+        void Reset() override { }
+        void EnterCombat(Unit* /*who*/) override { }
 
-        void DamageTaken(Unit* done_by, uint32 &damage)
+        void DamageTaken(Unit* done_by, uint32 &damage) override
         {
             if (done_by->GetTypeId() == TYPEID_PLAYER)
                 if (me->GetHealth() <= damage)
-                    if (rand()%100 < 75)
+                    if (rand32() % 100 < 75)
                         //Summon Lots of Wood Mights
                         DoCast(me, 39134, true);
         }
@@ -278,35 +287,40 @@ public:
 };
 
 /*######
-## mob_netherweb_victim
+## npc_netherweb_victim
 ######*/
 
-#define QUEST_TARGET        22459
-//#define SPELL_FREE_WEBBED   38950
+enum NetherwebVictim
+{
+    QUEST_TARGET            = 22459
+    //SPELL_FREE_WEBBED       = 38950
+};
 
 const uint32 netherwebVictims[6] =
 {
     18470, 16805, 21242, 18452, 22482, 21285
 };
-class mob_netherweb_victim : public CreatureScript
+
+class npc_netherweb_victim : public CreatureScript
 {
 public:
-    mob_netherweb_victim() : CreatureScript("mob_netherweb_victim") { }
+    npc_netherweb_victim() : CreatureScript("npc_netherweb_victim") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new mob_netherweb_victimAI (creature);
+        return new npc_netherweb_victimAI(creature);
     }
 
-    struct mob_netherweb_victimAI : public ScriptedAI
+    struct npc_netherweb_victimAI : public ScriptedAI
     {
-        mob_netherweb_victimAI(Creature* creature) : ScriptedAI(creature) {}
+        npc_netherweb_victimAI(Creature* creature) : ScriptedAI(creature) { }
 
-        void Reset() { }
-        void EnterCombat(Unit* /*who*/) { }
-        void MoveInLineOfSight(Unit* /*who*/) { }
+        void Reset() override { }
+        void EnterCombat(Unit* /*who*/) override { }
+        void MoveInLineOfSight(Unit* /*who*/) override { }
 
-        void JustDied(Unit* killer)
+
+        void JustDied(Unit* killer) override
         {
             Player* player = killer->ToPlayer();
             if (!player)
@@ -314,18 +328,18 @@ public:
 
             if (player->GetQuestStatus(10873) == QUEST_STATUS_INCOMPLETE)
             {
-                if (rand()%100 < 25)
+                if (rand32() % 100 < 25)
                 {
                     me->SummonCreature(QUEST_TARGET, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 60000);
-                    player->KilledMonsterCredit(QUEST_TARGET, 0);
+                    player->KilledMonsterCredit(QUEST_TARGET);
                 }
                 else
-                    me->SummonCreature(netherwebVictims[rand()%6], 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 60000);
+                    me->SummonCreature(netherwebVictims[rand32() % 6], 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 60000);
 
-                if (rand()%100 < 75)
-                    me->SummonCreature(netherwebVictims[rand()%6], 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 60000);
+                if (rand32() % 100 < 75)
+                    me->SummonCreature(netherwebVictims[rand32() % 6], 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 60000);
 
-                me->SummonCreature(netherwebVictims[rand()%6], 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 60000);
+                me->SummonCreature(netherwebVictims[rand32() % 6], 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 60000);
             }
         }
     };
@@ -338,7 +352,7 @@ public:
 #define GOSSIP_FLOON1           "You owe Sim'salabim money. Hand them over or die!"
 #define GOSSIP_FLOON2           "Hand over the money or die...again!"
 
-enum eFloon
+enum Floon
 {
     SAY_FLOON_ATTACK        = 0,
 
@@ -355,7 +369,7 @@ class npc_floon : public CreatureScript
 public:
     npc_floon() : CreatureScript("npc_floon") { }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
     {
         player->PlayerTalkClass->ClearMenus();
         if (action == GOSSIP_ACTION_INFO_DEF)
@@ -367,13 +381,13 @@ public:
         {
             player->CLOSE_GOSSIP_MENU();
             creature->setFaction(FACTION_HOSTILE_FL);
-            creature->AI()->Talk(SAY_FLOON_ATTACK, player->GetGUID());
+            creature->AI()->Talk(SAY_FLOON_ATTACK, player);
             creature->AI()->AttackStart(player);
         }
         return true;
     }
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    bool OnGossipHello(Player* player, Creature* creature) override
     {
         if (player->GetQuestStatus(QUEST_CRACK_SKULLS) == QUEST_STATUS_INCOMPLETE)
             player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_FLOON1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
@@ -382,16 +396,24 @@ public:
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_floonAI (creature);
+        return new npc_floonAI(creature);
     }
 
     struct npc_floonAI : public ScriptedAI
     {
         npc_floonAI(Creature* creature) : ScriptedAI(creature)
         {
+            Initialize();
             m_uiNormFaction = creature->getFaction();
+        }
+
+        void Initialize()
+        {
+            Silence_Timer = 2000;
+            Frostbolt_Timer = 4000;
+            FrostNova_Timer = 9000;
         }
 
         uint32 m_uiNormFaction;
@@ -399,25 +421,23 @@ public:
         uint32 Frostbolt_Timer;
         uint32 FrostNova_Timer;
 
-        void Reset()
+        void Reset() override
         {
-            Silence_Timer = 2000;
-            Frostbolt_Timer = 4000;
-            FrostNova_Timer = 9000;
+            Initialize();
             if (me->getFaction() != m_uiNormFaction)
                 me->setFaction(m_uiNormFaction);
         }
 
-        void EnterCombat(Unit* /*who*/) {}
+        void EnterCombat(Unit* /*who*/) override { }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
 
             if (Silence_Timer <= diff)
             {
-                DoCast(me->GetVictim(), SPELL_SILENCE);
+                DoCastVictim(SPELL_SILENCE);
                 Silence_Timer = 30000;
             } else Silence_Timer -= diff;
 
@@ -429,7 +449,7 @@ public:
 
             if (Frostbolt_Timer <= diff)
             {
-                DoCast(me->GetVictim(), SPELL_FROSTBOLT);
+                DoCastVictim(SPELL_FROSTBOLT);
                 Frostbolt_Timer = 5000;
             } else Frostbolt_Timer -= diff;
 
@@ -441,7 +461,7 @@ public:
 /*######
 ## npc_isla_starmane
 ######*/
-enum eIslaStarmaneData
+enum IslaStarmaneData
 {
     SAY_PROGRESS_1  = 0,
     SAY_PROGRESS_2  = 1,
@@ -461,9 +481,9 @@ public:
 
     struct npc_isla_starmaneAI : public npc_escortAI
     {
-        npc_isla_starmaneAI(Creature* creature) : npc_escortAI(creature) {}
+        npc_isla_starmaneAI(Creature* creature) : npc_escortAI(creature) { }
 
-        void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 waypointId) override
         {
             Player* player = GetPlayerForEscort();
             if (!player)
@@ -476,16 +496,16 @@ public:
                         Cage->SetGoState(GO_STATE_ACTIVE);
                     break;
                 case 2:
-                    Talk(SAY_PROGRESS_1, player->GetGUID());
+                    Talk(SAY_PROGRESS_1, player);
                     break;
                 case 5:
-                    Talk(SAY_PROGRESS_2, player->GetGUID());
+                    Talk(SAY_PROGRESS_2, player);
                     break;
                 case 6:
-                    Talk(SAY_PROGRESS_3, player->GetGUID());
+                    Talk(SAY_PROGRESS_3, player);
                     break;
                 case 29:
-                    Talk(SAY_PROGRESS_4, player->GetGUID());
+                    Talk(SAY_PROGRESS_4, player);
                     if (player->GetTeam() == ALLIANCE)
                         player->GroupEventHappens(QUEST_EFTW_A, me);
                     else if (player->GetTeam() == HORDE)
@@ -502,12 +522,12 @@ public:
             }
         }
 
-        void Reset()
+        void Reset() override
         {
             me->RestoreFaction();
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             if (Player* player = GetPlayerForEscort())
             {
@@ -519,17 +539,17 @@ public:
         }
     };
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
     {
         if (quest->GetQuestId() == QUEST_EFTW_H || quest->GetQuestId() == QUEST_EFTW_A)
         {
-            CAST_AI(npc_escortAI, (creature->AI()))->Start(true, false, player->GetGUID());
+            ENSURE_AI(npc_escortAI, (creature->AI()))->Start(true, false, player->GetGUID());
             creature->setFaction(113);
         }
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_isla_starmaneAI(creature);
     }
@@ -548,7 +568,7 @@ class go_skull_pile : public GameObjectScript
 public:
     go_skull_pile() : GameObjectScript("go_skull_pile") { }
 
-    bool OnGossipSelect(Player* player, GameObject* go, uint32 sender, uint32 action)
+    bool OnGossipSelect(Player* player, GameObject* go, uint32 sender, uint32 action) override
     {
         player->PlayerTalkClass->ClearMenus();
         switch (sender)
@@ -558,7 +578,7 @@ public:
         return true;
     }
 
-    bool OnGossipHello(Player* player, GameObject* go)
+    bool OnGossipHello(Player* player, GameObject* go) override
     {
         if ((player->GetQuestStatus(11885) == QUEST_STATUS_INCOMPLETE) || player->GetQuestRewardStatus(11885))
         {
@@ -596,7 +616,7 @@ public:
 ## npc_slim
 ######*/
 
-enum eSlim
+enum Slim
 {
     FACTION_CONSORTIUM  = 933
 };
@@ -606,7 +626,7 @@ class npc_slim : public CreatureScript
 public:
     npc_slim() : CreatureScript("npc_slim") { }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
     {
         player->PlayerTalkClass->ClearMenus();
         if (action == GOSSIP_ACTION_TRADE)
@@ -615,9 +635,9 @@ public:
         return true;
     }
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    bool OnGossipHello(Player* player, Creature* creature) override
     {
-        if (creature->isVendor() && player->GetReputationRank(FACTION_CONSORTIUM) >= REP_FRIENDLY)
+        if (creature->IsVendor() && player->GetReputationRank(FACTION_CONSORTIUM) >= REP_FRIENDLY)
         {
             player->ADD_GOSSIP_ITEM(GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
             player->SEND_GOSSIP_MENU(9896, creature->GetGUID());
@@ -633,7 +653,7 @@ public:
 ####npc_akuno
 #####*/
 
-enum eAkuno
+enum Akuno
 {
     QUEST_ESCAPING_THE_TOMB = 10887,
     NPC_CABAL_SKRIMISHER    = 21661
@@ -644,7 +664,7 @@ class npc_akuno : public CreatureScript
 public:
     npc_akuno() : CreatureScript("npc_akuno") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
     {
         if (quest->GetQuestId() == QUEST_ESCAPING_THE_TOMB)
         {
@@ -659,16 +679,16 @@ public:
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_akunoAI(creature);
     }
 
     struct npc_akunoAI : public npc_escortAI
     {
-        npc_akunoAI(Creature* creature) : npc_escortAI(creature) {}
+        npc_akunoAI(Creature* creature) : npc_escortAI(creature) { }
 
-        void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 waypointId) override
         {
             Player* player = GetPlayerForEscort();
             if (!player)
@@ -687,7 +707,7 @@ public:
             }
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             summon->AI()->AttackStart(me);
         }
@@ -696,10 +716,10 @@ public:
 
 void AddSC_terokkar_forest()
 {
-    new mob_unkor_the_ruthless();
-    new mob_infested_root_walker();
-    new mob_rotting_forest_rager();
-    new mob_netherweb_victim();
+    new npc_unkor_the_ruthless();
+    new npc_infested_root_walker();
+    new npc_rotting_forest_rager();
+    new npc_netherweb_victim();
     new npc_floon();
     new npc_isla_starmane();
     new go_skull_pile();

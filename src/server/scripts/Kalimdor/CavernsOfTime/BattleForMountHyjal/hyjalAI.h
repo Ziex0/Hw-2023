@@ -1,6 +1,6 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
- 
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -24,34 +24,6 @@
 
 #define HYJAL_AI_MAX_SPELLS 3
 
-enum CreaturesIds
-{
-    // Trash Mobs summoned in waves
-    NECROMANCER         = 17899,
-    ABOMINATION         = 17898,
-    GHOUL               = 17895,
-    BANSHEE             = 17905,
-    CRYPT_FIEND         = 17897,
-    GARGOYLE            = 17906,
-    FROST_WYRM          = 17907,
-    GIANT_INFERNAL      = 17908,
-    FEL_STALKER         = 17916,
-
-    JAINA               = 17772,
-    THRALL              = 17852,
-    TYRANDE             = 17948,
-
-    ANCIENT_VEIN        = 185557,
-    FLAMEOBJECT         = 182592,
-
-    // Bosses summoned after every 8 waves
-    RAGE_WINTERCHILL    = 17767,
-    ANETHERON           = 17808,
-    KAZROGAL            = 17888,
-    AZGALOR             = 17842,
-    ARCHIMONDE          = 17968,
-};
-
 enum SpellIds
 {
     SPELL_TELEPORT_VISUAL     = 41232,
@@ -65,7 +37,7 @@ enum SpellIds
 
     //Thrall spells
     SPELL_CHAIN_LIGHTNING     = 31330,
-    SPELL_SUMMON_DIRE_WOLF    = 31331,
+    SPELL_SUMMON_DIRE_WOLF    = 31331
 };
 
 struct Wave
@@ -147,6 +119,8 @@ struct hyjalAI : public npc_escortAI
 {
     hyjalAI(Creature* creature);
 
+    void Initialize();
+
     void Reset();                                           // Generically used to reset our variables. Do *not* call in EnterEvadeMode as this may make problems if the raid is still in combat
 
     void EnterEvadeMode();                                  // Send creature back to spawn location and evade.
@@ -186,9 +160,9 @@ struct hyjalAI : public npc_escortAI
     public:
         InstanceScript* instance;
 
-        uint64 PlayerGUID;
-        uint64 BossGUID[2];
-        uint64 VeinGUID[14];
+        ObjectGuid PlayerGUID;
+        ObjectGuid BossGUID[2];
+        ObjectGuid VeinGUID[14];
 
         uint32 NextWaveTimer;
         uint32 WaveCount;
@@ -219,7 +193,7 @@ struct hyjalAI : public npc_escortAI
         bool IsDummy;
         uint32 MassTeleportTimer;
         bool DoMassTeleport;
-        uint64 DummyGuid;
+        ObjectGuid DummyGuid;
 
         struct Spell
         {

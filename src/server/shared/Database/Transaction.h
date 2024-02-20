@@ -1,5 +1,5 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -33,7 +33,7 @@ class Transaction
     friend class DatabaseWorkerPool;
 
     public:
-        Transaction() : _cleanedUp(false) {}
+        Transaction() : _cleanedUp(false) { }
         ~Transaction() { Cleanup(); }
 
         void Append(PreparedStatement* statement);
@@ -50,7 +50,7 @@ class Transaction
         bool _cleanedUp;
 
 };
-typedef Trinity::AutoPtr<Transaction, ACE_Thread_Mutex> SQLTransaction;
+typedef std::shared_ptr<Transaction> SQLTransaction;
 
 /*! Low level class*/
 class TransactionTask : public SQLOperation
@@ -59,11 +59,11 @@ class TransactionTask : public SQLOperation
     friend class DatabaseWorker;
 
     public:
-        TransactionTask(SQLTransaction trans) : m_trans(trans) {} ;
-        ~TransactionTask(){};
+        TransactionTask(SQLTransaction trans) : m_trans(trans) { } ;
+        ~TransactionTask(){ };
 
     protected:
-        bool Execute();
+        bool Execute() override;
 
         SQLTransaction m_trans;
 };

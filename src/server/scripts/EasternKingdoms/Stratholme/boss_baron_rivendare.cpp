@@ -1,6 +1,6 @@
 /*
- * This file is part of the TrinityCore Project. See AUTHORS file for Copyright information
- 
+ * Copyright (C) 2008-2015 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -66,16 +66,26 @@ class boss_baron_rivendare : public CreatureScript
 public:
     boss_baron_rivendare() : CreatureScript("boss_baron_rivendare") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_baron_rivendareAI (creature);
+        return GetInstanceAI<boss_baron_rivendareAI>(creature);
     }
 
     struct boss_baron_rivendareAI : public ScriptedAI
     {
         boss_baron_rivendareAI(Creature* creature) : ScriptedAI(creature)
         {
+            Initialize();
             instance = me->GetInstanceScript();
+        }
+
+        void Initialize()
+        {
+            ShadowBolt_Timer = 5000;
+            Cleave_Timer = 8000;
+            MortalStrike_Timer = 12000;
+            //        RaiseDead_Timer = 30000;
+            SummonSkeletons_Timer = 34000;
         }
 
         InstanceScript* instance;
@@ -86,37 +96,32 @@ public:
         //    uint32 RaiseDead_Timer;
         uint32 SummonSkeletons_Timer;
 
-        void Reset()
+        void Reset() override
         {
-            ShadowBolt_Timer = 5000;
-            Cleave_Timer = 8000;
-            MortalStrike_Timer = 12000;
-            //        RaiseDead_Timer = 30000;
-            SummonSkeletons_Timer = 34000;
-            if (instance && instance->GetData(TYPE_RAMSTEIN) == DONE)
+            Initialize();
+            if (instance->GetData(TYPE_RAMSTEIN) == DONE)
                 instance->SetData(TYPE_BARON, NOT_STARTED);
         }
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* who) override
         {
-            if (instance)//can't use entercombat(), boss' dmg aura sets near players in combat, before entering the room's door
-                instance->SetData(TYPE_BARON, IN_PROGRESS);
+            //can't use entercombat(), boss' dmg aura sets near players in combat, before entering the room's door
+            instance->SetData(TYPE_BARON, IN_PROGRESS);
             ScriptedAI::AttackStart(who);
         }
 
-        void JustSummoned(Creature* summoned)
+        void JustSummoned(Creature* summoned) override
         {
             if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
                 summoned->AI()->AttackStart(target);
         }
 
-         void JustDied(Unit* /*killer*/)
-         {
-             if (instance)
-                 instance->SetData(TYPE_BARON, DONE);
-         }
+        void JustDied(Unit* /*killer*/) override
+        {
+            instance->SetData(TYPE_BARON, DONE);
+        }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -125,7 +130,7 @@ public:
             if (ShadowBolt_Timer <= diff)
             {
                 if (SelectTarget(SELECT_TARGET_RANDOM, 0))
-                    DoCast(me->GetVictim(), SPELL_SHADOWBOLT);
+                    DoCastVictim(SPELL_SHADOWBOLT);
 
                 ShadowBolt_Timer = 10000;
             } else ShadowBolt_Timer -= diff;
@@ -133,16 +138,16 @@ public:
             //Cleave
             if (Cleave_Timer <= diff)
             {
-                DoCast(me->GetVictim(), SPELL_CLEAVE);
+                DoCastVictim(SPELL_CLEAVE);
                 //13 seconds until we should cast this again
-                Cleave_Timer = 7000 + (rand()%10000);
+                Cleave_Timer = 7000 + (rand32() % 10000);
             } else Cleave_Timer -= diff;
 
             //MortalStrike
             if (MortalStrike_Timer <= diff)
             {
-                DoCast(me->GetVictim(), SPELL_MORTALSTRIKE);
-                MortalStrike_Timer = 10000 + (rand()%15000);
+                DoCastVictim(SPELL_MORTALSTRIKE);
+                MortalStrike_Timer = 10000 + (rand32() % 15000);
             } else MortalStrike_Timer -= diff;
 
             //RaiseDead
